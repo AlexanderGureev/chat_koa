@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 5);
+/******/ 	return __webpack_require__(__webpack_require__.s = 8);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -94,7 +94,7 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nvar _profile = __webpack_require__(/*! ./profile/profile.js */ \"./frontend/dev/js/chat/profile/profile.js\");\n\nvar _profile2 = _interopRequireDefault(_profile);\n\n__webpack_require__(/*! ../../less/chat/main.less */ \"./frontend/dev/less/chat/main.less\");\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n//import \"../common/socket.io\";\n\nalert((0, _profile2.default)());//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9mcm9udGVuZC9kZXYvanMvY2hhdC9pbmRleC5qcz9jMDk4Il0sIm5hbWVzIjpbImFsZXJ0Il0sIm1hcHBpbmdzIjoiOztBQUFBOzs7O0FBS0E7Ozs7QUFKQTs7QUFFQUEsTUFBTSx3QkFBTiIsImZpbGUiOiIuL2Zyb250ZW5kL2Rldi9qcy9jaGF0L2luZGV4LmpzLmpzIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IGdldE5hbWUgZnJvbSBcIi4vcHJvZmlsZS9wcm9maWxlLmpzXCI7XG4vL2ltcG9ydCBcIi4uL2NvbW1vbi9zb2NrZXQuaW9cIjtcblxuYWxlcnQoZ2V0TmFtZSgpKTtcblxuaW1wb3J0IFwiLi4vLi4vbGVzcy9jaGF0L21haW4ubGVzc1wiOyJdLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///./frontend/dev/js/chat/index.js\n");
+eval("\n\nvar _profile = __webpack_require__(/*! ./profile/profile.js */ \"./frontend/dev/js/chat/profile/profile.js\");\n\nvar _profile2 = _interopRequireDefault(_profile);\n\n__webpack_require__(/*! ../../less/chat/chat.less */ \"./frontend/dev/less/chat/chat.less\");\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n//import \"../common/socket.io\";\n\nalert((0, _profile2.default)());//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9mcm9udGVuZC9kZXYvanMvY2hhdC9pbmRleC5qcz9jMDk4Il0sIm5hbWVzIjpbImFsZXJ0Il0sIm1hcHBpbmdzIjoiOztBQUFBOzs7O0FBS0E7Ozs7QUFKQTs7QUFFQUEsTUFBTSx3QkFBTiIsImZpbGUiOiIuL2Zyb250ZW5kL2Rldi9qcy9jaGF0L2luZGV4LmpzLmpzIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IGdldE5hbWUgZnJvbSBcIi4vcHJvZmlsZS9wcm9maWxlLmpzXCI7XG4vL2ltcG9ydCBcIi4uL2NvbW1vbi9zb2NrZXQuaW9cIjtcblxuYWxlcnQoZ2V0TmFtZSgpKTtcblxuaW1wb3J0IFwiLi4vLi4vbGVzcy9jaGF0L2NoYXQubGVzc1wiOyJdLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///./frontend/dev/js/chat/index.js\n");
 
 /***/ }),
 
@@ -110,25 +110,25 @@ eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n    value: true\n});
 
 /***/ }),
 
-/***/ "./frontend/dev/less/chat/main.less":
+/***/ "./frontend/dev/less/chat/chat.less":
 /*!******************************************!*\
-  !*** ./frontend/dev/less/chat/main.less ***!
+  !*** ./frontend/dev/less/chat/chat.less ***!
   \******************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("// extracted by mini-css-extract-plugin//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9mcm9udGVuZC9kZXYvbGVzcy9jaGF0L21haW4ubGVzcz84ZWZkIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIiwiZmlsZSI6Ii4vZnJvbnRlbmQvZGV2L2xlc3MvY2hhdC9tYWluLmxlc3MuanMiLCJzb3VyY2VzQ29udGVudCI6WyIvLyBleHRyYWN0ZWQgYnkgbWluaS1jc3MtZXh0cmFjdC1wbHVnaW4iXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///./frontend/dev/less/chat/main.less\n");
+eval("// extracted by mini-css-extract-plugin//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9mcm9udGVuZC9kZXYvbGVzcy9jaGF0L2NoYXQubGVzcz82MzUzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBIiwiZmlsZSI6Ii4vZnJvbnRlbmQvZGV2L2xlc3MvY2hhdC9jaGF0Lmxlc3MuanMiLCJzb3VyY2VzQ29udGVudCI6WyIvLyBleHRyYWN0ZWQgYnkgbWluaS1jc3MtZXh0cmFjdC1wbHVnaW4iXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///./frontend/dev/less/chat/chat.less\n");
 
 /***/ }),
 
-/***/ 5:
+/***/ 8:
 /*!*********************************************!*\
   !*** multi ./frontend/dev/js/chat/index.js ***!
   \*********************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /home/alexga/Desktop/koa_webpack/frontend/dev/js/chat/index.js */"./frontend/dev/js/chat/index.js");
+module.exports = __webpack_require__(/*! /home/alexga/Desktop/chat_koa/frontend/dev/js/chat/index.js */"./frontend/dev/js/chat/index.js");
 
 
 /***/ })

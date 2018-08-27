@@ -2,6 +2,7 @@ const path = require("path");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const webpack = require("webpack");
 
 const mode = process.env.NODE_ENV || "development";
@@ -34,10 +35,16 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin([rootDir.dist]),
+        new CopyWebpackPlugin([
+            {
+              from: path.join(rootDir.dev, "img"),
+              to: path.join(rootDir.dist, "img")
+            }
+        ]),
         new MiniCssExtractPlugin({
             filename: "css/[name].css",
             chunkFilename: "css/[id].css"
-          }),
+        }),
         new HtmlWebpackPlugin({
             inject: true,
             template: path.join(rootDir.dev, "index.html"),
@@ -51,8 +58,8 @@ module.exports = {
             chunks: ["chat"]
         }),
         new webpack.ProvidePlugin({
-            $: 'jquery',
-            _: "lodash"
+            $: "jquery",
+            //_: "lodash"
         })
     ],
     resolve: {
@@ -69,7 +76,7 @@ module.exports = {
                 use: {
                     loader: "babel-loader",
                     options: {
-                        presets: ["env"]
+                        presets: ["env", "react", "stage-0"]
                     }
                 }
             },
@@ -108,7 +115,7 @@ module.exports = {
                 ]
             },
             {
-                test: /\.(woff|woff2|eot|ttf|otf|svg)$/,
+                test: /\.(woff|woff2|eot|ttf|otf)$/,
                 use: [
                   {
                     loader: "file-loader",

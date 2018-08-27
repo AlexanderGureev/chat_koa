@@ -1,21 +1,271 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title> TITLE </title>
+    <!-- <style>body { opacity: 0; overflow-x: hidden; } html { background-color: #1a1a1a; }</style> -->
+
 </head>
-<body>
-    <h1 class="title">home</h1>
-    <div class="box">
-        <div class="box1">1</div>
-        <div class="box2">2</div>
+
+<body class="is-home">
+
+    <div class="preloader">
+        <div class="spinner">
+            <div class="dot1"></div>
+            <div class="dot2"></div>
+        </div>
     </div>
-    
-    <div class="alert alert-primary" role="alert">
-        Это основное уведомление — check it out!
-      </div>
+
+    <div id="my-page">
+        <div id="my-header">
+            <header class="site-header">
+
+                <div class="top-line">
+
+                    <div class="toggle-menu">
+                        <div class="hamb"></div>
+                    </div>
+                    <div class="minilogo">
+                        <img src="/img/logo.svg" alt="logo">
+                        <h1>Chater</h1>
+                    </div>
+
+
+                    <div class="collapsed">
+                        <div class="logo wow fadeInLeft" data-wow-delay="1.3s">
+                            <img src="/img/logo.svg" alt="logo">
+                            <a href="/">
+                                <h1>Chater
+                                    <span>Online free chat</span>
+                                </h1>
+                            </a>
+                        </div>
+
+                        <nav>
+                            <ul>
+                                <li>
+                                    <a href="#">Функции</a>
+                                </li>
+                                <li>
+                                    <a href="#">Безопасность</a>
+                                </li>
+                                <li>
+                                    <a href="#">FAQ</a>
+                                </li>
+                            </ul>
+                        </nav>
+
+                        <div class="right-box">
+                            <div class="soc">
+                                <a href="#">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#">
+                                    <i class="fab fa-facebook"></i>
+                                </a>
+                                <a href="#">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                            </div>
+
+                            <div class="auth">
+                                <a href="#" class="button">Войти</a>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+                <div class="header-center">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="header-composition">
+                                    <h2>Конфиденциально. Удобно. Быстро.</h2>
+                                    <p>Lorem ipsum dolor sit amet adipiscing elit, sed do eiusmod tempor incididunt ut labore
+                                        et dolore magna aliqua. Ad minim veniam, quis nostrud exercitation ullamco nisi commodo
+                                        consequat. </p>
+                                </div>
+                            </div>
+                            <div class="col-lg-5 offset-lg-1 form-box">
+
+                                <div class="register-form wow zoomInRight" data-wow-duration="1.5s" data-wow-delay="1.4s">
+                                    <div class="register-container">
+                                        <form action="/register" method="post" class="register">
+
+                                            <input type="hidden" name="_csrf" value="">
+                                            <div class="form-header">
+                                                <h3>Регистрация</h3>
+
+                                                <span class="tooltipError" data-tooltip-content="#tooltip_content"></span>
+                                                <div class="tooltip_templates">
+                                                    <span id="tooltip_content">
+                                                        
+                                                    </span>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="emailReg">Электронная почта</label>
+                                                <input type="email" name="emailReg" id="emailReg">
+                                                <div id="tooltipEmailReg" class="validation"></div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="loginReg">Имя пользователя</label>
+                                                <input type="text" name="loginReg" id="loginReg">
+                                                <div id="tooltipLoginReg" class="validation"></div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="passReg">Пароль</label>
+                                                <input type="password" name="passReg" id="passReg">
+                                                <div id="tooltipPasswordReg" class="validation"></div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <button type="submit" class="button-ex reg">
+                                                    <i class="fas fa-circle-notch fa-spin"></i>Регистрация</button>
+                                                <a href="#" id="btnAuth">Уже зарегистрированы?</a>
+                                            </div>
+
+                                        </form>
+                                    </div>
+
+                                    <div class="auth-container">
+                                        <form action="/auth" method="post" class="auth">
+
+                                            <input type="hidden" name="_csrf" value="">
+                                            <div class="form-header">
+                                                <h3>Авторизация</h3>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="loginAuth">Имя пользователя</label>
+                                                <input type="text" name="loginAuth" id="loginAuth">
+                                                <div id="tooltipLoginAuth" class="validation"></div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="passAuth">Пароль</label>
+                                                <input type="password" name="passAuth" id="passAuth">
+                                                <div id="tooltipPasswordAuth" class="validation"></div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <button type="submit" class="button-ex auth">
+                                                    <i class="fas fa-circle-notch fa-spin"></i>Войти</button>
+                                                <a href="#" id="btnRegister">Зарегистрировать новый аккаунт</a>
+                                                <a href="/forgot" id="btnForgotPassword">Забыл пароль?</a>
+                                            </div>
+                                            <div class="socialAuth">
+                                                <a href="/auth/vkontakte">
+                                                    <img src="/img/vk.svg" alt="">
+                                                </a>
+                                                <a href="/auth/google/">
+                                                    <img src="/img/google-plus.svg" alt="">
+                                                </a>
+                                                <a href="/auth/twitter">
+                                                    <img src="/img/twitter.svg" alt="">
+                                                </a>
+                                                <h4>Вход через соц. сети</h4>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </header>
+        </div>
+    </div>
+
+    <div id="my-content">
+
+        <section class="s-main">
+            <div class="features">
+                <div class="image"></div>
+                <div class="info">
+                    <span class="line"></span>
+                    <h2 class="title">Удобно, надежно</h2>
+                    <div class="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                        ut labore et dolore magna aliqua. enim ad minim veniam, quis nostrud exercitation ullamco laboris
+                        nisi ut aliquip ex ea commodo consequat. </div>
+                </div>
+            </div>
+            <div class="description">
+                <div class="image"></div>
+                <div class="info">
+                    <span class="line"></span>
+                    <h2 class="title">Продолжайте общение</h2>
+                    <div class="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                        ut labore et dolore magna aliqua. enim ad minim veniam, quis nostrud exercitation ullamco laboris
+                        nisi ut aliquip ex ea commodo consequat.</div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <div id="my-footer">
+
+        <div class="container info-block">
+            <div class="row no-gutters justify-content-between">
+                <div class="col-md-3 offset-md-0 col-sm-6 offset-sm-4 col-9 offset-2">
+                    <h3>Информация</h3>
+                    <ul>
+                        <li><a href="">Помощь и поддержка</a></li>
+                        <li><a href="">Правила</a></li>
+                        <li><a href="">Обратная связь</a></li>
+                        <li><a href="">Условия использования</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 offset-md-1 col-sm-6 offset-sm-4 col-9 offset-2 ">
+                    <h3>Информация</h3>
+                    <ul>
+                        <li><a href="">Помощь и поддержка</a></li>
+                        <li><a href="">Правила</a></li>
+                        <li><a href="">Обратная связь</a></li>
+                        <li><a href="">Условия использования</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 offset-md-1 col-sm-6 offset-sm-4 col-9 offset-2">
+                    <h3>Информация</h3>
+                    <ul>
+                        <li><a href="">Помощь и поддержка</a></li>
+                        <li><a href="">Правила</a></li>
+                        <li><a href="">Обратная связь</a></li>
+                        <li><a href="">Условия использования</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            <div class="box">
+                <p>2018 <i class="far fa-copyright"></i> CHATER.RU</p>
+                <div class="soc">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="top" title="Наверх">
+    <i class="fas fa-angle-double-up"></i>
+</div> -->
+
 
 </body>
+
 </html>
