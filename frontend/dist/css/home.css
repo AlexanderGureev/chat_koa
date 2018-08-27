@@ -1,0 +1,10 @@
+@font-face {
+	font-family: "robo-slap";
+	font-weight: bold;
+	font-style: normal;
+	src: url(../fonts/RobotoSlab-Bold.woff) format("woff");
+}
+h1 {
+    font-size: 40px;
+}
+.title{color:#000;font-family:robo-slap}.box{-webkit-filter:drop-shadow(0 0 10px rgba(0,0,0,.45));display:flex;filter:drop-shadow(0 0 10px rgba(0,0,0,.45))}.box .box1{background-image:url(../img/ava_default.png)}
