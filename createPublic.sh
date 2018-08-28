@@ -4,14 +4,14 @@ const fs = require("fs-extra");
 const colors = require("colors");
 
 try {
-    fs.removeSync("./backend/public/");
+    fs.removeSync("./backend/server/public/");
     console.log(`Backend public folder ${colors.underline.red("deleted")} successfully!`);
 } catch(e) {
     console.error(e)
 }
 
 try {
-    fs.copySync("./frontend/dist", "./backend/public/")
+    fs.copySync("./frontend/dist", "./backend/server/public/")
     console.log(`Backend public folder ${colors.underline.green("created")} successfully!`);
 } catch (e) {
     console.error(e)

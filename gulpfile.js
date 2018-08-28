@@ -5,7 +5,7 @@ const gulp          = require("gulp"),
 
 gulp.task("clean", function () {
     try {
-        del.sync(["backend/public/**", "!backend/public"]);
+        del.sync(["backend/server/public/**", "!backend/server/public"]);
         console.log(`Backend public folder ${colors.underline.red("deleted")} successfully!`);
     } catch (e) {
         console.error(e)
@@ -18,7 +18,7 @@ gulp.task("build", function () {
     return gulp.src([
         "frontend/dist/**/*"
     ])
-        .pipe(gulp.dest("backend/public/"));
+        .pipe(gulp.dest("backend/server/public/"));
 });
 
 gulp.task("watch", function (cb) {

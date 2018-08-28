@@ -4,14 +4,19 @@
   "main": "./bin/main.js",
   "license": "MIT",
   "scripts": {
-    "start": "node ./bin/main.js",
+    "start": "NODE_ENV=development node ./bin/main.js",
+    "dev": "nodemon ./bin/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "koa": "^2.5.2",
+    "koa-convert": "^1.2.0",
+    "koa-proxy": "^0.9.0",
+    "koa-router": "^7.4.0",
     "koa-static": "^5.0.0"
   },
   "devDependencies": {
+    "koa-logger": "^3.2.0",
     "koa-webpack": "^5.1.0"
   }
 }
