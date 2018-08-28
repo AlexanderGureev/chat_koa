@@ -3,7 +3,7 @@ const path = require("path");
 const Router = require("koa-router");
 const proxy = require("koa-proxy");
 const router = new Router();
-const convert = require("koa-convert")
+const convert = require("koa-convert");
 const publicDir = path.join(__dirname, "..", "public");
 
 router.get("/", async (ctx, next) => {
