@@ -1438,13 +1438,19 @@ body {
     
 }
 
-.tooltipster-sidetip.tooltipster-noir.tooltipster-noir-customized .tooltipster-content {
+.error-tooltipster {
+    filter: drop-shadow(0 0 20px rgba(0,0,0, .2));
     color: rgb(167, 33, 33);
     font-size: 11px;
     font-weight: 500;
     font-family: "Montserrat-ex";
-    padding: 8px;
+    padding: 8px 20px;
     white-space: pre-wrap;
+    z-index: 1000;
+}
+.error-tooltipster ul {
+    list-style: none;
+    padding: 8px;
 }
 
 .tooltipster-sidetip.tooltipster-noir.tooltipster-noir-customized.tooltipster-error .tooltipster-content {

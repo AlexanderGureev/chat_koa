@@ -6,7 +6,7 @@ import { App } from "./component";
 
 ReactDOM.render(<App />, document.getElementById("root-node"));
 
-import "tooltipster";
+import "typeface-roboto";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "animate.css";
 import "../../less/home/main.less";

@@ -1,67 +1,64 @@
 import React, { Component } from "react";
 import classnames from "classnames";
 import Validator from "../../services/validation";
+import SocialAuth from "./SocialAuth";
+import SimpleTooltip from "./SimpleTooltip";
 
 const validator = new Validator();
 
 export default class AuthForm extends Component {
   state = {
     login: {
+      target: null,
       value: "",
       isValid: false,
       isInvalid: false,
+      isOpenTooltip: false,
       errors: []
     },
     password: {
+      target: null,
       value: "",
       isValid: false,
       isInvalid: false,
+      isOpenTooltip: false,
       errors: []
     }
   };
 
   validate = (value, type) => validator.isValid(value, type);
-  showErrors = (target, type) => {
-    const { errors } = this.state[type];
-    console.log(errors)
-    const elemets = target.nextElementSibling;
-    console.log(elemets)
-    const toolTip = $(elemets).tooltipster({
-      theme: ["tooltipster-noir", "tooltipster-noir-customized"],
-      animation: "grow",
-      multiple: true,
-      timer: 10000,
-      trigger: "custom"
-    });
-    toolTip.tooltipster("content", "te").tooltipster("open");
-    console.log(toolTip);
-  };
-
   onChangeLogin = ({ target }) => {
     let isValidate = this.validate(target.value, "login");
-    if (!isValidate) {
-      this.showErrors(target, "login");
-    }
     this.setState({
       login: {
+        target,
         value: target.value.replace(/\s/g, ""),
         isValid: isValidate,
         isInvalid: !isValidate,
-        errors: validator.errors
+        errors: validator.errors,
+        isOpenTooltip: !isValidate
+      },
+      password: {
+        ...this.state.password,
+        isOpenTooltip: false
       }
     });
   };
   onChangePassword = ({ target }) => {
     let isValidate = this.validate(target.value, "password");
-    if (!isValidate) {
-      this.showErrors(target, "password");
-    }
+
     this.setState({
+      login: {
+        ...this.state.login,
+        isOpenTooltip: false
+      },
       password: {
+        target,
         value: target.value.replace(/\s/g, ""),
         isValid: isValidate,
         isInvalid: !isValidate,
-        errors: validator.errors
+        errors: validator.errors,
+        isOpenTooltip: !isValidate
       }
     });
   };
@@ -69,6 +66,46 @@ export default class AuthForm extends Component {
     return classnames({
       valid: input.isValid,
       invalid: input.isInvalid
+    });
+  };
+  submitForm = e => {
+    e.preventDefault();
+    const { loginAuth, passAuth } = e.target;
+
+    const loginIsValid = this.validate(loginAuth.value, "login");
+    const loginError = validator.errors;
+    const passIsValid = this.validate(passAuth.value, "password");
+    const passwordError = validator.errors;
+
+    this.setState({
+      login: {
+        target: loginAuth,
+        value: loginAuth.value.replace(/\s/g, ""),
+        isValid: loginIsValid,
+        isInvalid: !loginIsValid,
+        errors: loginError,
+        isOpenTooltip: !loginIsValid
+      },
+      password: {
+        target: passAuth,
+        value: passAuth.value.replace(/\s/g, ""),
+        isValid: passIsValid,
+        isInvalid: !passIsValid,
+        errors: passwordError,
+        isOpenTooltip: !passIsValid
+      }
+    });
+
+    if (!loginError.length && !passwordError.length) {
+      console.log("OK");
+    }
+  };
+  closeTooltip = type => () => {
+    this.setState({
+      [type]: {
+        ...this.state[type],
+        isOpenTooltip: false
+      }
     });
   };
 
@@ -81,7 +118,12 @@ export default class AuthForm extends Component {
 
     return (
       <div className={cnForm}>
-        <form action="/auth" method="post" className="auth">
+        <form
+          action="/auth"
+          method="post"
+          className="auth"
+          onSubmit={this.submitForm}
+        >
           <input type="hidden" name="_csrf" value="" />
           <div className="form-header">
             <h3>Авторизация</h3>
@@ -101,7 +143,14 @@ export default class AuthForm extends Component {
               value={login.value}
               onChange={this.onChangeLogin}
             />
-            <div id="tooltipLoginAuth" className="validation" />
+            {
+              <SimpleTooltip
+                isOpen={login.isOpenTooltip}
+                target={login.target}
+                errors={login.errors}
+                onClose={this.closeTooltip("login")}
+              />
+            }
           </div>
 
           <div className="form-group">
@@ -118,7 +167,14 @@ export default class AuthForm extends Component {
               value={password.value}
               onChange={this.onChangePassword}
             />
-            <div id="tooltipPasswordAuth" className="validation" />
+            {
+              <SimpleTooltip
+                isOpen={password.isOpenTooltip}
+                target={password.target}
+                errors={password.errors}
+                onClose={this.closeTooltip(password)}
+              />
+            }
           </div>
 
           <div className="form-group">
@@ -133,18 +189,7 @@ export default class AuthForm extends Component {
               Забыл пароль?
             </a>
           </div>
-          <div className="socialAuth">
-            <a href="/auth/vkontakte">
-              <img src="/img/vk.svg" alt="" />
-            </a>
-            <a href="/auth/google/">
-              <img src="/img/google-plus.svg" alt="" />
-            </a>
-            <a href="/auth/twitter">
-              <img src="/img/twitter.svg" alt="" />
-            </a>
-            <h4>Вход через соц. сети</h4>
-          </div>
+          <SocialAuth />
         </form>
       </div>
     );
