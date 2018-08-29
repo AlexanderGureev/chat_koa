@@ -8,11 +8,11 @@ class SimpleTooltip extends Component {
     setTimeout(this.props.onClose, 10000);
   }
 
-  render() {
-    const { isOpen, target, errors } = this.props;
+  renderTemplate = () => {
+    const { isOpenTooltip, target, errors } = this.props;
     return (
       <Popper
-        open={isOpen}
+        open={isOpenTooltip}
         anchorEl={target}
         className="error-tooltipster"
         placement="top"
@@ -31,6 +31,13 @@ class SimpleTooltip extends Component {
         )}
       </Popper>
     );
+  };
+
+  render() {
+    const { value, sendingForm } = this.props;
+    return sendingForm
+      ? this.renderTemplate()
+      : value.length > 3 && this.renderTemplate();
   }
 }
 export default SimpleTooltip;

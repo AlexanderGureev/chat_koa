@@ -23,7 +23,8 @@ export default class AuthForm extends Component {
       isInvalid: false,
       isOpenTooltip: false,
       errors: []
-    }
+    },
+    sendingForm: false
   };
 
   validate = (value, type) => validator.isValid(value, type);
@@ -41,7 +42,8 @@ export default class AuthForm extends Component {
       password: {
         ...this.state.password,
         isOpenTooltip: false
-      }
+      },
+      sendingForm: false
     });
   };
   onChangePassword = ({ target }) => {
@@ -59,7 +61,8 @@ export default class AuthForm extends Component {
         isInvalid: !isValidate,
         errors: validator.errors,
         isOpenTooltip: !isValidate
-      }
+      },
+      sendingForm: false
     });
   };
   getClassNamesInputs = input => {
@@ -93,7 +96,8 @@ export default class AuthForm extends Component {
         isInvalid: !passIsValid,
         errors: passwordError,
         isOpenTooltip: !passIsValid
-      }
+      },
+      sendingForm: true
     });
 
     if (!loginError.length && !passwordError.length) {
@@ -110,7 +114,7 @@ export default class AuthForm extends Component {
   };
 
   render() {
-    const { login, password } = this.state;
+    const { login, password, sendingForm } = this.state;
     let cnForm = classnames({
       "auth-container": true,
       show: this.props.isShow
@@ -143,14 +147,7 @@ export default class AuthForm extends Component {
               value={login.value}
               onChange={this.onChangeLogin}
             />
-            {
-              <SimpleTooltip
-                isOpen={login.isOpenTooltip}
-                target={login.target}
-                errors={login.errors}
-                onClose={this.closeTooltip("login")}
-              />
-            }
+            {<SimpleTooltip {...login} sendingForm={sendingForm} onClose={this.closeTooltip("login")} />}
           </div>
 
           <div className="form-group">
@@ -169,9 +166,8 @@ export default class AuthForm extends Component {
             />
             {
               <SimpleTooltip
-                isOpen={password.isOpenTooltip}
-                target={password.target}
-                errors={password.errors}
+                {...password}
+                sendingForm={sendingForm}
                 onClose={this.closeTooltip(password)}
               />
             }
