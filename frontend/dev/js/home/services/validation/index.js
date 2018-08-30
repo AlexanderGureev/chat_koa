@@ -1,23 +1,22 @@
 export default class Validator {
   constructor() {
-    this.errorList = [];
     this.validationMethod = {
       login: [
         {
-          isValid: input => {
+          checkValidity: input => {
             return input.length < 4;
           },
           errorMessage: "Имя пользователя должно содержать не меньше 4 символов"
         },
         {
-          isValid: input => {
+          checkValidity: input => {
             let res = /[^а-яёa-z0-9]/i.test(input);
             return res;
           },
           errorMessage: "Имя пользователя не должно содержать спец. символы"
         },
         {
-          isValid: input => {
+          checkValidity: input => {
             let res = input.length == 0;
             return res;
           },
@@ -26,13 +25,13 @@ export default class Validator {
       ],
       password: [
         {
-          isValid: input => {
+          checkValidity: input => {
             return input.length < 4;
           },
           errorMessage: "Пароль должен содержать не меньше 4 символов"
         },
         {
-          isValid: input => {
+          checkValidity: input => {
             let res = input.length == 0;
             return res;
           },
@@ -42,19 +41,19 @@ export default class Validator {
       passwordConfirm: previousPassword => {
         return [
           {
-            isValid: password => {
+            checkValidity: password => {
               return !(password === previousPassword);
             },
             errorMessage: "Пароли должны совпадать"
           },
           {
-            isValid: input => {
+            checkValidity: input => {
               return input.length < 4;
             },
             errorMessage: "Пароль должен содержать не меньше 4 символов"
           },
           {
-            isValid: input => {
+            checkValidity: input => {
               let res = input.length == 0;
               return res;
             },
@@ -64,20 +63,20 @@ export default class Validator {
       },
       email: [
         {
-          isValid: input => {
+          checkValidity: input => {
             return !/.+\@.+\..+/.test(input);
           },
           errorMessage: "Введите корректный email (например, email@email.com)"
         },
         {
-          isValid: input => {
+          checkValidity: input => {
             let res = /[^а-яёa-z0-9@.]/i.test(input);
             return res;
           },
           errorMessage: "Имя почтового ящика не должно содержать спец. символы"
         },
         {
-          isValid: input => {
+          checkValidity: input => {
             let res = input.length == 0;
             return res;
           },
@@ -87,20 +86,31 @@ export default class Validator {
     };
   }
 
-  get errors() {
-    return this.errorList;
-  }
+  _isValid(value, type) {
+    const errors = [];
+    let validateMethods;
 
-  isValid(input, type) {
-    this.errorList = [];
-    const validateMethods = this.validationMethod[type];
+    if(value instanceof Array && type === "passwordConfirm") {
+      validateMethods = this.validationMethod[type](value[0]);
+    } else {
+      validateMethods = this.validationMethod[type];
+    }
 
-    validateMethods.forEach(({ isValid, errorMessage }) => {
-      if (isValid(input)) {
-        this.errorList.push(errorMessage);
+    validateMethods.forEach(({ checkValidity, errorMessage }) => {
+      if (checkValidity(value)) {
+        errors.push(errorMessage);
       }
     });
 
-    return !this.errorList.length ? true : false;
+    return {
+      isValid: !errors.length,
+      errors
+    };
   }
+
+  loginValidation = ({ value }) => this._isValid(value, "login");
+  emailValidation = ({ value })=> this._isValid(value, "email");
+  passwordValidation = ({ value }) => this._isValid(value, "password");
+  passwordConfirmValidation = (previousPass, newPass) => this._isValid([previousPass, newPass], "passwordConfirm");
 }
+

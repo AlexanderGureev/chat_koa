@@ -50,6 +50,8 @@
     "popper.js": "^1.14.4",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1",
     "react-tippy": "^1.2.2",
     "typeface-roboto": "^0.0.54",
     "wowjs": "^1.1.3"

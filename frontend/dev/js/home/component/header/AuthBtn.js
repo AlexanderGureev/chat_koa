@@ -1,11 +1,12 @@
 import React, { Component } from "react";
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 export default function AuthBtn() {
   return (
     <div className="auth">
-      <a href="#" className="button">
+      <Link to="/" className="button">
         Войти
-      </a>
+      </Link>
     </div>
   );
 }

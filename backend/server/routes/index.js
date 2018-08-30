@@ -6,14 +6,19 @@ const router = new Router();
 const convert = require("koa-convert");
 const publicDir = path.join(__dirname, "..", "public");
 
-router.get("/", async (ctx, next) => {
+router.get(["/", "/forgot"], async (ctx, next) => {
   ctx.type = "text/html";
   ctx.body = fs.createReadStream(publicDir + "/index.html");
 });
 
-router.get("/api", convert(proxy({
-  host: "http://localhost:3001"
-})));
+router.get(
+  "/api",
+  convert(
+    proxy({
+      host: "http://localhost:3001"
+    })
+  )
+);
 
 module.exports.routes = () => router.routes();
 module.exports.allowedMethods = () => router.allowedMethods();

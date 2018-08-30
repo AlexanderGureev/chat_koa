@@ -3,13 +3,9 @@ import Popper from "@material-ui/core/Popper";
 import Paper from "@material-ui/core/Paper";
 import Grow from "@material-ui/core/Grow";
 
-class SimpleTooltip extends Component {
-  componentDidMount() {
-    setTimeout(this.props.onClose, 10000);
-  }
-
-  renderTemplate = () => {
-    const { isOpenTooltip, target, errors } = this.props;
+const SimpleTooltip = props => {
+  const renderTemplate = () => {
+    const { isOpenTooltip, target, errors } = props;
     return (
       <Popper
         open={isOpenTooltip}
@@ -17,10 +13,13 @@ class SimpleTooltip extends Component {
         className="error-tooltipster"
         placement="top"
         transition
+        modifiers={{
+          flip: { behavior: ["right", "left"] }
+        }}
       >
         {({ TransitionProps }) => (
           <Grow {...TransitionProps} timeout={450}>
-            <Paper>
+            <Paper className="paper-error">
               <ul>
                 {errors.map((error, i) => (
                   <li key={i}>{error}</li>
@@ -33,11 +32,9 @@ class SimpleTooltip extends Component {
     );
   };
 
-  render() {
-    const { value, sendingForm } = this.props;
-    return sendingForm
-      ? this.renderTemplate()
-      : value.length > 3 && this.renderTemplate();
-  }
-}
+  const { value, sendingForm } = props;
+  return sendingForm
+    ? renderTemplate()
+    : value.length > 3 && renderTemplate();
+};
 export default SimpleTooltip;

@@ -1,10 +1,8 @@
 import React, { Component } from "react";
 import classnames from "classnames";
-import Validator from "../../services/validation";
 import SocialAuth from "./SocialAuth";
 import SimpleTooltip from "./SimpleTooltip";
-
-const validator = new Validator();
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 export default class AuthForm extends Component {
   state = {
@@ -27,17 +25,29 @@ export default class AuthForm extends Component {
     sendingForm: false
   };
 
-  validate = (value, type) => validator.isValid(value, type);
+  removeSpaces = input => input.value.replace(/\s/g, "");
+  validationAuthForm = (login, password) => {
+    let result = {};
+    const { validator } = this.props;
+    result.login = validator.loginValidation(login);
+    result.password = validator.passwordValidation(password);
+
+    return result;
+  };
+  authorizationUser = () => {
+    console.log("OK!");
+  };
   onChangeLogin = ({ target }) => {
-    let isValidate = this.validate(target.value, "login");
+    const { validator } = this.props;
+    const { isValid, errors } = validator.loginValidation(target);
     this.setState({
       login: {
         target,
-        value: target.value.replace(/\s/g, ""),
-        isValid: isValidate,
-        isInvalid: !isValidate,
-        errors: validator.errors,
-        isOpenTooltip: !isValidate
+        value: this.removeSpaces(target),
+        isValid,
+        isInvalid: !isValid,
+        errors,
+        isOpenTooltip: !isValid
       },
       password: {
         ...this.state.password,
@@ -47,7 +57,8 @@ export default class AuthForm extends Component {
     });
   };
   onChangePassword = ({ target }) => {
-    let isValidate = this.validate(target.value, "password");
+    const { validator } = this.props;
+    const { isValid, errors } = validator.passwordValidation(target);
 
     this.setState({
       login: {
@@ -56,11 +67,11 @@ export default class AuthForm extends Component {
       },
       password: {
         target,
-        value: target.value.replace(/\s/g, ""),
-        isValid: isValidate,
-        isInvalid: !isValidate,
-        errors: validator.errors,
-        isOpenTooltip: !isValidate
+        value: this.removeSpaces(target),
+        isValid,
+        isInvalid: !isValid,
+        errors,
+        isOpenTooltip: !isValid
       },
       sendingForm: false
     });
@@ -75,42 +86,47 @@ export default class AuthForm extends Component {
     e.preventDefault();
     const { loginAuth, passAuth } = e.target;
 
-    const loginIsValid = this.validate(loginAuth.value, "login");
-    const loginError = validator.errors;
-    const passIsValid = this.validate(passAuth.value, "password");
-    const passwordError = validator.errors;
+    const { login, password } = this.validationAuthForm(loginAuth, passAuth);
 
     this.setState({
       login: {
         target: loginAuth,
-        value: loginAuth.value.replace(/\s/g, ""),
-        isValid: loginIsValid,
-        isInvalid: !loginIsValid,
-        errors: loginError,
-        isOpenTooltip: !loginIsValid
+        value: this.removeSpaces(loginAuth),
+        isValid: login.isValid,
+        isInvalid: !login.isValid,
+        errors: login.errors,
+        isOpenTooltip: !login.isValid
       },
       password: {
         target: passAuth,
-        value: passAuth.value.replace(/\s/g, ""),
-        isValid: passIsValid,
-        isInvalid: !passIsValid,
-        errors: passwordError,
-        isOpenTooltip: !passIsValid
+        value: this.removeSpaces(passAuth),
+        isValid: password.isValid,
+        isInvalid: !password.isValid,
+        errors: password.errors,
+        isOpenTooltip: !password.isValid
       },
       sendingForm: true
     });
 
-    if (!loginError.length && !passwordError.length) {
-      console.log("OK");
+    if (login.isValid && password.isValid) {
+      this.authorizationUser();
     }
   };
-  closeTooltip = type => () => {
+  closeTooltips = () => {
     this.setState({
-      [type]: {
-        ...this.state[type],
+      login: {
+        ...this.state.login,
+        isOpenTooltip: false
+      },
+      password: {
+        ...this.state.password,
         isOpenTooltip: false
       }
     });
+  };
+  changeForm = e => {
+    this.closeTooltips();
+    this.props.onClick(e);
   };
 
   render() {
@@ -147,7 +163,7 @@ export default class AuthForm extends Component {
               value={login.value}
               onChange={this.onChangeLogin}
             />
-            {<SimpleTooltip {...login} sendingForm={sendingForm} onClose={this.closeTooltip("login")} />}
+            <SimpleTooltip {...login} sendingForm={sendingForm} />
           </div>
 
           <div className="form-group">
@@ -164,13 +180,8 @@ export default class AuthForm extends Component {
               value={password.value}
               onChange={this.onChangePassword}
             />
-            {
-              <SimpleTooltip
-                {...password}
-                sendingForm={sendingForm}
-                onClose={this.closeTooltip(password)}
-              />
-            }
+
+            <SimpleTooltip {...password} sendingForm={sendingForm} />
           </div>
 
           <div className="form-group">
@@ -178,12 +189,12 @@ export default class AuthForm extends Component {
               <i className="fas fa-circle-notch fa-spin" />
               Войти
             </button>
-            <a href="#" id="btnRegister" onClick={this.props.onClick}>
+            <a href="#" id="btnRegister" onClick={this.changeForm}>
               Зарегистрировать новый аккаунт
             </a>
-            <a href="/forgot" id="btnForgotPassword">
+            <Link to="/forgot" id="btnForgotPassword">
               Забыл пароль?
-            </a>
+            </Link>
           </div>
           <SocialAuth />
         </form>

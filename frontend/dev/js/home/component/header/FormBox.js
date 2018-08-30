@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import RegisterForm from "./RegisterForm";
 import AuthForm from "./AuthForm";
+import Validator from "../../services/validation";
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 export default class FormBox extends Component {
   state = {
@@ -18,17 +20,20 @@ export default class FormBox extends Component {
 
   render() {
     let { isHideRegForm, isShowAuthForm } = this.state;
+    const validator = new Validator();
     return (
-      <div className="col-lg-5 offset-lg-1 form-box">
-        <div
-          className="register-form wow zoomInRight"
-          data-wow-duration="1.5s"
-          data-wow-delay="1.4s"
-        >
-          <RegisterForm onClick={this.changeForm} isHide={isHideRegForm} />
-          <AuthForm onClick={this.changeForm} isShow={isShowAuthForm} />
-        </div>
-      </div>
+      <React.Fragment>
+        <RegisterForm
+          onClick={this.changeForm}
+          isHide={isHideRegForm}
+          validator={validator}
+        />
+        <AuthForm
+          onClick={this.changeForm}
+          isShow={isShowAuthForm}
+          validator={validator}
+        />
+      </React.Fragment>
     );
   }
 }
