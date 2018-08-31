@@ -89,15 +89,17 @@ export default class Validator {
   _isValid(value, type) {
     const errors = [];
     let validateMethods;
+    let _value = value;
 
     if(value instanceof Array && type === "passwordConfirm") {
       validateMethods = this.validationMethod[type](value[0]);
+      _value = value[1];
     } else {
       validateMethods = this.validationMethod[type];
     }
 
     validateMethods.forEach(({ checkValidity, errorMessage }) => {
-      if (checkValidity(value)) {
+      if (checkValidity(_value)) {
         errors.push(errorMessage);
       }
     });
@@ -111,6 +113,6 @@ export default class Validator {
   loginValidation = ({ value }) => this._isValid(value, "login");
   emailValidation = ({ value })=> this._isValid(value, "email");
   passwordValidation = ({ value }) => this._isValid(value, "password");
-  passwordConfirmValidation = (previousPass, newPass) => this._isValid([previousPass, newPass], "passwordConfirm");
+  passwordConfirmValidation = (previousPass, newPass) => this._isValid([previousPass.value, newPass.value], "passwordConfirm");
 }
 

@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import classnames from "classnames";
 import SimpleTooltip from "./SimpleTooltip";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-
 
 export default class RegisterForm extends Component {
   state = {
