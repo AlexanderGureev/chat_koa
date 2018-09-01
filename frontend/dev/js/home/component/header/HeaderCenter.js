@@ -6,6 +6,7 @@ import HeaderText from "./HeaderText";
 import About from "./About";
 import Security from "./Security";
 import Faq from "./Faq";
+import UserProfile from "../profile/UserProfile";
 
 // import ChangePasswordForm from "./ChangePasswordForm";
 
@@ -14,6 +15,8 @@ export default function HeaderCenter() {
     <React.Fragment>
       <Route exact path="/" component={HeaderText} />
       <Route exact path="/forgot" component={HeaderText} />
+      <Route exact path="/profile" component={HeaderText} />
+      
       <Route exact path="/about" component={About} />
       <Route exact path="/security" component={Security} />
       <Route exact path="/faq" component={Faq} />
@@ -35,6 +38,7 @@ export default function HeaderCenter() {
             >
               <Route exact path="/" component={FormBox} />
               <Route path="/forgot" component={ForgotPasswordForm} />
+              <Route path="/profile" component={UserProfile} />
             </div>
           </div>
         </div>

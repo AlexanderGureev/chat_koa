@@ -3,6 +3,7 @@ import classnames from "classnames";
 import SocialAuth from "./SocialAuth";
 import SimpleTooltip from "./SimpleTooltip";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import CircularIndeterminate from "./CircularIndeterminate";
 
 export default class AuthForm extends Component {
   state = {
@@ -185,8 +186,9 @@ export default class AuthForm extends Component {
           </div>
 
           <div className="form-group">
-            <button type="submit" className="button-ex auth">
+            <button disabled={sendingForm} type="submit" className="button-ex auth">
               <i className="fas fa-circle-notch fa-spin" />
+              <CircularIndeterminate isActive={sendingForm}/>
               Войти
             </button>
             <a href="#" id="btnRegister" onClick={this.changeForm}>
