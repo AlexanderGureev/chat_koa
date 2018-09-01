@@ -3,9 +3,11 @@ import Validator from "../../services/validation";
 import SimpleTooltip from "./SimpleTooltip";
 import classnames from "classnames";
 
-const validator = new Validator();
-
 export default class ForgotPasswordForm extends Component {
+  constructor() {
+    super();
+    this.validator = new Validator();
+  }
   state = {
     password: {
       target: null,
@@ -29,15 +31,15 @@ export default class ForgotPasswordForm extends Component {
   removeSpaces = input => input.value.replace(/\s/g, "");
   validationChangePasswordForm = (password, confirmPassword) => {
     let result = {};
-    result.password = validator.passwordValidation(password);
-    result.confirmPassword = validator.passwordConfirmValidation(
+    result.password = this.validator.passwordValidation(password);
+    result.confirmPassword = this.validator.passwordConfirmValidation(
       password,
       confirmPassword
     );
     return result;
   };
   onChangePassword = ({ target }) => {
-    const { isValid, errors } = validator.passwordValidation(target);
+    const { isValid, errors } = this.validator.passwordValidation(target);
     this.setState({
       password: {
         target,
@@ -52,7 +54,7 @@ export default class ForgotPasswordForm extends Component {
   };
   onChangeConfirmPassword = ({ target }) => {
     const { password } = this.state;
-    const { isValid, errors } = validator.passwordConfirmValidation(
+    const { isValid, errors } = this.validator.passwordConfirmValidation(
       password.target,
       target
     );

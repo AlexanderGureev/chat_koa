@@ -3,9 +3,12 @@ import Validator from "../../services/validation";
 import SimpleTooltip from "./SimpleTooltip";
 import classnames from "classnames";
 
-const validator = new Validator();
 
 export default class ForgotPasswordForm extends Component {
+  constructor() {
+    super();
+    this.validator = new Validator();
+  }
   state = {
     email: {
       target: null,
@@ -21,11 +24,11 @@ export default class ForgotPasswordForm extends Component {
   removeSpaces = input => input.value.replace(/\s/g, "");
   validationForgotForm = email => {
     let result = {};
-    result.email = validator.emailValidation(email);
+    result.email = this.validator.emailValidation(email);
     return result;
   };
   onChangeEmail = ({ target }) => {
-    const { isValid, errors } = validator.emailValidation(target);
+    const { isValid, errors } = this.validator.emailValidation(target);
     this.setState({
       email: {
         target,

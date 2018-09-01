@@ -186,7 +186,8 @@ export default class RegisterForm extends Component {
     const { email, login, password, sendingForm } = this.state;
     let cnForm = classnames({
       "register-container": true,
-      hide: this.props.isHide
+      hide: this.props.isHide,
+      show: !this.props.isHide,
     });
 
     return (

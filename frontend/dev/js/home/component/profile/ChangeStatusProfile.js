@@ -14,16 +14,21 @@ class ChangeStatusProfile extends Component {
     isOpen: false
   };
 
-  componentDidMount() {
-    window.addEventListener("click", e => {
-      if (!this.statusMenu.current.contains(e.target)) {
-        this.setState({
-          isOpen: false
-        });
-      }
-    });
-  }
+  handleCloseMenu = e => {
+    if (!this.statusMenu.current.contains(e.target)) {
+      this.setState({
+        isOpen: false
+      });
+    }
+  };
 
+  componentDidMount() {
+    window.addEventListener("click", this.handleCloseMenu);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("click", this.handleCloseMenu);
+  }
+  
   handleAnimationEnd = () => {
     if (!this.state.isOpen) {
       this.style = { display: "none" };
@@ -53,7 +58,7 @@ class ChangeStatusProfile extends Component {
     e.preventDefault();
     console.log("OK!");
   };
-  
+
   render() {
     const { isOpen } = this.state;
     const cnForm = cn({

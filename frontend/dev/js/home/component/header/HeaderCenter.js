@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import FormBox from "./FormBox";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import HeaderText from "./HeaderText";
 import About from "./About";
@@ -10,17 +10,15 @@ import UserProfile from "../profile/UserProfile";
 
 // import ChangePasswordForm from "./ChangePasswordForm";
 
+
 export default function HeaderCenter() {
   const Routes = () => (
-    <React.Fragment>
-      <Route exact path="/" component={HeaderText} />
-      <Route exact path="/forgot" component={HeaderText} />
-      <Route exact path="/profile" component={HeaderText} />
-      
-      <Route exact path="/about" component={About} />
-      <Route exact path="/security" component={Security} />
-      <Route exact path="/faq" component={Faq} />
-    </React.Fragment>
+    <Switch>
+      <Route path="/about" component={About} />
+      <Route path="/security" component={Security} />
+      <Route path="/faq" component={Faq} />
+      <Route path="/" component={HeaderText} />
+    </Switch>
   );
 
   return (
@@ -36,9 +34,14 @@ export default function HeaderCenter() {
               data-wow-duration="1.5s"
               data-wow-delay="1.4s"
             >
-              <Route exact path="/" component={FormBox} />
-              <Route path="/forgot" component={ForgotPasswordForm} />
-              <Route path="/profile" component={UserProfile} />
+            
+         
+              <Switch>
+                <Route exact path="/" component={FormBox} />
+                <Route path="/forgot" component={ForgotPasswordForm} />
+                <Route path="/profile" component={UserProfile} />
+              </Switch>
+
             </div>
           </div>
         </div>

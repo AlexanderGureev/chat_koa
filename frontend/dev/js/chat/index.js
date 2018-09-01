@@ -1,6 +1,11 @@
-import getName from "./profile/profile.js";
-//import "../common/socket.io";
+import React from "react";
+import ReactDOM from "react-dom";
 
-alert(getName());
+import { App } from "./component";
 
-import "../../less/chat/chat.less";
+ReactDOM.render(<App />, document.getElementById("root-node"));
+
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import "../../less/home/main.less";
+import "../../less/home/media.less";
+import "root/bootstrap/dist/css/bootstrap.min.css"; //root - алиас для импорта

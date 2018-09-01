@@ -134,7 +134,8 @@ export default class AuthForm extends Component {
     const { login, password, sendingForm } = this.state;
     let cnForm = classnames({
       "auth-container": true,
-      show: this.props.isShow
+      show: this.props.isShow,
+      hide: !this.props.isShow,
     });
 
     return (

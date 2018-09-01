@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import RegisterForm from "./RegisterForm";
 import AuthForm from "./AuthForm";
 import Validator from "../../services/validation";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 export default class FormBox extends Component {
   state = {

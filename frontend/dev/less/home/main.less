@@ -248,7 +248,8 @@ body {
     padding: 10px 0;
     color: #fff;
     background: linear-gradient(135deg, #82A5F6, #2B6AAF);
-    box-shadow: 0 10px 25px rgba(0,0,0, .2);
+    filter: drop-shadow(0 10px 25px rgba(0,0,0, .2));
+    //box-shadow: 0 10px 25px rgba(0,0,0, .2);
     border: none;
     margin-top: -15px;
 }
@@ -426,11 +427,18 @@ body {
 
 .register-container.hide {
     transform: rotateY(180deg);
+    opacity: 0;
 }
 .auth-container.show {
     transform: rotateY(360deg);
+    opacity: 1;
 }
-
+.register-container.show {
+    opacity: 1;
+}
+.auth-container.hide {
+    opacity: 0;
+}
 
 // VALIDATION
 
@@ -627,7 +635,7 @@ body {
     color: #F6F6FC;
     background: linear-gradient(135deg, #4D73CB, #195597);
     padding: 10px 32px;
-    box-shadow: 0 5px 35px rgba(0,0,0, .26);
+    //box-shadow: 0 5px 35px rgba(0,0,0, .26);
     cursor: pointer;
     transition: .2s ease;
     margin: 0;
@@ -782,7 +790,6 @@ body {
         a {
             padding: 10px 38px;
             text-transform: uppercase;
-            box-shadow: 0 15px 35px rgba(0,0,0, .2);
         }
         a:first-child {
             left: 25px;
@@ -856,7 +863,7 @@ body {
     top: 0;
     content: "";
     border-radius: 10px;
-    background-color: rgba(0,0,0, .4);
+    background-color: rgba(0,0,0, 0);
     transition: .5s ease;
   }
 

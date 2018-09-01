@@ -14,17 +14,22 @@ class ProfileMenu extends Component {
     isOpen: false
   };
 
+  handleCloseMenu = e => {
+    if (
+      !this.list.current.contains(e.target) &&
+      !this.toggle.current.contains(e.target)
+    ) {
+      this.setState({
+        isOpen: false
+      });
+    }
+  };
+
   componentDidMount() {
-    window.addEventListener("click", e => {
-      if (
-        !this.list.current.contains(e.target) &&
-        !this.toggle.current.contains(e.target)
-      ) {
-        this.setState({
-          isOpen: false
-        });
-      }
-    });
+    window.addEventListener("click", this.handleCloseMenu);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("click", this.handleCloseMenu);
   }
 
   handleAnimationEnd = () => {
@@ -33,7 +38,7 @@ class ProfileMenu extends Component {
       this.forceUpdate();
     }
   };
-  
+
   handleClick = e => {
     const { display } = this.styleList;
     const { isOpen } = this.state;
