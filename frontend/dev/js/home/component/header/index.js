@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import TopLine from "./TopLine";
 import HeaderCenter from "./HeaderCenter";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+//import NoMatch from "./NoMatch";
+import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 
 export default function Header() {
   return (

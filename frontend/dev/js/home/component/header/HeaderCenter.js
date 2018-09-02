@@ -7,7 +7,6 @@ import About from "./About";
 import Security from "./Security";
 import Faq from "./Faq";
 import UserProfile from "../profile/UserProfile";
-
 // import ChangePasswordForm from "./ChangePasswordForm";
 
 
