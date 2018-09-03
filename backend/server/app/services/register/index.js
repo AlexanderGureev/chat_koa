@@ -15,11 +15,11 @@ module.exports = async (req, username, password, done) => {
       username,
       password: hash
     }).save();
-    
+
     return done(null, user);
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
     done(error);
   }
 };

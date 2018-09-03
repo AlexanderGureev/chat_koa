@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
+const util = require("util");
+const randomBytes = util.promisify(crypto.randomBytes);
 
 const userSchema = mongoose.Schema({
   twitterId: String,
@@ -29,44 +31,51 @@ const userSchema = mongoose.Schema({
 });
 
 const userValidateSchema = Joi.object().keys({
-  email: Joi.string().email().required(),
-  username: Joi.string().regex(/^[а-яёa-z0-9]/i).min(4).max(20).required(),
-  password: Joi.string().min(3).max(30).required()
+  email: Joi.string()
+    .email()
+    .required(),
+  username: Joi.string()
+    .regex(/^[а-яёa-z0-9]/i)
+    .min(4)
+    .max(20)
+    .required(),
+  password: Joi.string()
+    .min(3)
+    .max(30)
+    .required()
 });
 
 const User = mongoose.model("user", userSchema);
 
-const validateUser = async( model) => await Joi.validate(model, userValidateSchema);
+const validateUser = async model =>
+  await Joi.validate(model, userValidateSchema);
 
-const hashPassword = async (password) => {
+const hashPassword = async password => {
   try {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
     return hash;
   } catch (error) {
-    throw (error);
+    throw error;
   }
 };
 
-const checkPassword = async (password, user) => {
+const checkPassword = async (password, hashPassword) => {
   try {
-    const result = await bcrypt.compare(password, user.password);
+    const result = await bcrypt.compare(password, hashPassword);
     return result;
   } catch (error) {
-    throw (error);
+    throw error;
   }
 };
 
-const generateResetToken = function () {
-  return new Promise((resolve, reject) => {
-    crypto.randomBytes(50, (err, buf) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(buf.toString("hex"));
-      }
-    });
-  });
+const generateResetToken = async () => {
+  try {
+    const token = await randomBytes(50);
+    return token.toString("hex");
+  } catch (error) {
+    throw error;
+  }
 };
 
 module.exports = {

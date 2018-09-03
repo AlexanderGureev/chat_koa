@@ -1,6 +1,7 @@
 const passport = require("koa-passport");
 const LocalStrategy = require("passport-local").Strategy;
 const registerService = require("../app/services/register");
+const authService = require("../app/services/auth");
 const { User } = require("../app/model/user");
 
 passport.serializeUser((user, done) => {
@@ -24,6 +25,15 @@ const passportInit = () => {
         passReqToCallback: true
       },
       registerService
+    )
+  );
+  passport.use(
+    "auth",
+    new LocalStrategy(
+      {
+        passReqToCallback: true
+      },
+      authService
     )
   );
 };
