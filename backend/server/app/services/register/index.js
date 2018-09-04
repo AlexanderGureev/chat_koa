@@ -5,10 +5,6 @@ module.exports = async (req, username, password, done) => {
   try {
     const { email, username, password } = await validateUser(req.body);
     let user = await User.findOne({ email });
-
-    if (user) {
-      throw new Error("Email уже используется.");
-    }
     const hash = await hashPassword(password);
     user = await new User({
       email,

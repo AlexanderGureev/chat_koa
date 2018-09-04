@@ -7,8 +7,7 @@ import About from "./About";
 import Security from "./Security";
 import Faq from "./Faq";
 import UserProfile from "../profile/UserProfile";
-// import ChangePasswordForm from "./ChangePasswordForm";
-
+import ChangePasswordForm from "./ChangePasswordForm";
 
 export default function HeaderCenter() {
   const Routes = () => (
@@ -33,14 +32,16 @@ export default function HeaderCenter() {
               data-wow-duration="1.5s"
               data-wow-delay="1.4s"
             >
-            
-         
               <Switch>
                 <Route exact path="/" component={FormBox} />
                 <Route path="/forgot" component={ForgotPasswordForm} />
+                <Route
+                  path="/resetPassword/:token"
+                  component={ChangePasswordForm}
+                />
+                <Route path="/changePassword" component={ChangePasswordForm} />
                 <Route path="/profile" component={UserProfile} />
               </Switch>
-
             </div>
           </div>
         </div>

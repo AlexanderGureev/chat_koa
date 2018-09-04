@@ -4,8 +4,8 @@ import SimpleTooltip from "./SimpleTooltip";
 import classnames from "classnames";
 
 export default class ForgotPasswordForm extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.validator = new Validator();
   }
   state = {
@@ -28,6 +28,9 @@ export default class ForgotPasswordForm extends Component {
     sendingForm: false
   };
 
+  componentDidMount() {
+    console.log(this.props.params);
+  }
   removeSpaces = input => input.value.replace(/\s/g, "");
   validationChangePasswordForm = (password, confirmPassword) => {
     let result = {};

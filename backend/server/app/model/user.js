@@ -2,9 +2,11 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const util = require("util");
-const randomBytes = util.promisify(crypto.randomBytes);
+const { promisify } = require("util");
+const randomBytes = promisify(crypto.randomBytes);
+const uniqueValidator = require("mongoose-unique-validator");
 
+mongoose.set("useCreateIndex", true);
 const userSchema = mongoose.Schema({
   twitterId: String,
   vkId: String,
@@ -13,8 +15,14 @@ const userSchema = mongoose.Schema({
     type: String,
     default: "local"
   },
-  email: String,
-  username: String,
+  email: {
+    type: String,
+    unique: true
+  },
+  username: {
+    type: String,
+    unique: true
+  },
   password: String,
   profile: {
     status: {
@@ -29,6 +37,8 @@ const userSchema = mongoose.Schema({
   resetPasswordToken: String,
   resetPasswordExpires: Date
 });
+
+userSchema.plugin(uniqueValidator);
 
 const userValidateSchema = Joi.object().keys({
   email: Joi.string()
