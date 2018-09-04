@@ -7,7 +7,7 @@ module.exports = {
   PORT: process.env.PORT || 3000,
   MONGO_URI: process.env.MONGO_URI || `mongodb://${user}:${password}@localhost:27017/${database}`,
   emailService: {
-    user: "",
-    pass: ""
+    user: "gureev.alex95@gmail.com",
+    pass: "469090812SsSs"
   }
 }
