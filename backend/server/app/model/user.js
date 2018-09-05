@@ -7,6 +7,8 @@ const randomBytes = promisify(crypto.randomBytes);
 const uniqueValidator = require("mongoose-unique-validator");
 
 mongoose.set("useCreateIndex", true);
+mongoose.set("useFindAndModify", false);
+
 const userSchema = mongoose.Schema({
   twitterId: String,
   vkId: String,

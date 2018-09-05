@@ -6,6 +6,7 @@ const router = new Router();
 const passport = require("passport");
 const { responseMessage} = require("../app/services/responseMessage");
 const { isAuthenticated } = require("../middleware/isAuth");
+const { addAvatar, delAvatar, setStatus } = require("../app/services/profile");
 const {
   forgotPassword,
   checkToken,
@@ -84,6 +85,10 @@ router.post(
   resetFormValidation,
   changePassword
 );
+
+router.post("/addAvatar", isAuthenticated, addAvatar);
+router.delete("/delAvatar", isAuthenticated, delAvatar);
+router.put("/setStatus", isAuthenticated, setStatus);
 
 module.exports.routes = () => router.routes();
 module.exports.allowedMethods = () => router.allowedMethods();

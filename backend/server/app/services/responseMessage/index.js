@@ -1,6 +1,7 @@
-const responseMessage = (status = 200, message = "OK") => ({
+const responseMessage = (status = 200, message = "OK", data) => ({
   status,
-  message
+  message,
+  data
 });
 
-module.exports.responseMessage = responseMessage;
+exports.responseMessage = responseMessage;
