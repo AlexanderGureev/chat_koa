@@ -11,10 +11,13 @@ const render = require("koa-ejs");
 const { routes, allowedMethods } = require("../routes");
 const bodyParser = require("koa-bodyparser");
 const passport = require("koa-passport");
+const { SESSION_KEY } = require("../config");
+
 const publicDir = path.join(__dirname, "..", "public");
+const pathToFavicon = path.join(publicDir, "img", "favicon.png");
 
 const CONFIG = {
-  key: "chater:session",
+  key: SESSION_KEY,
   maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week,
   httpOnly: true,
   signed: true,
@@ -42,6 +45,6 @@ module.exports = app => {
     routes(),
     allowedMethods(),
     static(publicDir),
-    favicon(path.join(publicDir, "img", "favicon.png"))
+    favicon(pathToFavicon)
   ];
 };
