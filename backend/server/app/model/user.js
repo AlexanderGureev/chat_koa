@@ -38,7 +38,9 @@ const userSchema = mongoose.Schema({
   resetPasswordExpires: Date
 });
 
-userSchema.plugin(uniqueValidator);
+userSchema.plugin(uniqueValidator, {
+  message: "{VALUE} уже используется"
+});
 
 const userValidateSchema = Joi.object().keys({
   email: Joi.string()

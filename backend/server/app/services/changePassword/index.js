@@ -1,6 +1,7 @@
 const { User, generateResetToken, hashPassword } = require("../../model/user");
 const { sendEmail } = require("../sendEmail");
-const { validateResetPasswordForm } = require("../../../app/services/validate");
+const { responseMessage} = require("../responseMessage");
+
 
 const forgotPassword = async ctx => {
   try {
@@ -11,8 +12,7 @@ const forgotPassword = async ctx => {
     ]);
 
     if (!user) {
-      ctx.body = { success: false };
-      ctx.throw(400);
+      ctx.throw(400, "Форма заполнена некорректно.");
     }
 
     user.resetPasswordToken = token;
@@ -37,12 +37,11 @@ const forgotPassword = async ctx => {
       ctx.throw(400);
     }
 
-    ctx.body = { success: true };
-    console.log(
+    ctx.body = responseMessage(
       "Сообщение с инструкциями по сбросу пароля отправлены на вашу почту."
     );
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 };
 
@@ -56,23 +55,18 @@ const checkToken = async (ctx, next) => {
     });
 
     if (!user) {
-      console.error("Password reset token is invalid or has expired.");
+      ctx.throw(400, "Password reset token is invalid or has expired.");
       return ctx.redirect("/forgot");
     }
 
     ctx.user = user;
     await next();
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 };
 
 const resetPassword = async ctx => {
-  if(!validateResetPasswordForm(ctx.request.body)) {
-    ctx.body = { success: false };
-    ctx.throw(400, "Форма заполнена некорректно");
-  }
-
   const { passNew } = ctx.request.body;
   const { user } = ctx;
 
@@ -84,7 +78,10 @@ const resetPassword = async ctx => {
 
     const { username, email } = await user.save();
     await ctx.login(user);
-    ctx.body = { success: true };
+
+    ctx.body = responseMessage(
+      "Пароль успешно изменен, дополнительная информация отправлена на почту."
+    );
 
     const mailOptions = {
       username,
@@ -99,16 +96,11 @@ const resetPassword = async ctx => {
 
     await sendEmail(mailOptions);
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 };
 
 const changePassword = async ctx => {
-  if(!validateResetPasswordForm(ctx.request.body)) {
-    ctx.body = { success: false };
-    ctx.throw(400, "Форма заполнена некорректно");
-  }
-
   try {
     const { _id } = ctx.state.user;
     let user = await User.findById(_id);
@@ -132,10 +124,11 @@ const changePassword = async ctx => {
     };
 
     await sendEmail(mailOptions);
-    ctx.body = { success: true };
-
+    ctx.body = responseMessage(
+      "Пароль успешно изменен, дополнительная информация отправлена на почту."
+    );
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 };
 

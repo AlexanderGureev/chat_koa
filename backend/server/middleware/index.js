@@ -11,13 +11,15 @@ const render = require("koa-ejs");
 const { routes, allowedMethods } = require("../routes");
 const bodyParser = require("koa-bodyparser");
 const passport = require("koa-passport");
+const compose = require("koa-compose");
+const CSRF = require("koa-csrf");
 const { SESSION_KEY } = require("../config");
 
 const publicDir = path.join(__dirname, "..", "public");
 const pathToFavicon = path.join(publicDir, "img", "favicon.png");
 
 const CONFIG = {
-  key: SESSION_KEY,
+  key: "chater:session",
   maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week,
   httpOnly: true,
   signed: true,
@@ -28,23 +30,30 @@ const ejsOptions = {
   layout: false,
   viewExt: "html"
 };
+const csrfConfig = {
+  invalidSessionSecretMessage: "Invalid session secret",
+  invalidSessionSecretStatusCode: 403,
+  invalidTokenMessage: "Invalid CSRF token",
+  invalidTokenStatusCode: 403
+};
 
 module.exports = app => {
-  app.keys = ["chater_secret"];
+  app.keys = [SESSION_KEY];
   render(app, ejsOptions);
 
-  return [
+  return compose([
     error,
     logger(),
     helmet(),
     compress(),
     bodyParser(),
     session(CONFIG),
+    //new CSRF(csrfConfig),
     passport.initialize(),
     passport.session(),
     routes(),
     allowedMethods(),
     static(publicDir),
     favicon(pathToFavicon)
-  ];
+  ]);
 };

@@ -16,7 +16,6 @@ module.exports = async (req, username, password, done) => {
     }
 
   } catch (error) {
-    console.error(error);
     done(error);
   }
 };
