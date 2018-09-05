@@ -89,8 +89,6 @@ const _deleteAvatar = async ({ _id }) => {
   return await user.save();
 };
 
-
-
 module.exports = {
   addAvatar,
   delAvatar,
