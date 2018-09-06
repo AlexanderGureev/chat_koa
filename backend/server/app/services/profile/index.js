@@ -6,7 +6,7 @@ const { responseMessage } = require("../responseMessage");
 
 const publicPath = path.join("img", "uploads");
 const pathStore = path.join("public", "img", "uploads");
-const allowedExt = [".png", ".jpg", ".gif", ".jpeg"];
+const allowedExt = [".png", ".jpg", ".gif", ".jpeg", ".svg"];
 const defaultAvatar = path.join("img", "ava_default.png");
 
 const storage = multer.diskStorage({
