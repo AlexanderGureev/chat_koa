@@ -2,3 +2,4 @@ node_modules
 backend/server/node_modules
 frontend/dist
 backend/server/config/index.js
+.vscode
