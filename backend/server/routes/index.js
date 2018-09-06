@@ -3,7 +3,7 @@ const path = require("path");
 const Router = require("koa-router");
 const proxy = require("koa-proxy");
 const router = new Router();
-const passport = require("passport");
+const passport = require("koa-passport");
 const { responseMessage } = require("../app/services/responseMessage");
 const { isAuthenticated } = require("../middleware/isAuth");
 const { addAvatar, delAvatar, setStatus } = require("../app/services/profile");
@@ -100,7 +100,7 @@ router.get(
   })
 );
 
-router.get("/auth/google/callback", async ctx =>
+router.get("/auth/google/callback", async (ctx, next) =>
   passport.authenticate("google", (err, user, info, status) => {
     if (!user) {
       ctx.throw(401, err);
@@ -118,7 +118,7 @@ router.get(
   })
 );
 
-router.get("/auth/vkontakte/callback", async ctx =>
+router.get("/auth/vkontakte/callback", async (ctx, next) =>
   passport.authenticate("vkontakte", (err, user, info, status) => {
     if (!user) {
       ctx.throw(401, err);
@@ -130,7 +130,7 @@ router.get("/auth/vkontakte/callback", async ctx =>
 );
 
 router.get("/auth/twitter", passport.authenticate("twitter"));
-router.get("/auth/twitter/callback", async ctx =>
+router.get("/auth/twitter/callback", async (ctx, next) =>
   passport.authenticate("twitter", (err, user, info, status) => {
     if (!user) {
       ctx.throw(401, err);

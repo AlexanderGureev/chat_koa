@@ -26,7 +26,6 @@ module.exports.googleRegister = function (accessToken, refreshToken, profile, do
   var at = accessToken;
   var rt = refreshToken;
 
-
   User.findOne({
     googleId: profile.id
   })

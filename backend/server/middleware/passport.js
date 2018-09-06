@@ -17,6 +17,7 @@ const {
 
 
 passport.serializeUser((user, done) => {
+  console.log(user)
   done(null, user.id);
 });
 
@@ -50,6 +51,7 @@ const passportInit = () => {
   );
 
   passport.use(
+    "google",
     new GoogleStrategy(
       {
         clientID: google.clientId,
@@ -62,6 +64,7 @@ const passportInit = () => {
   );
 
   passport.use(
+    "vkontakte",
     new VKStrategy(
       {
         clientID: vk.clientId,
@@ -74,6 +77,7 @@ const passportInit = () => {
   );
 
   passport.use(
+    "twitter",
     new TwitterStrategy(
       {
         consumerKey: twitter.consumerKey,

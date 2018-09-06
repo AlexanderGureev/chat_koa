@@ -13,7 +13,7 @@ const bodyParser = require("koa-bodyparser");
 const passport = require("koa-passport");
 const compose = require("koa-compose");
 const CSRF = require("koa-csrf");
-const { SESSION_KEY } = require("../config");
+const { SESSION_KEY, REDIS_URI } = require("../config");
 
 const publicDir = path.join(__dirname, "..", "public");
 const pathToFavicon = path.join(publicDir, "img", "favicon.png");
@@ -23,7 +23,9 @@ const CONFIG = {
   maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week,
   httpOnly: true,
   signed: true,
-  store: redisStore()
+  store: redisStore({
+    url: REDIS_URI
+  })
 };
 const ejsOptions = {
   root: publicDir,
