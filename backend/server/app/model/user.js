@@ -11,7 +11,7 @@ mongoose.set("useFindAndModify", false);
 
 const userSchema = mongoose.Schema({
   twitterId: String,
-  vkId: String,
+  vkontakteId: String,
   googleId: String,
   provider: {
     type: String,

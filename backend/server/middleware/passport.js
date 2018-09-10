@@ -17,7 +17,6 @@ const {
 
 
 passport.serializeUser((user, done) => {
-  console.log(user)
   done(null, user.id);
 });
 
