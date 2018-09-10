@@ -32,7 +32,7 @@ const SimpleTooltip = props => {
     );
   };
 
-  const { value, sendingForm } = props;
+  const { value = 4, sendingForm } = props;
   return sendingForm
     ? renderTemplate()
     : value.length > 3 && renderTemplate();

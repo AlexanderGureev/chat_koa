@@ -3,7 +3,7 @@ import classnames from "classnames";
 import SocialAuth from "./SocialAuth";
 import SimpleTooltip from "./SimpleTooltip";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import CircularIndeterminate from "./CircularIndeterminate";
+import ButtonEx from "./ButtonEx";
 
 export default class AuthForm extends Component {
   state = {
@@ -35,9 +35,16 @@ export default class AuthForm extends Component {
 
     return result;
   };
-  authorizationUser = () => {
-    console.log("OK!");
+
+  authorizationUser = async ({ target }) => {
+    const { login, password } = this.state;
+    const { authUser } = this.props;
+    await authUser(target, login.value, password.value);
+    this.setState({
+      sendingForm: false
+    });
   };
+
   onChangeLogin = ({ target }) => {
     const { validator } = this.props;
     const { isValid, errors } = validator.loginValidation(target);
@@ -106,11 +113,13 @@ export default class AuthForm extends Component {
         errors: password.errors,
         isOpenTooltip: !password.isValid
       },
-      sendingForm: true
     });
 
     if (login.isValid && password.isValid) {
-      this.authorizationUser();
+      this.setState({
+        sendingForm: true
+      });
+      this.authorizationUser(e);
     }
   };
   closeTooltips = () => {
@@ -127,6 +136,7 @@ export default class AuthForm extends Component {
   };
   changeForm = e => {
     this.closeTooltips();
+    this.props.closeTooltip();
     this.props.onClick(e);
   };
 
@@ -135,7 +145,7 @@ export default class AuthForm extends Component {
     let cnForm = classnames({
       "auth-container": true,
       show: this.props.isShow,
-      hide: !this.props.isShow,
+      hide: !this.props.isShow
     });
 
     return (
@@ -187,11 +197,9 @@ export default class AuthForm extends Component {
           </div>
 
           <div className="form-group">
-            <button disabled={sendingForm} type="submit" className="button-ex auth">
-              <i className="fas fa-circle-notch fa-spin" />
-              <CircularIndeterminate isActive={sendingForm}/>
-              Войти
-            </button>
+
+            <ButtonEx isActive={sendingForm}>Войти</ButtonEx>
+
             <a href="#" id="btnRegister" onClick={this.changeForm}>
               Зарегистрировать новый аккаунт
             </a>

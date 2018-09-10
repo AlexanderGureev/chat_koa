@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import classnames from "classnames";
 import SimpleTooltip from "./SimpleTooltip";
+import ButtonEx from "./ButtonEx";
 
 export default class RegisterForm extends Component {
   state = {
@@ -187,7 +188,7 @@ export default class RegisterForm extends Component {
     let cnForm = classnames({
       "register-container": true,
       hide: this.props.isHide,
-      show: !this.props.isHide,
+      show: !this.props.isHide
     });
 
     return (
@@ -263,10 +264,9 @@ export default class RegisterForm extends Component {
           </div>
 
           <div className="form-group">
-            <button type="submit" className="button-ex reg">
-              <i className="fas fa-circle-notch fa-spin" />
-              Регистрация
-            </button>
+          
+            <ButtonEx isActive={sendingForm}>Регистрация</ButtonEx>
+
             <a href="#" id="btnAuth" onClick={this.changeForm}>
               Уже зарегистрированы?
             </a>

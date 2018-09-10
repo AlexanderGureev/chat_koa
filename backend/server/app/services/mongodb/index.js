@@ -1,10 +1,11 @@
 const { MONGO_URI } = require("../../../config");
 const mongooseConnector = require("./mongoose-connector");
+const colors = require("colors");
 
 const connectionInit = () => {
   mongooseConnector(MONGO_URI)
     .then(db => {
-      console.log("Successfully connected to database chaterDB");
+      console.log("Successfully connected to database chaterDB".black.bgGreen);
     })
     .catch(err => {
       console.log(err);

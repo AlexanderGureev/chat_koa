@@ -4,7 +4,7 @@ module.exports = async (ctx, next) => {
   } catch (err) {
     console.error(err);
     
-    ctx.status = err.statusCode || err.status || 500;
+    //ctx.status = err.statusCode || err.status || 500;
 
     const { errors } = err;
     let validationErrors;
@@ -23,7 +23,7 @@ module.exports = async (ctx, next) => {
 
     ctx.body = {
       status: ctx.status,
-      message: validationErrors || err.message
+      message: validationErrors || [ err.message ]
     };
   }
 };

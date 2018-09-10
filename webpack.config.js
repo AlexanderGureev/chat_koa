@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const webpack = require("webpack");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
- 
+
 const mode = process.env.NODE_ENV || "development";
 const rootDir = {
     dev: path.join(__dirname, "frontend", "dev"),
@@ -61,7 +61,7 @@ module.exports = {
         new webpack.ProvidePlugin({
             $: "jquery",
             //_: "lodash"
-        }),
+        })
         //new BundleAnalyzerPlugin()
     ],
     resolve: {
@@ -78,7 +78,8 @@ module.exports = {
                 use: {
                     loader: "babel-loader",
                     options: {
-                        presets: ["env", "react", "stage-0"]
+                        presets: ["env", "react", "stage-0"],
+                        plugins: ["transform-runtime"]
                     }
                 }
             },

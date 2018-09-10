@@ -1,0 +1,75 @@
+Arguments: 
+  /usr/bin/node /bin/yarn
+
+PATH: 
+  /bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+
+Yarn version: 
+  1.9.4
+
+Node version: 
+  10.10.0
+
+Platform: 
+  linux x64
+
+Trace: 
+  SyntaxError: /home/alexga/Desktop/chat_koa/backend/server/package.json: Unexpected token } in JSON at position 1173
+      at JSON.parse (<anonymous>)
+      at /usr/lib/node_modules/yarn/lib/cli.js:1130:59
+      at Generator.next (<anonymous>)
+      at step (/usr/lib/node_modules/yarn/lib/cli.js:92:30)
+      at /usr/lib/node_modules/yarn/lib/cli.js:103:13
+
+npm manifest: 
+  {
+    "name": "backend",
+    "version": "1.0.0",
+    "main": "./bin/main.js",
+    "license": "MIT",
+    "scripts": {
+      "start": "NODE_ENV=development node ./bin/main.js",
+      "dev": "nodemon ./bin/main.js",
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+      "axios": "^0.18.0",
+      "bcryptjs": "^2.4.3",
+      "colors": "^1.3.2",
+      "crypto": "^1.0.1",
+      "del": "^3.0.0",
+      "joi": "^13.6.0",
+      "koa": "^2.5.2",
+      "koa-bodyparser": "^4.2.1",
+      "koa-compose": "^4.1.0",
+      "koa-compress": "^3.0.0",
+      "koa-convert": "^1.2.0",
+      "koa-csrf": "^3.0.6",
+      "koa-ejs": "^4.1.2",
+      "koa-favicon": "^2.0.1",
+      "koa-generic-session": "^2.0.1",
+      "koa-helmet": "^4.0.0",
+      "koa-multer": "^1.0.2",
+      "koa-passport": "^4.1.0",
+      "koa-proxy": "^0.9.0",
+      "koa-redis": "^3.1.2",
+      "koa-router": "^7.4.0",
+      "koa-static": "^5.0.0",
+      "mongoose": "^5.2.12",
+      "mongoose-unique-validator": "^2.0.1",
+      "nodemailer": "^4.6.8",
+      "passport-google-oauth": "^1.0.0",
+      "passport-local": "^1.0.0",
+      "passport-twitter": "^1.0.4",
+      "passport-vkontakte": "^0.3.2"
+    },
+    "devDependencies": {
+      "koa-logger": "^3.2.0",
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

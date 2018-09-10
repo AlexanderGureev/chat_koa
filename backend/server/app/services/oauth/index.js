@@ -1,4 +1,3 @@
-const passport = require("koa-passport");
 const { User } = require("../../model/user");
 const TokenModel = require("../../model/authToken");
 const { vkApi } = require("../socialApi");
@@ -50,7 +49,6 @@ const googleRegister = async (accessToken, refreshToken, profile, done) => {
     done(error);
   }
 };
-
 const vkRegister = async (accessToken, refreshToken, params, profile, done) => {
   try {
     let user = await User.findOne({
@@ -81,7 +79,6 @@ const vkRegister = async (accessToken, refreshToken, params, profile, done) => {
     done(error);
   }
 };
-
 const twitterRegister = async (accessToken, refreshToken, profile, done) => {
   try {
     let user = await User.findOne({
