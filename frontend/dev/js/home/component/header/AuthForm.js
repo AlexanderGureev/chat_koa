@@ -22,8 +22,7 @@ export default class AuthForm extends Component {
       isInvalid: false,
       isOpenTooltip: false,
       errors: []
-    },
-    sendingForm: false
+    }
   };
 
   removeSpaces = input => input.value.replace(/\s/g, "");
@@ -35,16 +34,14 @@ export default class AuthForm extends Component {
 
     return result;
   };
-
   authorizationUser = async ({ target }) => {
     const { login, password } = this.state;
-    const { authUser } = this.props;
-    await authUser(target, login.value, password.value);
-    this.setState({
-      sendingForm: false
+    const { sendForm } = this.props;
+    await sendForm(target, {
+      username: login.value,
+      password: password.value
     });
   };
-
   onChangeLogin = ({ target }) => {
     const { validator } = this.props;
     const { isValid, errors } = validator.loginValidation(target);
@@ -60,8 +57,7 @@ export default class AuthForm extends Component {
       password: {
         ...this.state.password,
         isOpenTooltip: false
-      },
-      sendingForm: false
+      }
     });
   };
   onChangePassword = ({ target }) => {
@@ -80,8 +76,7 @@ export default class AuthForm extends Component {
         isInvalid: !isValid,
         errors,
         isOpenTooltip: !isValid
-      },
-      sendingForm: false
+      }
     });
   };
   getClassNamesInputs = input => {
@@ -116,9 +111,6 @@ export default class AuthForm extends Component {
     });
 
     if (login.isValid && password.isValid) {
-      this.setState({
-        sendingForm: true
-      });
       this.authorizationUser(e);
     }
   };
@@ -136,12 +128,11 @@ export default class AuthForm extends Component {
   };
   changeForm = e => {
     this.closeTooltips();
-    this.props.closeTooltip();
-    this.props.onClick(e);
+    this.props.changeForm(e);
   };
 
   render() {
-    const { login, password, sendingForm } = this.state;
+    const { login, password } = this.state;
     let cnForm = classnames({
       "auth-container": true,
       show: this.props.isShow,
@@ -156,7 +147,6 @@ export default class AuthForm extends Component {
           className="auth"
           onSubmit={this.submitForm}
         >
-          <input type="hidden" name="_csrf" value="" />
           <div className="form-header">
             <h3>Авторизация</h3>
           </div>
@@ -175,7 +165,7 @@ export default class AuthForm extends Component {
               value={login.value}
               onChange={this.onChangeLogin}
             />
-            <SimpleTooltip {...login} sendingForm={sendingForm} />
+            <SimpleTooltip {...login} minLength={4}/>
           </div>
 
           <div className="form-group">
@@ -193,12 +183,12 @@ export default class AuthForm extends Component {
               onChange={this.onChangePassword}
             />
 
-            <SimpleTooltip {...password} sendingForm={sendingForm} />
+            <SimpleTooltip {...password} minLength={4}/>
           </div>
 
           <div className="form-group">
 
-            <ButtonEx isActive={sendingForm}>Войти</ButtonEx>
+            <ButtonEx isActive={this.props.isLoading}>Войти</ButtonEx>
 
             <a href="#" id="btnRegister" onClick={this.changeForm}>
               Зарегистрировать новый аккаунт

@@ -1,50 +1,91 @@
 import React, { Component } from "react";
 import classnames from "classnames";
 import SimpleTooltip from "./SimpleTooltip";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Redirect
+} from "react-router-dom";
 import axios from "axios";
+import ValidationError from "../../services/validationError";
+import getToken from "../../services/csrfToken";
 
-const FormWrapper = ComposedComponent =>
+const FormWrapper = (ComposedComponent, url) =>
   class extends Component {
     state = {
-      loginForm: null,
+      target: null,
       errors: [],
       isLoading: false,
-      isLoaded: false
+      isLoaded: false,
+      isOpenTooltip: false
     };
 
-    noop = async () => new Promise((res, rej) => setTimeout(() => { res(2) }, 2000));
+    noop = async () =>
+      new Promise((res, rej) =>
+        setTimeout(() => {
+          res(2);
+        }, 2000)
+      );
 
-    authUser = async (target, login, password) => {
+    sendForm = async (target, data) => {
+      this.setState({ isLoading: true });
       try {
-        const { data: { status, message } } = await axios.post("/auth", { username: login, password });
+        const token = await getToken("/api/token");
+        const {
+          data: { status, message }
+        } = await axios.post(url, { ...data, _csrf: token });
+
         const res = await this.noop();
+
+        if (status !== 200) {
+          throw new ValidationError(message);
+        }
+       
         this.setState({
-          loginForm: target,
-          errors: message,
+          isLoading: false,
           isLoaded: true,
         });
-      } catch(error) {
-        console.log(error)
+
+        await this.props.authenticateUser();
+
+      } catch ({ message }) {
+        this.setState({
+          target,
+          errors: message,
+          isLoading: false,
+          isLoaded: true,
+          isOpenTooltip: true
+        });
       }
     };
 
-    onCloseTooltip = () => {
+    wrappedChangeForm = fn => e => {
       this.setState({
-        isLoaded: false,
+        isOpenTooltip: false
       });
-    }
+      fn(e);
+    };
+
     render() {
-      const { isLoaded, errors, loginForm } = this.state;
+      const { isLoading, errors, target, isOpenTooltip } = this.state;
+      if (this.props.isAuth) {
+        return <Redirect to="/profile" />;
+      }
+
       return (
         <React.Fragment>
           <SimpleTooltip
-            isOpenTooltip={isLoaded}
-            target={loginForm}
+            isOpenTooltip={isOpenTooltip}
+            target={target}
             errors={errors}
-            sendingForm={isLoaded}
           />
-          <ComposedComponent {...this.props } authUser={this.authUser} closeTooltip={this.onCloseTooltip} />
+          <ComposedComponent
+            {...this.props}
+            changeForm={this.wrappedChangeForm(this.props.changeForm)}
+            sendForm={this.sendForm}
+            isLoading={isLoading}
+          />
         </React.Fragment>
       );
     }

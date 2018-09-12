@@ -4,6 +4,12 @@ import Friends from "./Friends";
 import ContactInfo from "./ContactInfo";
 import FooterProfile from "./FooterProfile";
 import HeaderProfile from "./HeaderProfile";
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Redirect
+} from "react-router-dom";
 
 const posts = [
   {
@@ -28,6 +34,12 @@ const friends = [
 
 class UserProfile extends Component {
   render() {
+    const { isAuth, logout } = this.props;
+
+    if (!isAuth) {
+      return <Redirect to="/" />;
+    }
+
     return (
       <div className="manage-panel">
         <span className="tooltipError" data-tooltip-content="#tooltip_content" />
@@ -46,7 +58,7 @@ class UserProfile extends Component {
               <Friends friends={friends} />
             </div>
           </div>
-          <FooterProfile />
+          <FooterProfile logout={logout} />
         </div>
       </div>
     );

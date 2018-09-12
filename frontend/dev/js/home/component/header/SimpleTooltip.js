@@ -32,9 +32,8 @@ const SimpleTooltip = props => {
     );
   };
 
-  const { value = 4, sendingForm } = props;
-  return sendingForm
-    ? renderTemplate()
-    : value.length > 3 && renderTemplate();
+  const { value, minLength = 0 } = props;
+  return value ? value.length > minLength && renderTemplate() 
+               : renderTemplate();
 };
 export default SimpleTooltip;

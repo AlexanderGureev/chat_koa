@@ -9,8 +9,8 @@ import Faq from "./Faq";
 import UserProfile from "../profile/UserProfile";
 import ChangePasswordForm from "./ChangePasswordForm";
 
-export default function HeaderCenter() {
-  const Routes = () => (
+export default function HeaderCenter({ authenticateUser, logout, isAuth }) {
+  const getRoutes = () => (
     <Switch>
       <Route path="/about" component={About} />
       <Route path="/security" component={Security} />
@@ -23,9 +23,7 @@ export default function HeaderCenter() {
     <div className="header-center">
       <div className="container">
         <div className="row">
-          <div className="col-lg-6">
-            <Routes />
-          </div>
+          <div className="col-lg-6">{getRoutes()}</div>
           <div className="col-lg-5 offset-lg-1 form-box">
             <div
               className="register-form wow zoomInRight"
@@ -33,14 +31,29 @@ export default function HeaderCenter() {
               data-wow-delay="1.4s"
             >
               <Switch>
-                <Route exact path="/" component={FormBox} />
+                <Route
+                  exact
+                  path="/"
+                  render={props => (
+                    <FormBox
+                      {...props}
+                      isAuth={isAuth}
+                      authenticateUser={authenticateUser}
+                    />
+                  )}
+                />
                 <Route path="/forgot" component={ForgotPasswordForm} />
                 <Route
                   path="/resetPassword/:token"
                   component={ChangePasswordForm}
                 />
                 <Route path="/changePassword" component={ChangePasswordForm} />
-                <Route path="/profile" component={UserProfile} />
+                <Route
+                  path="/profile"
+                  render={props => (
+                    <UserProfile {...props} isAuth={isAuth} logout={logout} />
+                  )}
+                />
               </Switch>
             </div>
           </div>

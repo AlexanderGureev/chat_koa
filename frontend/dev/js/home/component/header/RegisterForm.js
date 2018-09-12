@@ -28,8 +28,7 @@ export default class RegisterForm extends Component {
       isInvalid: false,
       isOpenTooltip: false,
       errors: []
-    },
-    sendingForm: false
+    }
   };
 
   removeSpaces = input => input.value.replace(/\s/g, "");
@@ -42,8 +41,14 @@ export default class RegisterForm extends Component {
 
     return result;
   };
-  registerUser = () => {
-    console.log("OK!");
+  registerUser = async ({ target }) => {
+    const { email, login, password } = this.state;
+    const { sendForm } = this.props;
+    await sendForm(target, {
+      email: email.value,
+      username: login.value,
+      password: password.value
+    });
   };
   onChangeEmail = ({ target }) => {
     const { validator } = this.props;
@@ -64,8 +69,7 @@ export default class RegisterForm extends Component {
       password: {
         ...this.state.password,
         isOpenTooltip: false
-      },
-      sendingForm: false
+      }
     });
   };
   onChangeLogin = ({ target }) => {
@@ -87,8 +91,7 @@ export default class RegisterForm extends Component {
       password: {
         ...this.state.password,
         isOpenTooltip: false
-      },
-      sendingForm: false
+      }
     });
   };
   onChangePassword = ({ target }) => {
@@ -111,8 +114,7 @@ export default class RegisterForm extends Component {
         isInvalid: !isValid,
         errors,
         isOpenTooltip: !isValid
-      },
-      sendingForm: false
+      }
     });
   };
   getClassNamesInputs = input => {
@@ -154,12 +156,11 @@ export default class RegisterForm extends Component {
         isInvalid: !password.isValid,
         errors: password.errors,
         isOpenTooltip: !password.isValid
-      },
-      sendingForm: true
+      }
     });
 
     if (email.isValid && login.isValid && password.isValid) {
-      this.registerUser();
+      this.registerUser(e);
     }
   };
   closeTooltips = () => {
@@ -180,15 +181,15 @@ export default class RegisterForm extends Component {
   };
   changeForm = e => {
     this.closeTooltips();
-    this.props.onClick(e);
+    this.props.changeForm(e);
   };
 
   render() {
-    const { email, login, password, sendingForm } = this.state;
+    const { email, login, password } = this.state;
     let cnForm = classnames({
       "register-container": true,
-      hide: this.props.isHide,
-      show: !this.props.isHide
+      show: this.props.isShow,
+      hide: !this.props.isShow
     });
 
     return (
@@ -199,17 +200,8 @@ export default class RegisterForm extends Component {
           className="register"
           onSubmit={this.submitForm}
         >
-          <input type="hidden" name="_csrf" value="" />
           <div className="form-header">
             <h3>Регистрация</h3>
-
-            <span
-              className="tooltipError"
-              data-tooltip-content="#tooltip_content"
-            />
-            <div className="tooltip_templates">
-              <span id="tooltip_content" />
-            </div>
           </div>
 
           <div className="form-group">
@@ -226,7 +218,7 @@ export default class RegisterForm extends Component {
               value={email.value}
               onChange={this.onChangeEmail}
             />
-            <SimpleTooltip {...email} sendingForm={sendingForm} />
+            <SimpleTooltip {...email} minLength={4}/>
           </div>
 
           <div className="form-group">
@@ -243,7 +235,7 @@ export default class RegisterForm extends Component {
               value={login.value}
               onChange={this.onChangeLogin}
             />
-            <SimpleTooltip {...login} sendingForm={sendingForm} />
+            <SimpleTooltip {...login} minLength={4}/>
           </div>
 
           <div className="form-group">
@@ -260,12 +252,12 @@ export default class RegisterForm extends Component {
               value={password.value}
               onChange={this.onChangePassword}
             />
-            <SimpleTooltip {...password} sendingForm={sendingForm} />
+            <SimpleTooltip {...password} minLength={4}/>
           </div>
 
           <div className="form-group">
           
-            <ButtonEx isActive={sendingForm}>Регистрация</ButtonEx>
+            <ButtonEx isActive={this.props.isLoading}>Регистрация</ButtonEx>
 
             <a href="#" id="btnAuth" onClick={this.changeForm}>
               Уже зарегистрированы?

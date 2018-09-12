@@ -50,7 +50,7 @@ export default class TopLine extends Component {
         <div className={cnCollapsed}>
           <Logo />
           <Nav />
-          <RightBox />
+          <RightBox isAuth={this.props.isAuth}/>
         </div>
       </div>
     );

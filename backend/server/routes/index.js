@@ -26,13 +26,13 @@ const routes = [
   "/changePassword"
 ];
 
-// router.get(routes, async (ctx, next) => {
-//   await ctx.render("index");
-// });
+router.get(routes, async (ctx, next) => {
+  await ctx.render("index");
+});
 
-// router.get("/chat", isAuthenticated, async (ctx, next) => {
-//   await ctx.render("chat");
-// });
+router.get("/chat", isAuthenticated, async (ctx, next) => {
+  await ctx.render("chat");
+});
 
 //router.get("/api", convert(proxy({ host: "http://localhost:3001"} )));
 
@@ -108,7 +108,7 @@ router.get("/auth/google/callback", async (ctx, next) =>
     if (!user) {
       ctx.throw(401, err);
     } else {
-      ctx.body = responseMessage();
+      ctx.redirect("/profile");
       return ctx.login(user);
     }
   })(ctx)
@@ -126,7 +126,7 @@ router.get("/auth/vkontakte/callback", async (ctx, next) =>
     if (!user) {
       ctx.throw(401, err);
     } else {
-      ctx.body = responseMessage();
+      ctx.redirect("/profile");
       return ctx.login(user);
     }
   })(ctx)
@@ -138,7 +138,7 @@ router.get("/auth/twitter/callback", async (ctx, next) =>
     if (!user) {
       ctx.throw(401, err);
     } else {
-      ctx.body = responseMessage();
+      ctx.redirect("/profile");
       return ctx.login(user);
     }
   })(ctx)

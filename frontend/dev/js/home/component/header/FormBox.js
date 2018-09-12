@@ -4,38 +4,42 @@ import AuthForm from "./AuthForm";
 import Validator from "../../services/validation";
 import FormWrapper from "./FormWrapper";
 
-const WrappedRegForm = FormWrapper(RegisterForm);
-const WrappedAuthForm = FormWrapper(AuthForm);
+const WrappedRegForm = FormWrapper(RegisterForm, "/register");
+const WrappedAuthForm = FormWrapper(AuthForm, "/auth");
+const validator = new Validator();
 
 export default class FormBox extends Component {
   state = {
-    isHideRegForm: false,
+    isShowRegForm: true,
     isShowAuthForm: false
   };
 
   changeForm = e => {
     e.preventDefault();
     this.setState({
-      isHideRegForm: !this.state.isHideRegForm,
+      isShowRegForm: !this.state.isShowRegForm,
       isShowAuthForm: !this.state.isShowAuthForm
     });
   };
 
   render() {
-    let { isHideRegForm, isShowAuthForm } = this.state;
-    const validator = new Validator();
-
+    const { isShowRegForm, isShowAuthForm } = this.state;
+    const { isAuth, authenticateUser } = this.props;
     return (
       <React.Fragment>
         <WrappedRegForm
-          onClick={this.changeForm}
-          isHide={isHideRegForm}
+          changeForm={this.changeForm}
+          isShow={isShowRegForm}
           validator={validator}
+          isAuth={isAuth}
+          authenticateUser={authenticateUser}
         />
         <WrappedAuthForm
-          onClick={this.changeForm}
+          changeForm={this.changeForm}
           isShow={isShowAuthForm}
           validator={validator}
+          isAuth={isAuth}
+          authenticateUser={authenticateUser}
         />
       </React.Fragment>
     );
