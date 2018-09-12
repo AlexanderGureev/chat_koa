@@ -16,6 +16,7 @@ const FormWrapper = (ComposedComponent, url) =>
     state = {
       target: null,
       errors: [],
+      message: "",
       isLoading: false,
       isLoaded: false,
       isOpenTooltip: false
@@ -29,26 +30,38 @@ const FormWrapper = (ComposedComponent, url) =>
       );
 
     sendForm = async (target, data) => {
+      const { authenticateUser, match } = this.props;
+      console.log(match)
+      if (match && match.params.token) {
+        url = match.url;
+      }
+    
       this.setState({ isLoading: true });
+
       try {
         const token = await getToken("/api/token");
-        const {
-          data: { status, message }
-        } = await axios.post(url, { ...data, _csrf: token });
 
+        const {
+          data: { status, message, errors }
+        } = await axios.post(url, { ...data, _csrf: token });
         const res = await this.noop();
 
         if (status !== 200) {
-          throw new ValidationError(message);
+          throw new ValidationError(errors);
         }
-       
-        this.setState({
-          isLoading: false,
-          isLoaded: true,
-        });
+        if (message) {
+          this.setState({
+            target,
+            isLoading: false,
+            isLoaded: true,
+            isOpenTooltip: true,
+            message
+          });
+        }
 
-        await this.props.authenticateUser();
-
+        if (authenticateUser) {
+          await authenticateUser();
+        }
       } catch ({ message }) {
         this.setState({
           target,
@@ -68,7 +81,7 @@ const FormWrapper = (ComposedComponent, url) =>
     };
 
     render() {
-      const { isLoading, errors, target, isOpenTooltip } = this.state;
+      const { isLoading, errors, target, isOpenTooltip, message } = this.state;
       if (this.props.isAuth) {
         return <Redirect to="/profile" />;
       }
@@ -79,6 +92,7 @@ const FormWrapper = (ComposedComponent, url) =>
             isOpenTooltip={isOpenTooltip}
             target={target}
             errors={errors}
+            message={message}
           />
           <ComposedComponent
             {...this.props}

@@ -1,7 +1,6 @@
 const { User, generateResetToken, hashPassword } = require("../../model/user");
 const { sendEmail } = require("../sendEmail");
-const { responseMessage} = require("../responseMessage");
-
+const { responseMessage } = require("../responseMessage");
 
 const forgotPassword = async ctx => {
   try {
@@ -33,11 +32,11 @@ const forgotPassword = async ctx => {
     const result = await sendEmail(mailOptions);
 
     if (!result) {
-      ctx.body = { success: false };
-      ctx.throw(400);
+      ctx.throw(400, "Произошла ошибка отправки письма");
     }
 
     ctx.body = responseMessage(
+      200,
       "Сообщение с инструкциями по сбросу пароля отправлены на вашу почту."
     );
   } catch (error) {
@@ -80,6 +79,7 @@ const resetPassword = async ctx => {
     await ctx.login(user);
 
     ctx.body = responseMessage(
+      200,
       "Пароль успешно изменен, дополнительная информация отправлена на почту."
     );
 
@@ -125,6 +125,7 @@ const changePassword = async ctx => {
 
     await sendEmail(mailOptions);
     ctx.body = responseMessage(
+      200,
       "Пароль успешно изменен, дополнительная информация отправлена на почту."
     );
   } catch (error) {

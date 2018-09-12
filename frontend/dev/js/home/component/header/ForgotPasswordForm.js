@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Validator from "../../services/validation";
 import SimpleTooltip from "./SimpleTooltip";
 import classnames from "classnames";
-
+import ButtonEx from "./ButtonEx";
 
 export default class ForgotPasswordForm extends Component {
   constructor() {
@@ -17,8 +17,7 @@ export default class ForgotPasswordForm extends Component {
       isInvalid: false,
       isOpenTooltip: false,
       errors: []
-    },
-    sendingForm: false
+    }
   };
 
   removeSpaces = input => input.value.replace(/\s/g, "");
@@ -37,12 +36,15 @@ export default class ForgotPasswordForm extends Component {
         isInvalid: !isValid,
         errors,
         isOpenTooltip: !isValid
-      },
-      sendingForm: false
+      }
     });
   };
-  changePassword = () => {
-    console.log("OK");
+  forgotPassword = async ({ target }) => {
+    const { email } = this.state;
+    const { sendForm } = this.props;
+    await sendForm(target, {
+      email: email.value,
+    });
   };
   getClassNamesInputs = input => {
     return classnames({
@@ -52,7 +54,7 @@ export default class ForgotPasswordForm extends Component {
   };
   submitForm = e => {
     e.preventDefault();
-    const { emailForgot} = e.target;
+    const { emailForgot } = e.target;
 
     const { email } = this.validationForgotForm(emailForgot);
 
@@ -64,21 +66,24 @@ export default class ForgotPasswordForm extends Component {
         isInvalid: !email.isValid,
         errors: email.errors,
         isOpenTooltip: !email.isValid
-      },
-      sendingForm: true
+      }
     });
 
     if (email.isValid) {
-      this.changePassword();
+      this.forgotPassword(e);
     }
   };
 
   render() {
-    const { email, sendingForm } = this.state;
+    const { email } = this.state;
     return (
       <div className="forgot-container">
-        <form action="/forgot" method="post" className="forgot" onSubmit={this.submitForm}>
-          <input type="hidden" name="_csrf" value="" />
+        <form
+          action="/forgot"
+          method="post"
+          className="forgot"
+          onSubmit={this.submitForm}
+        >
           <div className="form-header">
             <h3>Забыл пароль</h3>
           </div>
@@ -97,14 +102,11 @@ export default class ForgotPasswordForm extends Component {
               value={email.value}
               onChange={this.onChangeEmail}
             />
-             <SimpleTooltip {...email} sendingForm={sendingForm} />
+            <SimpleTooltip {...email} minLength={4}/>
           </div>
 
           <div className="form-group">
-            <button type="submit" className="button-ex forgot">
-              <i className="fas fa-circle-notch fa-spin" />
-              Сброс пароля
-            </button>
+            <ButtonEx isActive={this.props.isLoading}>Отправить</ButtonEx>
           </div>
         </form>
       </div>

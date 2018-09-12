@@ -2,6 +2,11 @@ import React, { Component } from "react";
 import Validator from "../../services/validation";
 import SimpleTooltip from "./SimpleTooltip";
 import classnames from "classnames";
+import ButtonEx from "./ButtonEx";
+import {
+  BrowserRouter as Router,
+  Redirect
+} from "react-router-dom";
 
 export default class ForgotPasswordForm extends Component {
   constructor(props) {
@@ -24,13 +29,9 @@ export default class ForgotPasswordForm extends Component {
       isInvalid: false,
       isOpenTooltip: false,
       errors: []
-    },
-    sendingForm: false
+    }
   };
 
-  componentDidMount() {
-    console.log(this.props.params);
-  }
   removeSpaces = input => input.value.replace(/\s/g, "");
   validationChangePasswordForm = (password, confirmPassword) => {
     let result = {};
@@ -51,8 +52,7 @@ export default class ForgotPasswordForm extends Component {
         isInvalid: !isValid,
         errors,
         isOpenTooltip: !isValid
-      },
-      sendingForm: false
+      }
     });
   };
   onChangeConfirmPassword = ({ target }) => {
@@ -69,13 +69,18 @@ export default class ForgotPasswordForm extends Component {
         isInvalid: !isValid,
         errors,
         isOpenTooltip: !isValid
-      },
-      sendingForm: false
+      }
     });
   };
-  changePassword = () => {
-    console.log("OK");
+  changePassword = async ({ target }) => {
+    const { password, confirmPassword } = this.state;
+    const { sendForm } = this.props;
+    await sendForm(target, {
+      passNew: password.value,
+      passConfirm: confirmPassword.value
+    });
   };
+
   getClassNamesInputs = input => {
     return classnames({
       valid: input.isValid,
@@ -106,17 +111,22 @@ export default class ForgotPasswordForm extends Component {
         isInvalid: !confirmPassword.isValid,
         errors: confirmPassword.errors,
         isOpenTooltip: !confirmPassword.isValid
-      },
-      sendingForm: true
+      }
     });
 
     if (password.isValid && confirmPassword.isValid) {
-      this.changePassword();
+      this.changePassword(e);
     }
   };
 
   render() {
-    const { password, confirmPassword, sendingForm } = this.state;
+    const { password, confirmPassword } = this.state;
+    // const { isAuth } = this.props;
+    // console.log(isAuth)
+    // if (isAuth == false) {
+    //   return <Redirect to="/" />;
+    // }
+
     return (
       <div className="change-container">
         <form
@@ -125,7 +135,6 @@ export default class ForgotPasswordForm extends Component {
           className="change"
           onSubmit={this.submitForm}
         >
-          <input type="hidden" name="_csrf" value="" />
           <div className="form-header">
             <h3>Смена пароля</h3>
           </div>
@@ -144,7 +153,7 @@ export default class ForgotPasswordForm extends Component {
               value={password.value}
               onChange={this.onChangePassword}
             />
-            <SimpleTooltip {...password} sendingForm={sendingForm} />
+            <SimpleTooltip {...password} minLength={4} />
           </div>
 
           <div className="form-group">
@@ -161,14 +170,11 @@ export default class ForgotPasswordForm extends Component {
               value={confirmPassword.value}
               onChange={this.onChangeConfirmPassword}
             />
-            <SimpleTooltip {...confirmPassword} sendingForm={sendingForm} />
+            <SimpleTooltip {...confirmPassword} minLength={4} />
           </div>
 
           <div className="form-group">
-            <button type="submit" className="button-ex change">
-              <i className="fas fa-circle-notch fa-spin" />
-              Сменить пароль
-            </button>
+          <ButtonEx isActive={this.props.isLoading}>Сменить пароль</ButtonEx>
           </div>
         </form>
       </div>

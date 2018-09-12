@@ -1,4 +1,4 @@
-const responseMessage = (status = 200, message = "OK", data) => ({
+const responseMessage = (status = 200, message, data) => ({
   status,
   message,
   data

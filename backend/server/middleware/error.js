@@ -23,7 +23,7 @@ module.exports = async (ctx, next) => {
 
     ctx.body = {
       status: ctx.status,
-      message: validationErrors || [ err.message ]
+      errors: validationErrors || [ err.message ]
     };
   }
 };

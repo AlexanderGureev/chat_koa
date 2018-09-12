@@ -4,8 +4,10 @@ import Paper from "@material-ui/core/Paper";
 import Grow from "@material-ui/core/Grow";
 
 const SimpleTooltip = props => {
+  const renderMessage = () => props.message && <li>{props.message}</li>;
+
   const renderTemplate = () => {
-    const { isOpenTooltip, target, errors } = props;
+    const { isOpenTooltip, target, errors, message } = props;
     return (
       <Popper
         open={isOpenTooltip}
@@ -24,6 +26,7 @@ const SimpleTooltip = props => {
                 {errors.map((error, i) => (
                   <li key={i}>{error}</li>
                 ))}
+                { renderMessage() }
               </ul>
             </Paper>
           </Grow>
@@ -33,7 +36,8 @@ const SimpleTooltip = props => {
   };
 
   const { value, minLength = 0 } = props;
-  return value ? value.length > minLength && renderTemplate() 
-               : renderTemplate();
+  return value
+    ? value.length > minLength && renderTemplate()
+    : renderTemplate();
 };
 export default SimpleTooltip;

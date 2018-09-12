@@ -8,6 +8,17 @@ import Security from "./Security";
 import Faq from "./Faq";
 import UserProfile from "../profile/UserProfile";
 import ChangePasswordForm from "./ChangePasswordForm";
+import FormWrapper from "./FormWrapper";
+
+const WrappedForgotPasswordForm = FormWrapper(ForgotPasswordForm, "/forgot");
+const WrappedResetPasswordForm = FormWrapper(
+  ChangePasswordForm,
+  "/resetPassword"
+);
+const WrappedChangePasswordForm = FormWrapper(
+  ChangePasswordForm,
+  "/changePassword"
+);
 
 export default function HeaderCenter({ authenticateUser, logout, isAuth }) {
   const getRoutes = () => (
@@ -42,12 +53,17 @@ export default function HeaderCenter({ authenticateUser, logout, isAuth }) {
                     />
                   )}
                 />
-                <Route path="/forgot" component={ForgotPasswordForm} />
+                <Route path="/forgot" component={WrappedForgotPasswordForm} />
                 <Route
                   path="/resetPassword/:token"
-                  component={ChangePasswordForm}
+                  component={WrappedResetPasswordForm}
                 />
-                <Route path="/changePassword" component={ChangePasswordForm} />
+                <Route
+                  path="/changePassword"
+                  render={props => (
+                    <WrappedChangePasswordForm {...props} isAuth={isAuth} />
+                  )}
+                />
                 <Route
                   path="/profile"
                   render={props => (
