@@ -50,7 +50,7 @@ module.exports = app => {
     compress(),
     bodyParser(),
     session(CONFIG),
-    //new CSRF(csrfConfig),
+    new CSRF(csrfConfig),
     passport.initialize(),
     passport.session(),
     routes(),

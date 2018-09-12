@@ -61,8 +61,8 @@ const userValidateSchema = Joi.object().keys({
 
 const User = mongoose.model("user", userSchema);
 
-const validateUser = async model =>
-  await Joi.validate(model, userValidateSchema);
+const validateUser = async ({ email, username, password }) =>
+  await Joi.validate({ email, username, password }, userValidateSchema);
 
 const hashPassword = async password => {
   try {

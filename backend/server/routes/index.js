@@ -26,13 +26,13 @@ const routes = [
   "/changePassword"
 ];
 
-router.get(routes, async (ctx, next) => {
-  await ctx.render("index");
-});
+// router.get(routes, async (ctx, next) => {
+//   await ctx.render("index");
+// });
 
-router.get("/chat", isAuthenticated, async (ctx, next) => {
-  await ctx.render("chat");
-});
+// router.get("/chat", isAuthenticated, async (ctx, next) => {
+//   await ctx.render("chat");
+// });
 
 //router.get("/api", convert(proxy({ host: "http://localhost:3001"} )));
 
@@ -66,6 +66,9 @@ router.get("/logout", async ctx => {
 
 router.get("/api/token", async ctx => {
   ctx.body = { token: ctx.csrf };
+});
+router.get("/api/isAuthenticated", async ctx => {
+  ctx.body = { isAuth: ctx.isAuthenticated() }
 });
 
 router.post(
