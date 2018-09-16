@@ -56,6 +56,6 @@ module.exports = app => {
     routes(),
     allowedMethods(),
     static(publicDir),
-    favicon(pathToFavicon)
+    //favicon(pathToFavicon)
   ]);
 };

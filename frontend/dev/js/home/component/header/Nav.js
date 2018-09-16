@@ -12,10 +12,10 @@ export default function Nav() {
           <Link to="/about">Функции</Link>
         </li>
         <li>
-          <Link to="/changePassword">Безопасность</Link>
+          <Link to="/security">Безопасность</Link>
         </li>
         <li>
-          <Link to="resetPassword">FAQ</Link>
+          <Link to="/faq">FAQ</Link>
         </li>
       </ul>
     </nav>

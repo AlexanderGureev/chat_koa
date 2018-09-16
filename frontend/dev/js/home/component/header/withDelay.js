@@ -7,14 +7,17 @@ const withDelay = (ComposedComponent, delay) =>
     };
 
     componentDidMount() {
-      setTimeout(() => {
+      this.timer = setTimeout(() => {
         this.setState({ hidden: true });
       }, delay);
     }
-
+    componentWillUnmount() {
+      clearTimeout(this.timer);
+    }
+    
     render() {
       const { hidden } = this.state;
-      return hidden && <ComposedComponent {...this.props}/>;
+      return hidden && <ComposedComponent {...this.props} />;
     }
   };
 

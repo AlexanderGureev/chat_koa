@@ -3,6 +3,7 @@ const path = require("path");
 const Router = require("koa-router");
 const proxy = require("koa-proxy");
 const router = new Router();
+const { env } = require("../config");
 const passport = require("koa-passport");
 const { responseMessage } = require("../app/services/responseMessage");
 const { isAuthenticated } = require("../middleware/isAuth");
@@ -26,9 +27,11 @@ const routes = [
   "/changePassword"
 ];
 
-// router.get(routes, async (ctx, next) => {
-//   await ctx.render("index");
-// });
+if(env === "dev_nodemon") {
+  router.get(routes, async (ctx, next) => {
+    await ctx.render("index");
+});
+}
 
 router.get("/chat", isAuthenticated, async (ctx, next) => {
   await ctx.render("chat");
