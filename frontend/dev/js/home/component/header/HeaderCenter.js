@@ -9,6 +9,7 @@ import Faq from "./Faq";
 import UserProfile from "../profile/UserProfile";
 import ChangePasswordForm from "./ChangePasswordForm";
 import FormWrapper from "./FormWrapper";
+import PrivateRoute from "./PrivateRoute";
 
 const WrappedForgotPasswordForm = FormWrapper(ForgotPasswordForm, "/forgot");
 const WrappedResetPasswordForm = FormWrapper(
@@ -58,11 +59,10 @@ export default function HeaderCenter({ authenticateUser, logout, isAuth }) {
                   path="/resetPassword/:token"
                   component={WrappedResetPasswordForm}
                 />
-                <Route
+                <PrivateRoute
                   path="/changePassword"
-                  render={props => (
-                    <WrappedChangePasswordForm {...props} isAuth={isAuth} />
-                  )}
+                  component={WrappedChangePasswordForm}
+                  isAuth = {isAuth}
                 />
                 <Route
                   path="/profile"

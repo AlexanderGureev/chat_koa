@@ -26,9 +26,9 @@ const routes = [
   "/changePassword"
 ];
 
-router.get(routes, async (ctx, next) => {
-  await ctx.render("index");
-});
+// router.get(routes, async (ctx, next) => {
+//   await ctx.render("index");
+// });
 
 router.get("/chat", isAuthenticated, async (ctx, next) => {
   await ctx.render("chat");
@@ -106,7 +106,7 @@ router.get(
 router.get("/auth/google/callback", async (ctx, next) =>
   passport.authenticate("google", (err, user, info, status) => {
     if (!user) {
-      ctx.throw(401, err);
+      ctx.throw(401, err, { cookie: true });
     } else {
       ctx.redirect("/profile");
       return ctx.login(user);
@@ -124,7 +124,7 @@ router.get(
 router.get("/auth/vkontakte/callback", async (ctx, next) =>
   passport.authenticate("vkontakte", (err, user, info, status) => {
     if (!user) {
-      ctx.throw(401, err);
+      ctx.throw(401, err, { cookie: true });
     } else {
       ctx.redirect("/profile");
       return ctx.login(user);
@@ -136,7 +136,7 @@ router.get("/auth/twitter", passport.authenticate("twitter"));
 router.get("/auth/twitter/callback", async (ctx, next) =>
   passport.authenticate("twitter", (err, user, info, status) => {
     if (!user) {
-      ctx.throw(401, err);
+      ctx.throw(401, err, { cookie: true });
     } else {
       ctx.redirect("/profile");
       return ctx.login(user);

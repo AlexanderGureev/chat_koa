@@ -3,9 +3,10 @@ import RegisterForm from "./RegisterForm";
 import AuthForm from "./AuthForm";
 import Validator from "../../services/validation";
 import FormWrapper from "./FormWrapper";
+import withErrors from "./withErrors";
 
-const WrappedRegForm = FormWrapper(RegisterForm, "/register");
-const WrappedAuthForm = FormWrapper(AuthForm, "/auth");
+const WrappedRegForm = withErrors(FormWrapper(RegisterForm, "/register", "/profile"));
+const WrappedAuthForm = FormWrapper(AuthForm, "/auth", "/profile");
 const validator = new Validator();
 
 export default class FormBox extends Component {

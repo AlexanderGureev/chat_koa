@@ -11,7 +11,7 @@ import axios from "axios";
 import ValidationError from "../../services/validationError";
 import getToken from "../../services/csrfToken";
 
-const FormWrapper = (ComposedComponent, url) =>
+const FormWrapper = (ComposedComponent, url, redirectURL) =>
   class extends Component {
     state = {
       target: null,
@@ -31,7 +31,7 @@ const FormWrapper = (ComposedComponent, url) =>
 
     sendForm = async (target, data) => {
       const { authenticateUser, match } = this.props;
-      console.log(match)
+
       if (match && match.params.token) {
         url = match.url;
       }
@@ -82,8 +82,10 @@ const FormWrapper = (ComposedComponent, url) =>
 
     render() {
       const { isLoading, errors, target, isOpenTooltip, message } = this.state;
-      if (this.props.isAuth) {
-        return <Redirect to="/profile" />;
+      const { isAuth } = this.props;
+
+      if (isAuth && redirectURL) {
+        return <Redirect to={redirectURL} />;
       }
 
       return (
