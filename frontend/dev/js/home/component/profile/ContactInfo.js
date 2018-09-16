@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 const ContactInfo = props => {
+  const { email } = props;
   return (
     <div className="contact-info">
       <h4 className="title">Contact info</h4>
@@ -9,7 +10,7 @@ const ContactInfo = props => {
         <div className="form-group">
           <label htmlFor="#emailProfile">Email</label>
           {/* <input type="email" id="#emailProfile" /> */}
-          <div className="email">User email</div>
+          <div className="email">{email}</div>
         </div>
 
         <div className="form-group">

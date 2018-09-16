@@ -18,6 +18,7 @@ const {
   resetFormValidation,
   formValidation
 } = require("../middleware/validate");
+const { User } = require("../app/model/user");
 
 const routes = [
   "/",
@@ -72,6 +73,20 @@ router.get("/api/token", async ctx => {
 });
 router.get("/api/isAuthenticated", async ctx => {
   ctx.body = { isAuth: ctx.isAuthenticated() }
+});
+
+router.get("/api/user/profile", isAuthenticated, async ctx => {
+  try {
+    const { profile: { status, avatarPath }, email, username } = await User.findById(ctx.state.user._id);
+    ctx.body = {
+      status,
+      avatarPath,
+      email,
+      username
+    };
+  } catch (error) {
+    throw(error);
+  }
 });
 
 router.post(

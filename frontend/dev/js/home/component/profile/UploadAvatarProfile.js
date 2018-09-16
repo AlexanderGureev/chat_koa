@@ -26,13 +26,14 @@ class UploadAvatarProfile extends Component {
 
   render() {
     const { path, isSend } = this.state;
+    const { avatarPath } = this.props;
     const avaBox = cn({
       avatarBox: true,
       upd: !isSend,
       send: isSend
     });
     const style = {
-      backgroundImage: "url('/img/ava_default.png')"
+      backgroundImage: `url("${avatarPath}")`
     };
     const btnStyles = {
       display: isSend ? "block" : "none"

@@ -52,6 +52,13 @@ export default class ForgotPasswordForm extends Component {
       invalid: input.isInvalid
     });
   };
+  setFocus = () => {
+    const valuesState = Object.values(this.state);
+    const input = valuesState.find(({ isInvalid }) => isInvalid);
+    if(input) {
+      input.target.focus();
+    }
+  };
   submitForm = e => {
     e.preventDefault();
     const { emailForgot } = e.target;
@@ -67,7 +74,7 @@ export default class ForgotPasswordForm extends Component {
         errors: email.errors,
         isOpenTooltip: !email.isValid
       }
-    });
+    }, this.setFocus);
 
     if (email.isValid) {
       this.forgotPassword(e);

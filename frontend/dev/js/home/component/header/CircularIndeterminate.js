@@ -14,12 +14,12 @@ const styles = {
 };
 
 const CircularIndeterminate = props => {
-  const { classes, isActive } = props;
+  const { classes, isActive, size = 40 } = props;
   const cnTooltip = cn(classes.root, { [classes.disabled]: isActive });
 
   return (
     <div className={cnTooltip}>
-      <CircularProgress size={40} />
+      <CircularProgress size={size} />
     </div>
   );
 };

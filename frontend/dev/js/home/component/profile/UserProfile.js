@@ -10,6 +10,8 @@ import {
   Link,
   Redirect
 } from "react-router-dom";
+import { getUser } from "../../services/api";
+import LoadingCycle from "../header/CircularIndeterminate";
 
 const posts = [
   {
@@ -33,8 +35,54 @@ const friends = [
 ];
 
 class UserProfile extends Component {
+  state = {
+    email: "",
+    avatarPath: "",
+    status: "Сменить статус",
+    isLoading: false,
+    isLoaded: false
+  };
+
+  componentWillMount() {
+    this.setState({ isLoading: true });
+    getUser()
+      .then(({ email, avatarPath, status, username }) => {
+        this.setState({
+          email,
+          avatarPath,
+          status,
+          username,
+          isLoading: false,
+          isLoaded: true
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  renderTemplate = () => {
+    const { logout } = this.props;
+    return (
+      <div className="profile">
+        <HeaderProfile {...this.state} />
+        <div className="body">
+          <div className="left-column">
+            <Posts posts={posts} />
+          </div>
+          <div className="right-column">
+            <ContactInfo email={this.state.email} />
+            <Friends friends={friends} />
+          </div>
+        </div>
+        <FooterProfile logout={logout} />
+      </div>
+    );
+  };
+
   render() {
-    const { isAuth, logout } = this.props;
+    const { isAuth } = this.props;
+    const { isLoading } = this.state;
 
     if (!isAuth) {
       return <Redirect to="/" />;
@@ -42,24 +90,21 @@ class UserProfile extends Component {
 
     return (
       <div className="manage-panel">
-        <span className="tooltipError" data-tooltip-content="#tooltip_content" />
+        <span
+          className="tooltipError"
+          data-tooltip-content="#tooltip_content"
+        />
         <div className="tooltip_templates">
           <span id="tooltip_content" />
         </div>
 
-        <div className="profile">
-          <HeaderProfile />
-          <div className="body">
-            <div className="left-column">
-              <Posts posts={posts} />
-            </div>
-            <div className="right-column">
-              <ContactInfo />
-              <Friends friends={friends} />
-            </div>
+        {isLoading ? (
+          <div className="loadingCycleBox">
+            <LoadingCycle isActive={isLoading} size={80}/>
           </div>
-          <FooterProfile logout={logout} />
-        </div>
+        ) : (
+          this.renderTemplate()
+        )}
       </div>
     );
   }

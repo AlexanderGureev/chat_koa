@@ -61,6 +61,7 @@ class ChangeStatusProfile extends Component {
 
   render() {
     const { isOpen } = this.state;
+    const { status } = this.props;
     const cnForm = cn({
       "form-change-status": true,
       "fa-active-status": isOpen,
@@ -70,7 +71,7 @@ class ChangeStatusProfile extends Component {
     return (
       <div className="status" ref={this.statusMenu}>
         <a href="#" className="open-form" onClick={this.handleClick}>
-          User Status
+          {status}
         </a>
         <div
           className={cnForm}

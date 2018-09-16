@@ -123,6 +123,13 @@ export default class RegisterForm extends Component {
       invalid: input.isInvalid
     });
   };
+  setFocus = () => {
+    const valuesState = Object.values(this.state);
+    const input = valuesState.find(({ isInvalid }) => isInvalid);
+    if(input) {
+      input.target.focus();
+    }
+  };
   submitForm = e => {
     e.preventDefault();
     const { emailReg, loginReg, passReg } = e.target;
@@ -132,32 +139,35 @@ export default class RegisterForm extends Component {
       passReg
     );
 
-    this.setState({
-      email: {
-        target: emailReg,
-        value: this.removeSpaces(emailReg),
-        isValid: email.isValid,
-        isInvalid: !email.isValid,
-        errors: email.errors,
-        isOpenTooltip: !email.isValid
+    this.setState(
+      {
+        email: {
+          target: emailReg,
+          value: this.removeSpaces(emailReg),
+          isValid: email.isValid,
+          isInvalid: !email.isValid,
+          errors: email.errors,
+          isOpenTooltip: !email.isValid
+        },
+        login: {
+          target: loginReg,
+          value: this.removeSpaces(loginReg),
+          isValid: login.isValid,
+          isInvalid: !login.isValid,
+          errors: login.errors,
+          isOpenTooltip: !login.isValid
+        },
+        password: {
+          target: passReg,
+          value: this.removeSpaces(passReg),
+          isValid: password.isValid,
+          isInvalid: !password.isValid,
+          errors: password.errors,
+          isOpenTooltip: !password.isValid
+        }
       },
-      login: {
-        target: loginReg,
-        value: this.removeSpaces(loginReg),
-        isValid: login.isValid,
-        isInvalid: !login.isValid,
-        errors: login.errors,
-        isOpenTooltip: !login.isValid
-      },
-      password: {
-        target: passReg,
-        value: this.removeSpaces(passReg),
-        isValid: password.isValid,
-        isInvalid: !password.isValid,
-        errors: password.errors,
-        isOpenTooltip: !password.isValid
-      }
-    });
+      this.setFocus
+    );
 
     if (email.isValid && login.isValid && password.isValid) {
       this.registerUser(e);
@@ -218,7 +228,7 @@ export default class RegisterForm extends Component {
               value={email.value}
               onChange={this.onChangeEmail}
             />
-            <SimpleTooltip {...email} minLength={4}/>
+            <SimpleTooltip {...email} minLength={4} />
           </div>
 
           <div className="form-group">
@@ -235,7 +245,7 @@ export default class RegisterForm extends Component {
               value={login.value}
               onChange={this.onChangeLogin}
             />
-            <SimpleTooltip {...login} minLength={4}/>
+            <SimpleTooltip {...login} minLength={4} />
           </div>
 
           <div className="form-group">
@@ -252,11 +262,10 @@ export default class RegisterForm extends Component {
               value={password.value}
               onChange={this.onChangePassword}
             />
-            <SimpleTooltip {...password} minLength={4}/>
+            <SimpleTooltip {...password} minLength={4} />
           </div>
 
           <div className="form-group">
-          
             <ButtonEx isActive={this.props.isLoading}>Регистрация</ButtonEx>
 
             <a href="#" id="btnAuth" onClick={this.changeForm}>

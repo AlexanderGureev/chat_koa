@@ -85,6 +85,13 @@ export default class AuthForm extends Component {
       invalid: input.isInvalid
     });
   };
+  setFocus = () => {
+    const valuesState = Object.values(this.state);
+    const input = valuesState.find(({ isInvalid }) => isInvalid);
+    if(input) {
+      input.target.focus();
+    }
+  };
   submitForm = e => {
     e.preventDefault();
     const { loginAuth, passAuth } = e.target;
@@ -108,7 +115,7 @@ export default class AuthForm extends Component {
         errors: password.errors,
         isOpenTooltip: !password.isValid
       },
-    });
+    }, this.setFocus);
 
     if (login.isValid && password.isValid) {
       this.authorizationUser(e);
