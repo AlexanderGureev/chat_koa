@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import cn from "classnames";
+import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 
 class ProfileMenu extends Component {
   constructor() {
@@ -65,7 +66,7 @@ class ProfileMenu extends Component {
         <a href="#">Друзья</a>
       </li>
       <li>
-        <a href="/changePassword">Смена пароля</a>
+        <Link to="/changePassword">Смена пароля</Link>
       </li>
       <li>
         <a href="#">Подписка</a>

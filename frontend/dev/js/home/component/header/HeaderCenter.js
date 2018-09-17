@@ -6,11 +6,13 @@ import HeaderText from "./HeaderText";
 import About from "./About";
 import Security from "./Security";
 import Faq from "./Faq";
-import UserProfile from "../profile/UserProfile";
+import UserProfile from "../profile";
 import ChangePasswordForm from "./ChangePasswordForm";
 import FormWrapper from "./FormWrapper";
 import PrivateRoute from "./PrivateRoute";
+import ProfileWrapper from "../profile/ProfileWrapper";
 
+const WrappedUserProfile = ProfileWrapper(UserProfile);
 const WrappedForgotPasswordForm = FormWrapper(ForgotPasswordForm, "/forgot");
 const WrappedResetPasswordForm = FormWrapper(
   ChangePasswordForm,
@@ -67,7 +69,7 @@ export default function HeaderCenter({ authenticateUser, logout, isAuth }) {
                 <Route
                   path="/profile"
                   render={props => (
-                    <UserProfile {...props} isAuth={isAuth} logout={logout} />
+                    <WrappedUserProfile {...props} isAuth={isAuth} logout={logout} />
                   )}
                 />
               </Switch>

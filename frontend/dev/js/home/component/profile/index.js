@@ -35,43 +35,17 @@ const friends = [
 ];
 
 class UserProfile extends Component {
-  state = {
-    email: "",
-    avatarPath: "",
-    status: "Сменить статус",
-    isLoading: false,
-    isLoaded: false
-  };
-
-  componentWillMount() {
-    this.setState({ isLoading: true });
-    getUser()
-      .then(({ email, avatarPath, status, username }) => {
-        this.setState({
-          email,
-          avatarPath,
-          status,
-          username,
-          isLoading: false,
-          isLoaded: true
-        });
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  }
-
   renderTemplate = () => {
-    const { logout } = this.props;
+    const { logout, email } = this.props;
     return (
       <div className="profile">
-        <HeaderProfile {...this.state} />
+        <HeaderProfile {...this.props} />
         <div className="body">
           <div className="left-column">
             <Posts posts={posts} />
           </div>
           <div className="right-column">
-            <ContactInfo email={this.state.email} />
+            <ContactInfo email={email} />
             <Friends friends={friends} />
           </div>
         </div>
@@ -80,9 +54,14 @@ class UserProfile extends Component {
     );
   };
 
+  renderErorrs = () => (
+    <div className="loadingCycleBox">
+      <img src="img/fail.svg" width="60px" alt="errors" />
+    </div>
+  );
+  
   render() {
-    const { isAuth } = this.props;
-    const { isLoading } = this.state;
+    const { isAuth, isLoading, isFail } = this.props;
 
     if (!isAuth) {
       return <Redirect to="/" />;
@@ -100,8 +79,10 @@ class UserProfile extends Component {
 
         {isLoading ? (
           <div className="loadingCycleBox">
-            <LoadingCycle isActive={isLoading} size={80}/>
+            <LoadingCycle isActive={isLoading} size={80} />
           </div>
+        ) : isFail ? (
+          this.renderErorrs()
         ) : (
           this.renderTemplate()
         )}
