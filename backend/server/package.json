@@ -6,10 +6,11 @@
   "scripts": {
     "deletePublic": "./deletePublic.sh",
     "createPublic": "cd ../../ && yarn start && ./createPublic.sh",
-    "start": "node ./bin/main.js",
+    "preBuild": "cd ../../ && yarn run build && ./createPublic.sh",
+    "start": "NODE_ENV=production node ./bin/main.js",
     "dev-front": "npm run deletePublic && node ./bin/main.js",
     "dev": "npm run createPublic && nodemon ./bin/main.js",
-    "build": "npm run createPublic && gulp heroku-build",
+    "build": "npm run preBuild && gulp heroku-build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

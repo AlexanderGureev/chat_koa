@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const { NODE_ENV = "development" } = process.env;
+
 const noop = async () =>
 new Promise((res, rej) =>
   setTimeout(() => {
@@ -10,7 +12,8 @@ new Promise((res, rej) =>
 export const getUser = async () => {
   try {
     const { data } = await axios.get("/api/user/profile");
-    await noop();
+    NODE_ENV === "development" && await this.noop(); //временно
+
     return data;
   } catch (error) {
     throw new Error("Ошибка загрузки данных...");
