@@ -6,8 +6,8 @@
   "scripts": {
     "deletePublic": "./deletePublic.sh",
     "createPublic": "cd ../../ && yarn start && ./createPublic.sh",
-    "start": "npm run deletePublic && NODE_ENV=development node ./bin/main.js",
-    "dev": "npm run createPublic && nodemon ./bin/main.js",
+    "dev": "npm run deletePublic && NODE_ENV=development node ./bin/main.js",
+    "start": "npm run createPublic && nodemon ./bin/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

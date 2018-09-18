@@ -13,11 +13,14 @@ const forgotPassword = async ctx => {
     if (!user) {
       ctx.throw(400, "Форма заполнена некорректно.");
     }
-
+    if(user.provider !== "local") {
+      throw new Error("Данная функция недоступна для пользователей зарегистрированных через социальные сети.");
+    }
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 3600000;
 
     user = await user.save();
+    console.log(user.email)
     const mailOptions = {
       username: user.username,
       email: user.email,
@@ -30,7 +33,6 @@ const forgotPassword = async ctx => {
     };
 
     const result = await sendEmail(mailOptions);
-
     if (!result) {
       ctx.throw(400, "Произошла ошибка отправки письма");
     }
