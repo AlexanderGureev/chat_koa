@@ -8,7 +8,8 @@
   "scripts": {
     "watch": "webpack --watch",
     "createPublic": "./createPublic.sh",
-    "start": "NODE_ENV=development webpack",
+    "dev": "NODE_ENV=development webpack",
+    "start": "cd ./backend/server && yarn start",
     "build": "NODE_ENV=production webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "deletePublic": "./deletePublic.sh",
-    "createPublic": "cd ../../ && yarn start && ./createPublic.sh",
+    "createPublic": "cd ../../ && yarn run dev && ./createPublic.sh",
     "dev": "npm run deletePublic && NODE_ENV=development node ./bin/main.js",
     "start": "npm run createPublic && nodemon ./bin/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
