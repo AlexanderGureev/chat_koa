@@ -27,11 +27,11 @@ class HeaderProfile extends Component {
   };
 
   render() {
-    const { username } = this.props;
+    const { username, provider } = this.props;
     const style = { position: "absolute", right: "25px", bottom: 0 };
     return (
       <div className="header">
-        <ProfileMenu raf={this.raf} />
+        <ProfileMenu raf={this.raf} provider={provider}/>
         <div className="about-me">
           <div className="name">{username}</div>
           <WrappedChangeStatusProfile

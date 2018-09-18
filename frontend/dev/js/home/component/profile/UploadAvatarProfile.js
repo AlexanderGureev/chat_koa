@@ -85,8 +85,8 @@ class UploadAvatarProfile extends Component {
     };
     const deleteBtn = cn({
       delete: true,
-      show: avatarPath !== this.defaultAvatarPath,
-      hide: avatarPath === this.defaultAvatarPath
+      show: avatarPath !== this.defaultAvatarPath && !isSend,
+      hide: avatarPath === this.defaultAvatarPath || isSend
     });
     return isLoading ? (
       this.renderLoading()

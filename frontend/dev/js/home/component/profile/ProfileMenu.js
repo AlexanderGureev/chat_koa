@@ -57,25 +57,30 @@ class ProfileMenu extends Component {
     });
   };
 
-  renderNav = () => (
-    <ul>
-      <li>
-        <a href="#">Главное меню</a>
-      </li>
-      <li>
-        <a href="#">Друзья</a>
-      </li>
-      <li>
-        <Link to="/changePassword">Смена пароля</Link>
-      </li>
-      <li>
-        <a href="#">Подписка</a>
-      </li>
-      <li>
-        <a href="#">Настройки</a>
-      </li>
-    </ul>
-  );
+  renderNav = () => {
+    const { provider } = this.props;
+    return (
+      <ul>
+        <li>
+          <a href="#">Главное меню</a>
+        </li>
+        <li>
+          <a href="#">Друзья</a>
+        </li>
+        {provider === "local" && (
+          <li>
+            <Link to="/changePassword">Смена пароля</Link>
+          </li>
+        )}
+        <li>
+          <a href="#">Подписка</a>
+        </li>
+        <li>
+          <a href="#">Настройки</a>
+        </li>
+      </ul>
+    );
+  };
 
   render() {
     const { isOpen } = this.state;
