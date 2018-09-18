@@ -12,6 +12,10 @@
     "build": "NODE_ENV=production webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "engines": {
+    "node": "10.5.0",
+    "yarn": "1.9.4"
+  },
   "devDependencies": {
     "autoprefixer": "^8.6.5",
     "babel-core": "^6.26.3",
