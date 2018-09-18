@@ -12,7 +12,7 @@ new Promise((res, rej) =>
 export const getUser = async () => {
   try {
     const { data } = await axios.get("/api/user/profile");
-    NODE_ENV === "development" && await this.noop(); //временно
+    NODE_ENV === "development" && await noop(); //временно
 
     return data;
   } catch (error) {
