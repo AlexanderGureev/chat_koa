@@ -7,7 +7,6 @@ const { env } = require("../config");
 const passport = require("koa-passport");
 const { responseMessage } = require("../app/services/responseMessage");
 const { isAuthenticated } = require("../middleware/isAuth");
-const { addAvatar, delAvatar, setStatus } = require("../app/services/profile");
 const {
   forgotPassword,
   checkToken,
@@ -18,7 +17,9 @@ const {
   resetFormValidation,
   formValidation
 } = require("../middleware/validate");
-const { User } = require("../app/model/user");
+
+require("./api")(router);
+require("./profile")(router);
 
 const routes = [
   "/",
@@ -68,28 +69,6 @@ router.get("/logout", async ctx => {
   ctx.redirect("/");
 });
 
-router.get("/api/token", async ctx => {
-  ctx.body = { token: ctx.csrf };
-});
-router.get("/api/isAuthenticated", async ctx => {
-  ctx.body = { isAuth: ctx.isAuthenticated() }
-});
-
-router.get("/api/user/profile", isAuthenticated, async ctx => {
-  try {
-    const { profile: { status, avatarPath }, email, username, provider } = await User.findById(ctx.state.user._id);
-    ctx.body = {
-      status,
-      avatarPath,
-      email,
-      username,
-      provider
-    };
-  } catch (error) {
-    throw(error);
-  }
-});
-
 router.post(
   "/resetPassword/:token",
   checkToken,
@@ -107,10 +86,6 @@ router.post(
   resetFormValidation,
   changePassword
 );
-
-router.post("/profile/add/avatar", isAuthenticated, addAvatar);
-router.delete("/profile/delete/avatar", isAuthenticated, delAvatar);
-router.put("/profile/status/change", isAuthenticated, setStatus);
 
 router.get(
   "/auth/google",
@@ -162,5 +137,6 @@ router.get("/auth/twitter/callback", async (ctx, next) =>
     }
   })(ctx)
 );
+
 module.exports.routes = () => router.routes();
 module.exports.allowedMethods = () => router.allowedMethods();
