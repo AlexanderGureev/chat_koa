@@ -21,19 +21,19 @@ const styles = {
     marginTop: "-15px"
   },
   disabled: {
-    background: "rgba(0, 0, 0, 0.12)",
+    background: "rgba(0, 0, 0, 0.12) !important",
     color: "white",
     boxShadow: "none"
   }
 };
 
 const ButtonEx = props => {
-  const { classes, isActive, children } = props;
+  const { classes, isActive, children, style, size } = props;
   const cnBtn = cn(classes.root, { [classes.disabled]: isActive });
 
   return (
-    <Button type="submit" disabled={isActive} className={cnBtn}>
-      <CircularIndeterminate isActive={isActive} />
+    <Button type="submit" disabled={isActive} className={cnBtn} style={style}>
+      <CircularIndeterminate isActive={isActive} size={size} />
       { children }
     </Button>
   );

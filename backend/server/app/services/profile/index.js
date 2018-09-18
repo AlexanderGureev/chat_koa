@@ -39,7 +39,7 @@ const addAvatar = async (ctx, next) => {
       req: { file }
     } = await upload(ctx);
     const { avatarPath } = await _updateAvatar(ctx.state.user, file);
-    ctx.body = responseMessage(200, "OK", avatarPath);
+    ctx.body = responseMessage(200, "", avatarPath);
   } catch (error) {
     throw error;
   }
@@ -48,7 +48,7 @@ const addAvatar = async (ctx, next) => {
 const delAvatar = async (ctx, next) => {
   try {
     const { profile } = await _deleteAvatar(ctx.state.user);
-    ctx.body = responseMessage(200, "OK", profile.avatarPath);
+    ctx.body = responseMessage(200, "", profile.avatarPath);
   } catch (error) {
     throw error;
   }
@@ -63,7 +63,7 @@ const setStatus = async (ctx, next) => {
     user.profile.status = status ? status : "Сменить статус";
     const { profile } = await user.save();
 
-    ctx.body = responseMessage(200, "OK", profile.status);
+    ctx.body = responseMessage(200, "", profile.status);
   } catch (error) {
     throw error;
   }

@@ -5,7 +5,7 @@ const { responseMessage } = require("../responseMessage");
 const forgotPassword = async ctx => {
   try {
     const { email } = ctx.request.body;
-    const [user, token] = await Promise.all([
+    let [user, token] = await Promise.all([
       User.findOne({ email }),
       generateResetToken()
     ]);
@@ -17,14 +17,14 @@ const forgotPassword = async ctx => {
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 3600000;
 
-    const { username } = await user.save();
+    user = await user.save();
     const mailOptions = {
-      username,
-      email,
+      username: user.username,
+      email: user.email,
       filename: "emailForgot.ejs",
       subject: "Сброс пароля CHATER.RU",
       htmlData: {
-        username,
+        username: user.username,
         url: `http://${ctx.host}/resetPassword/${user.resetPasswordToken}`
       }
     };
@@ -113,12 +113,12 @@ const changePassword = async ctx => {
     await ctx.login(user);
 
     const mailOptions = {
-      username,
-      email,
+      username: user.username,
+      email: user.email,
       filename: "emailResetSuccess.ejs",
       subject: "Пароль изменен CHATER.RU",
       htmlData: {
-        username,
+        username: user.username,
         url: `http://localhost:3000/`
       }
     };

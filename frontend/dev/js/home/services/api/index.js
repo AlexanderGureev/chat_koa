@@ -9,7 +9,7 @@ new Promise((res, rej) =>
 
 export const getUser = async () => {
   try {
-    const { data } = await axios.get("/api/user/profile1");
+    const { data } = await axios.get("/api/user/profile");
     await noop();
     return data;
   } catch (error) {

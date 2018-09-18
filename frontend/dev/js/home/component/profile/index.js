@@ -61,22 +61,10 @@ class UserProfile extends Component {
   );
   
   render() {
-    const { isAuth, isLoading, isFail } = this.props;
-
-    if (!isAuth) {
-      return <Redirect to="/" />;
-    }
-
+    const { isLoading, isFail } = this.props;
+    
     return (
       <div className="manage-panel">
-        <span
-          className="tooltipError"
-          data-tooltip-content="#tooltip_content"
-        />
-        <div className="tooltip_templates">
-          <span id="tooltip_content" />
-        </div>
-
         {isLoading ? (
           <div className="loadingCycleBox">
             <LoadingCycle isActive={isLoading} size={80} />

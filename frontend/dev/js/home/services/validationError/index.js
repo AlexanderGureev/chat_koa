@@ -1,4 +1,5 @@
 function ValidationError(message = []) {
+  this.type = "ValidateError";
   this.name = "Validation Error";
   this.message = message || "Ошибка валидации, повторите отправку.";
   this.stack = new Error().stack;

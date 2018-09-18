@@ -13,15 +13,16 @@ import PrivateRoute from "./PrivateRoute";
 import ProfileWrapper from "../profile/ProfileWrapper";
 
 const WrappedUserProfile = ProfileWrapper(UserProfile);
-const WrappedForgotPasswordForm = FormWrapper(ForgotPasswordForm, "/forgot");
-const WrappedResetPasswordForm = FormWrapper(
-  ChangePasswordForm,
-  "/resetPassword"
-);
-const WrappedChangePasswordForm = FormWrapper(
-  ChangePasswordForm,
-  "/changePassword"
-);
+const WrappedForgotPasswordForm = FormWrapper(ForgotPasswordForm, {
+  url: "/forgot",
+  redirectURL: "/forgot"
+});
+const WrappedResetPasswordForm = FormWrapper(ChangePasswordForm, {
+  url: "/resetPassword"
+});
+const WrappedChangePasswordForm = FormWrapper(ChangePasswordForm, {
+  url: "/changePassword"
+});
 
 export default function HeaderCenter({ authenticateUser, logout, isAuth }) {
   const getRoutes = () => (
@@ -64,13 +65,13 @@ export default function HeaderCenter({ authenticateUser, logout, isAuth }) {
                 <PrivateRoute
                   path="/changePassword"
                   component={WrappedChangePasswordForm}
-                  isAuth = {isAuth}
+                  isAuth={isAuth}
                 />
-                <Route
+                <PrivateRoute
                   path="/profile"
-                  render={props => (
-                    <WrappedUserProfile {...props} isAuth={isAuth} logout={logout} />
-                  )}
+                  component={WrappedUserProfile}
+                  isAuth={isAuth}
+                  logout={logout}
                 />
               </Switch>
             </div>

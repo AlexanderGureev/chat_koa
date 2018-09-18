@@ -5,8 +5,14 @@ import Validator from "../../services/validation";
 import FormWrapper from "./FormWrapper";
 import withErrors from "./withErrors";
 
-const WrappedRegForm = withErrors(FormWrapper(RegisterForm, "/register", "/profile"));
-const WrappedAuthForm = FormWrapper(AuthForm, "/auth", "/profile");
+const WrappedRegForm = withErrors(
+  FormWrapper(RegisterForm, { url: "/register", redirectURL: "/profile" })
+);
+const WrappedAuthForm = FormWrapper(AuthForm, {
+  url: "/auth",
+  redirectURL: "/profile"
+});
+
 const validator = new Validator();
 
 export default class FormBox extends Component {

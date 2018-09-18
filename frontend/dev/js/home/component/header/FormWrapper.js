@@ -11,7 +11,10 @@ import axios from "axios";
 import ValidationError from "../../services/validationError";
 import getToken from "../../services/csrfToken";
 
-const FormWrapper = (ComposedComponent, url, redirectURL) =>
+const FormWrapper = (
+  ComposedComponent,
+  { url, method = "post", redirectURL }
+) =>
   class extends Component {
     state = {
       target: null,
@@ -29,26 +32,43 @@ const FormWrapper = (ComposedComponent, url, redirectURL) =>
         }, 2000)
       );
 
-    sendForm = async (target, data) => {
+    sendForm = async (target, data, formData = false, options) => {
+      this.setState({ isLoading: true });
       const { authenticateUser, match } = this.props;
 
       if (match && match.params.token) {
         url = match.url;
       }
-    
-      this.setState({ isLoading: true });
 
       try {
         const token = await getToken("/api/token");
+        const _options = formData
+          ? {
+              method,
+              url,
+              data,
+              headers: { "X-CSRF-Token": `${token}` }
+            }
+          : {
+              method,
+              url,
+              data: {
+                ...data,
+                _csrf: token
+              },
+              ...options
+            };
 
         const {
-          data: { status, message, errors }
-        } = await axios.post(url, { ...data, _csrf: token });
+          data: { status, message, errors, info }
+        } = await axios(_options);
+
         const res = await this.noop();
 
         if (status !== 200) {
           throw new ValidationError(errors);
         }
+
         if (message) {
           this.setState({
             target,
@@ -57,15 +77,26 @@ const FormWrapper = (ComposedComponent, url, redirectURL) =>
             isOpenTooltip: true,
             message
           });
+        } else {
+          this.setState({
+            target,
+            isLoading: false,
+            isLoaded: true
+          });
         }
 
         if (authenticateUser) {
           await authenticateUser();
         }
+
+        if (info) {
+          return info;
+        }
       } catch ({ message }) {
+        const errors = message instanceof Array ? message : [message];
         this.setState({
           target,
-          errors: message,
+          errors,
           isLoading: false,
           isLoaded: true,
           isOpenTooltip: true
@@ -73,7 +104,7 @@ const FormWrapper = (ComposedComponent, url, redirectURL) =>
       }
     };
 
-    wrappedChangeForm = fn => e => {
+    wrappedChangeForm = (fn = () => {}) => e => {
       this.setState({
         isOpenTooltip: false
       });
