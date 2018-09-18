@@ -4,7 +4,7 @@ const koaWebpack = require("koa-webpack");
 let compiler;
 
 module.exports = (app, env) => {
-  if(env === "dev_nodemon") {
+  if(env !== "dev_webpack") {
     return;
   }
   compiler = webpack(config);
