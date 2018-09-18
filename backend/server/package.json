@@ -5,10 +5,11 @@
   "license": "MIT",
   "scripts": {
     "deletePublic": "./deletePublic.sh",
-    "createPublic": "cd ../../ && yarn run dev && ./createPublic.sh",
-    "dev": "npm run deletePublic && NODE_ENV=development node ./bin/main.js",
-    "start": "npm run createPublic && nodemon ./bin/main.js",
-    "heroku-build": "cd ../../ && yarn run dev && gulp && node ./bin/main.js",
+    "createPublic": "cd ../../ && yarn start && ./createPublic.sh",
+    "start": "node ./bin/main.js",
+    "dev-front": "npm run deletePublic && NODE_ENV=development node ./bin/main.js",
+    "dev": "npm run createPublic && nodemon ./bin/main.js",
+    "build": "npm run createPublic && gulp heroku-build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -28,6 +29,7 @@
     "koa-favicon": "^2.0.1",
     "koa-generic-session": "^2.0.1",
     "koa-helmet": "^4.0.0",
+    "koa-logger": "^3.2.0",
     "koa-multer": "^1.0.2",
     "koa-passport": "^4.1.0",
     "koa-proxy": "^0.9.0",
@@ -43,7 +45,6 @@
     "passport-vkontakte": "^0.3.2"
   },
   "devDependencies": {
-    "koa-logger": "^3.2.0",
     "koa-webpack": "^5.1.0"
   }
 }
