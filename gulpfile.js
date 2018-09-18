@@ -13,6 +13,24 @@ gulp.task("clean", function () {
     return;
 });
 
+gulp.task("clean-build", function () {
+    try {
+        del.sync(["build/**/*", "!build/.git"]);
+        console.log(`Build folder ${colors.underline.red("deleted")} successfully!`);
+    } catch (e) {
+        console.error(e)
+    }
+    return;
+});
+
+gulp.task("heroku-build", ["clean-build"], function () {
+    return gulp.src([
+        "backend/server/**/*",
+        "!backend/server/node_modules/**/*",
+        "!backend/server/*.sh"
+    ])
+        .pipe(gulp.dest("build"));
+});
 
 gulp.task("build", function () {
     return gulp.src([

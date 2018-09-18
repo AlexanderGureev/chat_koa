@@ -6,15 +6,17 @@ const { User } = require("../app/model/user");
 const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 const VKStrategy = require("passport-vkontakte").Strategy;
 const TwitterStrategy = require("passport-twitter").Strategy;
+const { env } = require("../config");
 const {
   googleRegister,
   vkRegister,
   twitterRegister
 } = require("../app/services/oauth");
-const {
-  oauth: { google, vk, twitter }
-} = require("../config");
 
+const propName = env === "production" ? "oauth" : "dev_oauth";
+const {
+  [propName]: { google, vk, twitter }
+} = require("../config");
 
 passport.serializeUser((user, done) => {
   done(null, user.id);

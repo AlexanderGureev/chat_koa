@@ -7,7 +7,7 @@
     "deletePublic": "./deletePublic.sh",
     "createPublic": "cd ../../ && yarn start && ./createPublic.sh",
     "start": "node ./bin/main.js",
-    "dev-front": "npm run deletePublic && NODE_ENV=development node ./bin/main.js",
+    "dev-front": "npm run deletePublic && node ./bin/main.js",
     "dev": "npm run createPublic && nodemon ./bin/main.js",
     "build": "npm run createPublic && gulp heroku-build",
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -28,10 +28,10 @@ const routes = [
   "/changePassword"
 ];
 
-if(env === "dev_nodemon") {
+if(env !== "dev_webpack") {
   router.get(routes, async (ctx, next) => {
     await ctx.render("index");
-});
+  });
 }
 
 router.get("/chat", isAuthenticated, async (ctx, next) => {

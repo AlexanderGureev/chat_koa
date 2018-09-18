@@ -5,7 +5,7 @@ const { connectionInit } = require("../app/services/mongodb");
 const { passportInit } = require("../middleware/passport");
 const { PORT, env } = require("../config");
 const colors = require("colors");
-require("../app/services/webpack")(app, env);
+env !== "production" && require("../app/services/webpack")(app, env);
 
 connectionInit();
 app.use(middleware(app));
