@@ -11,6 +11,8 @@ import axios from "axios";
 import ValidationError from "../../services/validationError";
 import getToken from "../../services/csrfToken";
 
+const { NODE_ENV = "development" } = process.env;
+
 const FormWrapper = (
   ComposedComponent,
   { url, method = "post", redirectURL }
@@ -63,7 +65,7 @@ const FormWrapper = (
           data: { status, message, errors, info }
         } = await axios(_options);
 
-        const res = await this.noop();
+        NODE_ENV === "development" && await this.noop(); //временно
 
         if (status !== 200) {
           throw new ValidationError(errors);
