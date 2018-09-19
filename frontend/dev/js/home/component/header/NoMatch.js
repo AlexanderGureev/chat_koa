@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 
 const NoMatch = ({ location }) => (
-  <div>
+  <div className="noMatch">
+    <img src="img/404.gif" alt="page not fount"/>
     <h3>
-      No match for <code>{location.pathname}</code>
+      Page <code>{location.pathname}</code> not found.
     </h3>
   </div>
 );

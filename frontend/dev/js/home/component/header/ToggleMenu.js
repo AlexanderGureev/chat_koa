@@ -4,7 +4,7 @@ import classnames from "classnames";
 export default function ToggleMenu(props) {
   let cnHamb = classnames({
     hamb: true,
-    show: props.isFocus
+    focus: props.isFocus
   });
 
   return (

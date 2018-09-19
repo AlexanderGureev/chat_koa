@@ -11,6 +11,11 @@ import ChangePasswordForm from "./ChangePasswordForm";
 import FormWrapper from "./FormWrapper";
 import PrivateRoute from "./PrivateRoute";
 import ProfileWrapper from "../profile/ProfileWrapper";
+import FormBoxContainer from "./FormBoxContainer";
+import IsMatch from "./IsMatch";
+import AboutImg from "./AboutImg";
+import FaqImg from "./FaqImg";
+import SecurityImg from "./SecurityImg";
 
 const WrappedUserProfile = ProfileWrapper(UserProfile);
 const WrappedForgotPasswordForm = FormWrapper(ForgotPasswordForm, {
@@ -38,14 +43,10 @@ export default function HeaderCenter({ authenticateUser, logout, isAuth }) {
     <div className="header-center">
       <div className="container">
         <div className="row">
-          <div className="col-lg-6">{getRoutes()}</div>
-          <div className="col-lg-5 offset-lg-1 form-box">
-            <div
-              className="register-form wow zoomInRight"
-              data-wow-duration="1.5s"
-              data-wow-delay="1.4s"
-            >
-              <Switch>
+          <IsMatch>
+            <div className="col-lg-6 text-content">{getRoutes()}</div>
+            <Switch>
+              <FormBoxContainer>
                 <Route
                   exact
                   path="/"
@@ -73,9 +74,16 @@ export default function HeaderCenter({ authenticateUser, logout, isAuth }) {
                   isAuth={isAuth}
                   logout={logout}
                 />
-              </Switch>
-            </div>
-          </div>
+              </FormBoxContainer>
+            </Switch>
+
+            <Switch>
+              <Route path="/about" component={AboutImg} />
+              <Route path="/security" component={FaqImg} />
+              <Route path="/faq" component={SecurityImg} />
+            </Switch>
+            
+          </IsMatch>
         </div>
       </div>
     </div>

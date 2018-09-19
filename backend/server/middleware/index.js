@@ -53,9 +53,9 @@ module.exports = app => {
     new CSRF(csrfConfig),
     passport.initialize(),
     passport.session(),
-    routes(),
-    allowedMethods(),
     static(publicDir),
+    routes(),
+    allowedMethods()
     //favicon(pathToFavicon)
   ]);
 };

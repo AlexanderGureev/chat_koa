@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import TopLine from "./TopLine";
 import HeaderCenter from "./HeaderCenter";
-//import NoMatch from "./NoMatch";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import { isAuth, authenticateUser, logout } from "../../services/Auth";
 

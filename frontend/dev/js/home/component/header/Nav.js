@@ -1,10 +1,14 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
-export default function Nav() {
+export default function Nav(props) {
+  const closeMenu = ({target}) => {
+    const { tagName } = target;
+    tagName === "A" && props.closeMenu();
+  }
   return (
     <nav>
-      <ul>
+      <ul onClick={closeMenu}>
         <li>
           <Link to="/">Главная</Link>
         </li>

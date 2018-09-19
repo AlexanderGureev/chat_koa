@@ -21,20 +21,6 @@ const {
 require("./api")(router);
 require("./profile")(router);
 
-const routes = [
-  "/",
-  "/forgot",
-  "/profile",
-  "/resetPassword/:token",
-  "/changePassword"
-];
-
-if(env !== "dev_webpack") {
-  router.get(routes, async (ctx, next) => {
-    await ctx.render("index");
-  });
-}
-
 router.get("/chat", isAuthenticated, async (ctx, next) => {
   await ctx.render("chat");
 });
@@ -137,6 +123,12 @@ router.get("/auth/twitter/callback", async (ctx, next) =>
     }
   })(ctx)
 );
+
+if(env !== "dev_webpack") {
+  router.get("*", async (ctx, next) => {
+    await ctx.render("index");
+  });
+}
 
 module.exports.routes = () => router.routes();
 module.exports.allowedMethods = () => router.allowedMethods();
