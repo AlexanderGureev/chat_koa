@@ -10,7 +10,9 @@ import {
 import axios from "axios";
 import ValidationError from "../../services/validationError";
 import getToken from "../../services/csrfToken";
+import withTimeoutHiding from "./withTimeoutHiding";
 
+const WrappedSimpleTooltip = withTimeoutHiding(SimpleTooltip, 5000);
 const { NODE_ENV = "development" } = process.env;
 
 const FormWrapper = (
@@ -123,11 +125,12 @@ const FormWrapper = (
 
       return (
         <React.Fragment>
-          <SimpleTooltip
+          <WrappedSimpleTooltip
             isOpenTooltip={isOpenTooltip}
             target={target}
             errors={errors}
             message={message}
+            closeTooltip={this.wrappedChangeForm()}
           />
           <ComposedComponent
             {...this.props}

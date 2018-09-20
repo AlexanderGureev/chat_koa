@@ -17,7 +17,7 @@ const ProfileWrapper = ComposedComponent =>
       isFail: false
     };
 
-    async componentWillMount() {
+    async componentDidMount() {
       this.setState({ isLoading: true });
       try {
         const userProfile = await getUser();

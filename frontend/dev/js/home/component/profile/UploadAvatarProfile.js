@@ -107,7 +107,6 @@ class UploadAvatarProfile extends Component {
           id="avatar"
           name="avatar"
           onChange={this.handleChange}
-          onAbort={this.handleChange}
           ref={this.avaInput}
         />
         <span className="fileName">{fileName}</span>

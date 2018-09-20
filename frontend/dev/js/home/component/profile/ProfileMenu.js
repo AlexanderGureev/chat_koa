@@ -28,9 +28,11 @@ class ProfileMenu extends Component {
 
   componentDidMount() {
     window.addEventListener("click", this.handleCloseMenu);
+    window.addEventListener("touchstart", this.handleCloseMenu);
   }
   componentWillUnmount() {
     window.removeEventListener("click", this.handleCloseMenu);
+    window.removeEventListener("touchstart", this.handleCloseMenu);
   }
 
   handleAnimationEnd = () => {
