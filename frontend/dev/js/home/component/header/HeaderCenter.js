@@ -79,8 +79,8 @@ export default function HeaderCenter({ authenticateUser, logout, isAuth }) {
 
             <Switch>
               <Route path="/about" component={AboutImg} />
-              <Route path="/security" component={FaqImg} />
-              <Route path="/faq" component={SecurityImg} />
+              <Route path="/security" component={SecurityImg} />
+              <Route path="/faq" component={FaqImg} />
             </Switch>
             
           </IsMatch>
