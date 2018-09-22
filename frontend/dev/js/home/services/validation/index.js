@@ -38,11 +38,11 @@ export default class Validator {
           errorMessage: "Поле не может быть пустым"
         }
       ],
-      passwordConfirm: previousPassword => {
+      passwordConfirm: passwordConfirm => {
         return [
           {
             checkValidity: password => {
-              return !(password === previousPassword);
+              return !(password === passwordConfirm);
             },
             errorMessage: "Пароли должны совпадать"
           },
@@ -113,6 +113,6 @@ export default class Validator {
   loginValidation = ({ value }) => this._isValid(value, "login");
   emailValidation = ({ value })=> this._isValid(value, "email");
   passwordValidation = ({ value }) => this._isValid(value, "password");
-  passwordConfirmValidation = (previousPass, newPass) => this._isValid([previousPass.value, newPass.value], "passwordConfirm");
+  passwordConfirmValidation = (password, passwordConfirm) => this._isValid([password.value, passwordConfirm.value], "passwordConfirm");
 }
 

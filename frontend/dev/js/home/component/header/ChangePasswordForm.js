@@ -3,10 +3,7 @@ import Validator from "../../services/validation";
 import SimpleTooltip from "./SimpleTooltip";
 import classnames from "classnames";
 import ButtonEx from "./ButtonEx";
-import {
-  BrowserRouter as Router,
-  Redirect
-} from "react-router-dom";
+import { BrowserRouter as Router, Redirect } from "react-router-dom";
 
 export default class ForgotPasswordForm extends Component {
   constructor(props) {
@@ -14,7 +11,7 @@ export default class ForgotPasswordForm extends Component {
     this.validator = new Validator();
   }
   state = {
-    password: {
+    passNew: {
       target: null,
       value: "",
       isValid: false,
@@ -22,7 +19,7 @@ export default class ForgotPasswordForm extends Component {
       isOpenTooltip: false,
       errors: []
     },
-    confirmPassword: {
+    passConfirm: {
       target: null,
       value: "",
       isValid: false,
@@ -32,37 +29,36 @@ export default class ForgotPasswordForm extends Component {
     }
   };
 
-  removeSpaces = input => input.value.replace(/\s/g, "");
+  removeSpaces = ({ value }) => value.replace(/\s/g, "");
   validationChangePasswordForm = (password, confirmPassword) => {
     let result = {};
-    result.password = this.validator.passwordValidation(password);
-    result.confirmPassword = this.validator.passwordConfirmValidation(
+    result.passNew = this.validator.passwordValidation(password);
+    result.passConfirm = this.validator.passwordConfirmValidation(
       password,
       confirmPassword
     );
     return result;
   };
-  onChangePassword = ({ target }) => {
-    const { isValid, errors } = this.validator.passwordValidation(target);
-    this.setState({
-      password: {
-        target,
-        value: this.removeSpaces(target),
-        isValid,
-        isInvalid: !isValid,
-        errors,
-        isOpenTooltip: !isValid
-      }
-    });
-  };
-  onChangeConfirmPassword = ({ target }) => {
-    const { password } = this.state;
-    const { isValid, errors } = this.validator.passwordConfirmValidation(
-      password.target,
-      target
+  onChangeInput = ({ target }) => {
+    const { isValid, errors } =
+      target.name === "passNew"
+        ? this.validator.passwordValidation(target)
+        : this.validator.passwordConfirmValidation(
+            this.state.passNew.target,
+            target
+          );
+
+    const newState = Object.keys(this.state).reduce(
+      (acc, key) => ({
+        ...acc,
+        [key]: { ...this.state[key], isOpenTooltip: false }
+      }),
+      {}
     );
+
     this.setState({
-      confirmPassword: {
+      ...newState,
+      [target.name]: {
         target,
         value: this.removeSpaces(target),
         isValid,
@@ -73,66 +69,59 @@ export default class ForgotPasswordForm extends Component {
     });
   };
   changePassword = async ({ target }) => {
-    const { password, confirmPassword } = this.state;
+    const { passNew, passConfirm } = this.state;
     const { sendForm } = this.props;
     await sendForm(target, {
-      passNew: password.value,
-      passConfirm: confirmPassword.value
+      passNew: passNew.value,
+      passConfirm: passConfirm.value
     });
   };
-
-  getClassNamesInputs = input => {
+  getClassNamesInputs = ({ isValid, isInvalid }) => {
     return classnames({
-      valid: input.isValid,
-      invalid: input.isInvalid
+      valid: isValid,
+      invalid: isInvalid
     });
   };
   setFocus = () => {
     const valuesState = Object.values(this.state);
     const input = valuesState.find(({ isInvalid }) => isInvalid);
-    if(input) {
+    if (input) {
       input.target.focus();
     }
   };
   submitForm = e => {
     e.preventDefault();
     const { passNew, passConfirm } = e.target;
-    const { password, confirmPassword } = this.validationChangePasswordForm(
-      passNew,
-      passConfirm
+    const res = this.validationChangePasswordForm(passNew, passConfirm);
+    const newState = [passNew, passConfirm].reduce(
+      (acc, input) => ({
+        ...acc,
+        [input.name]: {
+          target: input,
+          value: this.removeSpaces(input),
+          isValid: res[input.name].isValid,
+          isInvalid: !res[input.name].isValid,
+          errors: res[input.name].errors,
+          isOpenTooltip: !res[input.name].isValid
+        }
+      }),
+      {}
     );
 
-    this.setState({
-      password: {
-        target: passNew,
-        value: this.removeSpaces(passNew),
-        isValid: password.isValid,
-        isInvalid: !password.isValid,
-        errors: password.errors,
-        isOpenTooltip: !password.isValid
+    this.setState(
+      {
+        ...newState
       },
-      confirmPassword: {
-        target: passConfirm,
-        value: this.removeSpaces(passConfirm),
-        isValid: confirmPassword.isValid,
-        isInvalid: !confirmPassword.isValid,
-        errors: confirmPassword.errors,
-        isOpenTooltip: !confirmPassword.isValid
-      }
-    }, this.setFocus);
+      this.setFocus
+    );
 
-    if (password.isValid && confirmPassword.isValid) {
+    if (res.passNew.isValid && res.passConfirm.isValid) {
       this.changePassword(e);
     }
   };
 
   render() {
-    const { password, confirmPassword } = this.state;
-    // const { isAuth } = this.props;
-    // console.log(isAuth)
-    // if (isAuth == false) {
-    //   return <Redirect to="/" />;
-    // }
+    const { passNew, passConfirm } = this.state;
 
     return (
       <div className="change-container">
@@ -149,7 +138,7 @@ export default class ForgotPasswordForm extends Component {
           <div className="form-group">
             <label
               htmlFor="passNew"
-              className={this.getClassNamesInputs(password)}
+              className={this.getClassNamesInputs(passNew)}
             >
               Новый пароль
             </label>
@@ -157,16 +146,16 @@ export default class ForgotPasswordForm extends Component {
               type="password"
               name="passNew"
               id="passNew"
-              value={password.value}
-              onChange={this.onChangePassword}
+              value={passNew.value}
+              onChange={this.onChangeInput}
             />
-            <SimpleTooltip {...password} minLength={4} />
+            <SimpleTooltip {...passNew} minLength={4} />
           </div>
 
           <div className="form-group">
             <label
               htmlFor="passConfirm"
-              className={this.getClassNamesInputs(confirmPassword)}
+              className={this.getClassNamesInputs(passConfirm)}
             >
               Подтвердите пароль
             </label>
@@ -174,14 +163,14 @@ export default class ForgotPasswordForm extends Component {
               type="password"
               name="passConfirm"
               id="passConfirm"
-              value={confirmPassword.value}
-              onChange={this.onChangeConfirmPassword}
+              value={passConfirm.value}
+              onChange={this.onChangeInput}
             />
-            <SimpleTooltip {...confirmPassword} minLength={4} />
+            <SimpleTooltip {...passConfirm} minLength={4} />
           </div>
 
           <div className="form-group">
-          <ButtonEx isActive={this.props.isLoading}>Сменить пароль</ButtonEx>
+            <ButtonEx isActive={this.props.isLoading}>Сменить пароль</ButtonEx>
           </div>
         </form>
       </div>

@@ -20,7 +20,7 @@ export default class ForgotPasswordForm extends Component {
     }
   };
 
-  removeSpaces = input => input.value.replace(/\s/g, "");
+  removeSpaces = ({value}) => value.replace(/\s/g, "");
   validationForgotForm = email => {
     let result = {};
     result.email = this.validator.emailValidation(email);
@@ -46,10 +46,10 @@ export default class ForgotPasswordForm extends Component {
       email: email.value,
     });
   };
-  getClassNamesInputs = input => {
+  getClassNamesInputs = ({ isValid, isInvalid }) => {
     return classnames({
-      valid: input.isValid,
-      invalid: input.isInvalid
+      valid: isValid,
+      invalid: isInvalid
     });
   };
   setFocus = () => {

@@ -5,7 +5,7 @@ import ButtonEx from "./ButtonEx";
 
 export default class RegisterForm extends Component {
   state = {
-    email: {
+    emailReg: {
       target: null,
       value: "",
       isValid: false,
@@ -13,7 +13,7 @@ export default class RegisterForm extends Component {
       isOpenTooltip: false,
       errors: []
     },
-    login: {
+    loginReg: {
       target: null,
       value: "",
       isValid: false,
@@ -21,7 +21,7 @@ export default class RegisterForm extends Component {
       isOpenTooltip: false,
       errors: []
     },
-    password: {
+    passReg: {
       target: null,
       value: "",
       isValid: false,
@@ -31,83 +31,45 @@ export default class RegisterForm extends Component {
     }
   };
 
-  removeSpaces = input => input.value.replace(/\s/g, "");
+  removeSpaces = ({ value }) => value.replace(/\s/g, "");
   validationRegForm = (email, login, password) => {
     const { validator } = this.props;
     let result = {};
-    result.email = validator.emailValidation(email);
-    result.login = validator.loginValidation(login);
-    result.password = validator.passwordValidation(password);
+    result.emailReg = validator.emailValidation(email);
+    result.loginReg = validator.loginValidation(login);
+    result.passReg = validator.passwordValidation(password);
 
     return result;
   };
   registerUser = async ({ target }) => {
-    const { email, login, password } = this.state;
+    const { emailReg, loginReg, passReg } = this.state;
     const { sendForm } = this.props;
     await sendForm(target, {
-      email: email.value,
-      username: login.value,
-      password: password.value
+      email: emailReg.value,
+      username: loginReg.value,
+      password: passReg.value
     });
   };
-  onChangeEmail = ({ target }) => {
+  onChangeInput = ({ target }) => {
     const { validator } = this.props;
-    const { isValid, errors } = validator.emailValidation(target);
-    this.setState({
-      email: {
-        target,
-        value: this.removeSpaces(target),
-        isValid,
-        isInvalid: !isValid,
-        errors,
-        isOpenTooltip: !isValid
-      },
-      login: {
-        ...this.state.login,
-        isOpenTooltip: false
-      },
-      password: {
-        ...this.state.password,
-        isOpenTooltip: false
-      }
-    });
-  };
-  onChangeLogin = ({ target }) => {
-    const { validator } = this.props;
-    const { isValid, errors } = validator.loginValidation(target);
-    this.setState({
-      email: {
-        ...this.state.email,
-        isOpenTooltip: false
-      },
-      login: {
-        target,
-        value: this.removeSpaces(target),
-        isValid,
-        isInvalid: !isValid,
-        errors,
-        isOpenTooltip: !isValid
-      },
-      password: {
-        ...this.state.password,
-        isOpenTooltip: false
-      }
-    });
-  };
-  onChangePassword = ({ target }) => {
-    const { validator } = this.props;
-    const { isValid, errors } = validator.passwordValidation(target);
+    const { isValid, errors } =
+      target.name === "emailReg"
+        ? validator.emailValidation(target)
+        : target.name === "loginReg"
+          ? validator.loginValidation(target)
+          : validator.passwordValidation(target);
+
+    const newState = Object.keys(this.state).reduce(
+      (acc, key) => ({
+        ...acc,
+        [key]: { ...this.state[key], isOpenTooltip: false }
+      }),
+      {}
+    );
 
     this.setState({
-      email: {
-        ...this.state.email,
-        isOpenTooltip: false
-      },
-      login: {
-        ...this.state.login,
-        isOpenTooltip: false
-      },
-      password: {
+      ...newState,
+      [target.name]: {
         target,
         value: this.removeSpaces(target),
         isValid,
@@ -117,74 +79,62 @@ export default class RegisterForm extends Component {
       }
     });
   };
-  getClassNamesInputs = input => {
+  getClassNamesInputs = ({ isValid, isInvalid }) => {
     return classnames({
-      valid: input.isValid,
-      invalid: input.isInvalid
+      valid: isValid,
+      invalid: isInvalid
     });
   };
   setFocus = () => {
     const valuesState = Object.values(this.state);
     const input = valuesState.find(({ isInvalid }) => isInvalid);
-    if(input) {
+    if (input) {
       input.target.focus();
     }
   };
   submitForm = e => {
     e.preventDefault();
     const { emailReg, loginReg, passReg } = e.target;
-    const { email, login, password } = this.validationRegForm(
-      emailReg,
-      loginReg,
-      passReg
+    const res = this.validationRegForm(emailReg, loginReg, passReg);
+
+    const newState = [emailReg, loginReg, passReg].reduce(
+      (acc, input) => ({
+        ...acc,
+        [input.name]: {
+          target: input,
+          value: this.removeSpaces(input),
+          isValid: res[input.name].isValid,
+          isInvalid: !res[input.name].isValid,
+          errors: res[input.name].errors,
+          isOpenTooltip: !res[input.name].isValid
+        }
+      }),
+      {}
     );
 
     this.setState(
       {
-        email: {
-          target: emailReg,
-          value: this.removeSpaces(emailReg),
-          isValid: email.isValid,
-          isInvalid: !email.isValid,
-          errors: email.errors,
-          isOpenTooltip: !email.isValid
-        },
-        login: {
-          target: loginReg,
-          value: this.removeSpaces(loginReg),
-          isValid: login.isValid,
-          isInvalid: !login.isValid,
-          errors: login.errors,
-          isOpenTooltip: !login.isValid
-        },
-        password: {
-          target: passReg,
-          value: this.removeSpaces(passReg),
-          isValid: password.isValid,
-          isInvalid: !password.isValid,
-          errors: password.errors,
-          isOpenTooltip: !password.isValid
-        }
+        ...newState
       },
       this.setFocus
     );
 
-    if (email.isValid && login.isValid && password.isValid) {
+    if (res.emailReg.isValid && res.loginReg.isValid && res.passReg.isValid) {
       this.registerUser(e);
     }
   };
   closeTooltips = () => {
     this.setState({
-      email: {
-        ...this.state.email,
+      emailReg: {
+        ...this.state.emailReg,
         isOpenTooltip: false
       },
-      login: {
-        ...this.state.login,
+      loginReg: {
+        ...this.state.loginReg,
         isOpenTooltip: false
       },
-      password: {
-        ...this.state.password,
+      passReg: {
+        ...this.state.passReg,
         isOpenTooltip: false
       }
     });
@@ -195,7 +145,7 @@ export default class RegisterForm extends Component {
   };
 
   render() {
-    const { email, login, password } = this.state;
+    const { emailReg, loginReg, passReg } = this.state;
     let cnForm = classnames({
       "register-container": true,
       show: this.props.isShow,
@@ -217,7 +167,7 @@ export default class RegisterForm extends Component {
           <div className="form-group">
             <label
               htmlFor="emailReg"
-              className={this.getClassNamesInputs(email)}
+              className={this.getClassNamesInputs(emailReg)}
             >
               Электронная почта
             </label>
@@ -225,16 +175,16 @@ export default class RegisterForm extends Component {
               type="text"
               name="emailReg"
               id="emailReg"
-              value={email.value}
-              onChange={this.onChangeEmail}
+              value={emailReg.value}
+              onChange={this.onChangeInput}
             />
-            <SimpleTooltip {...email} minLength={4} />
+            <SimpleTooltip {...emailReg} minLength={4} />
           </div>
 
           <div className="form-group">
             <label
               htmlFor="loginReg"
-              className={this.getClassNamesInputs(login)}
+              className={this.getClassNamesInputs(loginReg)}
             >
               Имя пользователя
             </label>
@@ -242,16 +192,16 @@ export default class RegisterForm extends Component {
               type="text"
               name="loginReg"
               id="loginReg"
-              value={login.value}
-              onChange={this.onChangeLogin}
+              value={loginReg.value}
+              onChange={this.onChangeInput}
             />
-            <SimpleTooltip {...login} minLength={4} />
+            <SimpleTooltip {...loginReg} minLength={4} />
           </div>
 
           <div className="form-group">
             <label
               htmlFor="passReg"
-              className={this.getClassNamesInputs(password)}
+              className={this.getClassNamesInputs(passReg)}
             >
               Пароль
             </label>
@@ -259,10 +209,10 @@ export default class RegisterForm extends Component {
               type="password"
               name="passReg"
               id="passReg"
-              value={password.value}
-              onChange={this.onChangePassword}
+              value={passReg.value}
+              onChange={this.onChangeInput}
             />
-            <SimpleTooltip {...password} minLength={4} />
+            <SimpleTooltip {...passReg} minLength={4} />
           </div>
 
           <div className="form-group">

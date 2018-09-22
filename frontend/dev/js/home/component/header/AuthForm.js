@@ -7,7 +7,7 @@ import ButtonEx from "./ButtonEx";
 
 export default class AuthForm extends Component {
   state = {
-    login: {
+    loginAuth: {
       target: null,
       value: "",
       isValid: false,
@@ -15,7 +15,7 @@ export default class AuthForm extends Component {
       isOpenTooltip: false,
       errors: []
     },
-    password: {
+    passAuth: {
       target: null,
       value: "",
       isValid: false,
@@ -25,51 +25,41 @@ export default class AuthForm extends Component {
     }
   };
 
-  removeSpaces = input => input.value.replace(/\s/g, "");
+  removeSpaces = ({ value }) => value.replace(/\s/g, "");
   validationAuthForm = (login, password) => {
     let result = {};
     const { validator } = this.props;
-    result.login = validator.loginValidation(login);
-    result.password = validator.passwordValidation(password);
+    result.loginAuth = validator.loginValidation(login);
+    result.passAuth = validator.passwordValidation(password);
 
     return result;
   };
   authorizationUser = async ({ target }) => {
-    const { login, password } = this.state;
+    const { loginAuth, passAuth } = this.state;
     const { sendForm } = this.props;
     await sendForm(target, {
-      username: login.value,
-      password: password.value
+      username: loginAuth.value,
+      password: passAuth.value
     });
   };
-  onChangeLogin = ({ target }) => {
+  onChangeInput = ({ target }) => {
     const { validator } = this.props;
-    const { isValid, errors } = validator.loginValidation(target);
-    this.setState({
-      login: {
-        target,
-        value: this.removeSpaces(target),
-        isValid,
-        isInvalid: !isValid,
-        errors,
-        isOpenTooltip: !isValid
-      },
-      password: {
-        ...this.state.password,
-        isOpenTooltip: false
-      }
-    });
-  };
-  onChangePassword = ({ target }) => {
-    const { validator } = this.props;
-    const { isValid, errors } = validator.passwordValidation(target);
+    const { isValid, errors } =
+      target.name === "loginAuth"
+        ? validator.loginValidation(target)
+        : validator.passwordValidation(target);
+
+    const newState = Object.keys(this.state).reduce(
+      (acc, key) => ({
+        ...acc,
+        [key]: { ...this.state[key], isOpenTooltip: false }
+      }),
+      {}
+    );
 
     this.setState({
-      login: {
-        ...this.state.login,
-        isOpenTooltip: false
-      },
-      password: {
+      ...newState,
+      [target.name]: {
         target,
         value: this.removeSpaces(target),
         isValid,
@@ -79,56 +69,58 @@ export default class AuthForm extends Component {
       }
     });
   };
-  getClassNamesInputs = input => {
+  getClassNamesInputs = ({isValid, isInvalid}) => {
     return classnames({
-      valid: input.isValid,
-      invalid: input.isInvalid
+      valid: isValid,
+      invalid: isInvalid
     });
   };
   setFocus = () => {
     const valuesState = Object.values(this.state);
     const input = valuesState.find(({ isInvalid }) => isInvalid);
-    if(input) {
+    if (input) {
       input.target.focus();
     }
   };
   submitForm = e => {
     e.preventDefault();
     const { loginAuth, passAuth } = e.target;
+    const res = this.validationAuthForm(loginAuth, passAuth);
 
-    const { login, password } = this.validationAuthForm(loginAuth, passAuth);
+    const newState = [loginAuth, passAuth].reduce(
+      (acc, input) => ({
+        ...acc,
+        [input.name]: {
+          target: input,
+          value: this.removeSpaces(input),
+          isValid: res[input.name].isValid,
+          isInvalid: !res[input.name].isValid,
+          errors: res[input.name].errors,
+          isOpenTooltip: !res[input.name].isValid
+        }
+      }),
+      {}
+    );
 
-    this.setState({
-      login: {
-        target: loginAuth,
-        value: this.removeSpaces(loginAuth),
-        isValid: login.isValid,
-        isInvalid: !login.isValid,
-        errors: login.errors,
-        isOpenTooltip: !login.isValid
+    this.setState(
+      {
+        ...newState
       },
-      password: {
-        target: passAuth,
-        value: this.removeSpaces(passAuth),
-        isValid: password.isValid,
-        isInvalid: !password.isValid,
-        errors: password.errors,
-        isOpenTooltip: !password.isValid
-      },
-    }, this.setFocus);
+      this.setFocus
+    );
 
-    if (login.isValid && password.isValid) {
+    if (res.loginAuth.isValid && res.passAuth.isValid) {
       this.authorizationUser(e);
     }
   };
   closeTooltips = () => {
     this.setState({
-      login: {
-        ...this.state.login,
+      loginAuth: {
+        ...this.state.loginAuth,
         isOpenTooltip: false
       },
-      password: {
-        ...this.state.password,
+      passAuth: {
+        ...this.state.passAuth,
         isOpenTooltip: false
       }
     });
@@ -139,7 +131,7 @@ export default class AuthForm extends Component {
   };
 
   render() {
-    const { login, password } = this.state;
+    const { loginAuth, passAuth } = this.state;
     let cnForm = classnames({
       "auth-container": true,
       show: this.props.isShow,
@@ -161,7 +153,7 @@ export default class AuthForm extends Component {
           <div className="form-group">
             <label
               htmlFor="loginAuth"
-              className={this.getClassNamesInputs(login)}
+              className={this.getClassNamesInputs(loginAuth)}
             >
               Имя пользователя
             </label>
@@ -169,16 +161,16 @@ export default class AuthForm extends Component {
               type="text"
               name="loginAuth"
               id="loginAuth"
-              value={login.value}
-              onChange={this.onChangeLogin}
+              value={loginAuth.value}
+              onChange={this.onChangeInput}
             />
-            <SimpleTooltip {...login} minLength={4}/>
+            <SimpleTooltip {...loginAuth} minLength={4} />
           </div>
 
           <div className="form-group">
             <label
               htmlFor="passAuth"
-              className={this.getClassNamesInputs(password)}
+              className={this.getClassNamesInputs(passAuth)}
             >
               Пароль
             </label>
@@ -186,15 +178,14 @@ export default class AuthForm extends Component {
               type="password"
               name="passAuth"
               id="passAuth"
-              value={password.value}
-              onChange={this.onChangePassword}
+              value={passAuth.value}
+              onChange={this.onChangeInput}
             />
 
-            <SimpleTooltip {...password} minLength={4}/>
+            <SimpleTooltip {...passAuth} minLength={4} />
           </div>
 
           <div className="form-group">
-
             <ButtonEx isActive={this.props.isLoading}>Войти</ButtonEx>
 
             <a href="#" id="btnRegister" onClick={this.changeForm}>
