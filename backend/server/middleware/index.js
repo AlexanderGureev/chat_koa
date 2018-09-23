@@ -6,14 +6,14 @@ const helmet = require("koa-helmet");
 const compress = require("koa-compress");
 const favicon = require("koa-favicon");
 const session = require("koa-generic-session");
-const redisStore = require("koa-redis");
+const { store } = require("../app/services/redis");
 const render = require("koa-ejs");
 const { routes, allowedMethods } = require("../routes");
 const bodyParser = require("koa-bodyparser");
 const passport = require("koa-passport");
 const compose = require("koa-compose");
 const CSRF = require("koa-csrf");
-const { SESSION_KEY, REDIS_URI } = require("../config");
+const { SESSION_KEY } = require("../config");
 
 const publicDir = path.join(__dirname, "..", "public");
 const pathToFavicon = path.join(publicDir, "img", "favicon.png");
@@ -23,10 +23,9 @@ const CONFIG = {
   maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week,
   httpOnly: true,
   signed: true,
-  store: redisStore({
-    url: REDIS_URI
-  })
+  store
 };
+
 const ejsOptions = {
   root: publicDir,
   layout: false,

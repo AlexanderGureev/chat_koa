@@ -5,9 +5,9 @@ module.exports = async (ctx, next) => {
     console.error(err);
 
     //ctx.status = err.statusCode || err.status || 500;
-
-    const { errors, cookie } = err;
-    let validationErrors;
+   
+    const { message, errors, cookie } = err;
+    let validationErrors = [];
 
     if (errors) {
       validationErrors = Object.values(errors).map(
@@ -23,6 +23,7 @@ module.exports = async (ctx, next) => {
 
     if (cookie) {
       const inOneHour = new Date(new Date().getTime() + 60 * 60 * 1000);
+      message && validationErrors.push(message);
       const errors = encodeURIComponent(JSON.stringify(validationErrors));
       ctx.cookies.set("errors", `${errors}`, {
         expires: inOneHour,
@@ -31,10 +32,10 @@ module.exports = async (ctx, next) => {
       });
       return ctx.redirect("/");
     }
-    
+
     ctx.body = {
       status: ctx.status,
-      errors: validationErrors || [err.message]
+      errors: !validationErrors.length ? [message] : validationErrors
     };
   }
 };

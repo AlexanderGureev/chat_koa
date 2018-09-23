@@ -20,10 +20,7 @@ const {
 
 require("./api")(router);
 require("./profile")(router);
-
-router.get("/chat", isAuthenticated, async (ctx, next) => {
-  await ctx.render("chat");
-});
+require("./chat")(router);
 
 //router.get("/api", convert(proxy({ host: "http://localhost:3001"} )));
 
@@ -124,7 +121,7 @@ router.get("/auth/twitter/callback", async (ctx, next) =>
   })(ctx)
 );
 
-if(env !== "dev_webpack") {
+if (env !== "dev_webpack") {
   router.get("*", async (ctx, next) => {
     await ctx.render("index");
   });

@@ -1,41 +1,63 @@
 import React, { Component } from "react";
 import BarFooter from "./BarFooter";
+import Nav from "./Nav";
+import Rooms from "./Rooms";
+import cn from "classnames";
 
-const LeftBar = props => (
-  <div className="left-side-bar">
-    <span className="toggle" />
-    <div className="collapsed-bar" id="left-bar">
-      <div className="closes" />
-      <nav>
-        <ul>
-          <li>
-            <a href="#">Profile</a>
-          </li>
-          <li>
-            <a href="#">Messages</a>
-          </li>
-          <li>
-            <a href="#">Settings</a>
-          </li>
-        </ul>
-      </nav>
+class LeftBar extends Component {
+  constructor(props) {
+    super(props);
+    this.leftBar = React.createRef();
+  }
+  state = {
+    isOpen: false
+  };
 
-      <div className="rooms">
-        <h3>
-          Rooms
-          <span className="rooms-add">
-            <i className="fas fa-plus" />
-          </span>
-        </h3>
-        <ul>
-          <li>
-            <a href="">Project manager</a>
-          </li>
-        </ul>
+  componentDidMount() {
+    window.addEventListener("click", this.handleCloseMenu);
+    window.addEventListener("touchend", this.handleCloseMenu);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("click", this.handleCloseMenu);
+    window.removeEventListener("touchend", this.handleCloseMenu);
+  }
+  handleCloseMenu = ({ target }) => {
+    if (!this.leftBar.current.contains(target)) {
+      this.setState({
+        isOpen: false
+      });
+    }
+  };
+  toggleMenu = () => {
+    this.setState({
+      isOpen: !this.state.isOpen
+    });
+  };
+
+  render() {
+    const { isOpen } = this.state;
+
+    const classesBar = cn({
+      "left-side-bar": true,
+      active: isOpen
+    });
+    const classesToogle = cn({
+      toggle: true,
+      hide: isOpen
+    });
+
+    return (
+      <div className={classesBar} ref={this.leftBar}>
+        <span className={classesToogle} onClick={this.toggleMenu} />
+        <div className="collapsed-bar" id="left-bar">
+          <div className="closes" onClick={this.toggleMenu} />
+          <Nav />
+          <Rooms />
+        </div>
+        <BarFooter />
       </div>
-    </div>
-    <BarFooter />
-  </div>
-);
+    );
+  }
+}
 
 export default LeftBar;

@@ -2,7 +2,7 @@ const isAuthenticated = (ctx, next) => {
   if (ctx.isAuthenticated()) {
     return next();
   } else {
-    ctx.redirect("/");
+    ctx.throw(401, new Error("Not authorized"), { cookie: true });
   }
 };
 
