@@ -36,6 +36,16 @@ const userSchema = mongoose.Schema({
       default: "/img/ava_default.png"
     }
   },
+  rooms: {
+    type: Array,
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "rooms"
+    },
+    read_messages: Number,
+    join_date: Date
+  },
+  active_room:  mongoose.Schema.Types.ObjectId,
   resetPasswordToken: String,
   resetPasswordExpires: Date
 });

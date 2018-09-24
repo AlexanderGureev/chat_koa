@@ -1,6 +1,9 @@
 const cookies = require("cookie");
 const { store } = require("../redis");
 const { User } = require("../../model/user");
+const redis = require("redis");
+const sub = redis.createClient(), 
+      pub = redis.createClient();
 const {
   newConnection,
   getAllUserConnection,
@@ -47,9 +50,10 @@ const handlers = io => {
   io.on("connection", socket => {
 
     newConnection(socket);
+    const usersOnline = getAllUserConnection();
 
-    socket.emit("connection_success", getAllUserConnection());
-    socket.broadcast.emit("user_connected", getAllUserConnection());
+    socket.emit("connection_success", usersOnline);
+    socket.broadcast.emit("user_connected", usersOnline);
 
     socket.on("disconnect", () => {
       socket.broadcast.emit("user_disconnect", deleteConnection(socket));
