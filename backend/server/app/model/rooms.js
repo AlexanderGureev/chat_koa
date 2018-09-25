@@ -19,6 +19,8 @@ const roomsSchema = Schema({
       type: Schema.Types.ObjectId,
       ref: "user"
     },
+    avatarPath: String,
+    author: String,
     text: String,
     date: {
       type: Date,
@@ -45,6 +47,7 @@ const roomsValidateSchema = Joi.object().keys({
 const Rooms = mongoose.model("rooms", roomsSchema);
 const validateRooms = async ({ name, room_author }) =>
   await Joi.validate({ name, room_author }, roomsValidateSchema);
+
 
 module.exports = {
   Rooms,

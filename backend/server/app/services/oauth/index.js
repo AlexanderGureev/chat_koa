@@ -2,16 +2,19 @@ const { User } = require("../../model/user");
 const TokenModel = require("../../model/authToken");
 const { vkApi } = require("../socialApi");
 const path = require("path");
+const { getIdGeneralRoom } = require("../chat");
 
 const createUser = async ({ id, provider, displayName, email, photos }) => {
+  const idGeneralRoom = getIdGeneralRoom();
   const user = new User({
     [`${provider}Id`]: id,
     provider,
     username: displayName,
     email,
-    "profile.avatarPath": photos
+    rooms: [ {_id: idGeneralRoom, name: "General" }],
+    "active_room": idGeneralRoom,
+    "profile.avatarPath": photos,
   });
-
   return await user.save();
 };
 const createToken = async (id, accessToken, refreshToken) => {

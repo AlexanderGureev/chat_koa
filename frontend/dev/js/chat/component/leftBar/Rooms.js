@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-const Rooms = props => (
+const Rooms = ({ rooms }) => (
   <div className="rooms">
     <h3>
       Rooms
@@ -9,9 +9,11 @@ const Rooms = props => (
       </span>
     </h3>
     <ul>
-      <li>
-        <a href="">Project manager</a>
-      </li>
+      {rooms.map(({ _id, name }) => (
+        <li key={_id}>
+          <a href="">{name}</a>
+        </li>
+      ))}
     </ul>
   </div>
 );

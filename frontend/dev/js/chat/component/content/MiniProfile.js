@@ -21,7 +21,7 @@ const StyledPaper = withStyles({
 
 class MiniProfile extends Component {
   componentWillUnmount() {
-    this.setRef(null);
+    this.setRef && this.setRef(null);
   }
 
   render() {

@@ -38,11 +38,15 @@ const userSchema = mongoose.Schema({
   },
   rooms: {
     type: Array,
-    id: {
+    _id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "rooms"
     },
-    read_messages: Number,
+    read_messages: {
+      type: Number,
+      default: 0
+    },
+    name: String,
     join_date: Date
   },
   active_room:  mongoose.Schema.Types.ObjectId,

@@ -1,5 +1,7 @@
 const { isAuthenticated } = require("../middleware/isAuth");
 const { User } = require("../app/model/user");
+const { getMessages } = require("../app/services/chat/getMessages");
+const { responseMessage } = require("../app/services/responseMessage");
 
 module.exports = router => {
   router.get("/api/token", async ctx => {
@@ -26,5 +28,9 @@ module.exports = router => {
     } catch (error) {
       throw error;
     }
+  });
+  router.get("/api/messages/:room_id", isAuthenticated, async ctx => {
+    const messages = await getMessages(ctx.params);
+    ctx.body = responseMessage(200, "", messages);
   });
 };
