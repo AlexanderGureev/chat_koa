@@ -23,9 +23,7 @@ const App = props => {
       <div className="overflow-container">
         <Header />
         <LeftBar rooms={rooms} />
-    
-          <Content users={users} messages={messages} sendMessage={sendMessage}/>
-       
+        <Content users={users} messages={messages} sendMessage={sendMessage} />
       </div>
     </React.Fragment>
   );

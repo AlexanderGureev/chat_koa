@@ -989,6 +989,21 @@ body {
 
   
 // CHAT
+.emoji-mart {
+    position: absolute;
+    bottom: 40px;
+    right: 10px;
+    bottom: 60px;
+}
+.emoji-mart-search {
+    margin: 5px
+}
+.emoji-mart-search-icon {
+    top: 5px;
+}
+.emoji-mart-title-label {
+    font-style: 20px;
+}
 .is-chat {
     overflow-x: hidden;
     min-height: 450px;
@@ -1316,6 +1331,7 @@ body {
                     filter: drop-shadow(0 0 20px rgba(0,0,0, .3));
                 }
                 .message {
+                    word-break: break-word;
                     .text {
                         font-size: 14px;
                         font-weight: 400;
@@ -1365,7 +1381,7 @@ body {
     .send-message {
         position: relative;
      
-        input {
+        > input {
             position: absolute;
             bottom: 0;
             width: 100%;

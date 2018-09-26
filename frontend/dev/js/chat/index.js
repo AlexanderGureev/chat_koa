@@ -5,6 +5,7 @@ import { App } from "./component";
 
 ReactDOM.render(<App />, document.getElementById("root-node"));
 
+import "emoji-mart/css/emoji-mart.css";
 import "animate.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "../../less/home/main.less";
