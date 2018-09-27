@@ -5,12 +5,13 @@ const bluebird = require("bluebird");
 const colors = require("colors");
 const redis = require("redis");
 const async = require("async");
+const { REDIS_URI } = require("../../../config");
 const {
   Types: { ObjectId }
 } = require("mongoose");
-const sub = redis.createClient(),
-  pub = redis.createClient(),
-  client = redis.createClient();
+const sub = redis.createClient(REDIS_URI),
+      pub = redis.createClient(REDIS_URI),
+      client = redis.createClient(REDIS_URI);
 const {
   newConnection,
   getAllUserConnection,

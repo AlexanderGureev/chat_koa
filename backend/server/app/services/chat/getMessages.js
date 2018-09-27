@@ -1,5 +1,6 @@
 const redis = require("redis");
-const client = redis.createClient();
+const { REDIS_URI } = require("../../../config");
+const client = redis.createClient(REDIS_URI);
 const { Rooms } = require("../../model/rooms");
 
 const cachingMessage = async (id_rooms, messages) =>
