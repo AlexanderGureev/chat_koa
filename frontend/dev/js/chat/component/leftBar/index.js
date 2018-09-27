@@ -21,8 +21,18 @@ class LeftBar extends Component {
     window.removeEventListener("click", this.handleCloseMenu);
     window.removeEventListener("touchend", this.handleCloseMenu);
   }
+
+  getModalWindow = () =>
+    document.querySelector("div.ant-modal") || { contains: () => {} };
+
+  getPopover = () => document.querySelectorAll("div.ant-popover") || [];
+
   handleCloseMenu = ({ target }) => {
-    if (!this.leftBar.current.contains(target)) {
+    if (
+      !this.leftBar.current.contains(target) &&
+      !this.getModalWindow().contains(target) &&
+      ![].some.call(this.getPopover(), div => div.contains(target))
+    ) {
       this.setState({
         isOpen: false
       });
@@ -36,7 +46,7 @@ class LeftBar extends Component {
 
   render() {
     const { isOpen } = this.state;
-    const { rooms } = this.props;
+    const { rooms, createRoom, deleteRoom } = this.props;
     const classesBar = cn({
       "left-side-bar": true,
       active: isOpen
@@ -52,7 +62,11 @@ class LeftBar extends Component {
         <div className="collapsed-bar" id="left-bar">
           <div className="closes" onClick={this.toggleMenu} />
           <Nav />
-          <Rooms rooms={rooms}/>
+          <Rooms
+            rooms={rooms}
+            createRoom={createRoom}
+            deleteRoom={deleteRoom}
+          />
         </div>
         <BarFooter />
       </div>

@@ -33,6 +33,7 @@ const roomsSchema = Schema({
     default: true
   },
   room_author: Schema.Types.ObjectId,
+  password: String,
   created: {
     type: Date,
     default: Date.now()
@@ -41,15 +42,35 @@ const roomsSchema = Schema({
 
 const roomsValidateSchema = Joi.object().keys({
   name: Joi.string().required(),
-  room_author: Joi.required(),
+  room_author: Joi.required()
 });
 
 const Rooms = mongoose.model("rooms", roomsSchema);
 const validateRooms = async ({ name, room_author }) =>
   await Joi.validate({ name, room_author }, roomsValidateSchema);
 
+const hashPassword = async password => {
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+    return hash;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const checkPassword = async (password, hashPassword) => {
+  try {
+    const result = await bcrypt.compare(password, hashPassword);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
 
 module.exports = {
   Rooms,
-  validateRooms
+  validateRooms,
+  hashPassword,
+  checkPassword
 };

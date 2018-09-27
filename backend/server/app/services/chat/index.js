@@ -174,7 +174,7 @@ const handlers = io => {
     };
 
     socket.emit("connection_success", data);
-    socket.broadcast.emit("user_connected", data);
+    socket.broadcast.emit("user_connected", data.users);
 
     socket.on("disconnect", () => {
       socket.broadcast.emit("user_disconnect", deleteConnection(socket));

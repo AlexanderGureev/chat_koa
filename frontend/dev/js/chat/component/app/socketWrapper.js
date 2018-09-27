@@ -1,8 +1,11 @@
 import React, { Component } from "react";
 import io from "socket.io-client";
 import axios from "axios";
-
-const API_URL_MESSAGES = "api/messages/";
+import {
+  getMessages,
+  createRoom,
+  deleteRoom
+} from "../../../home/services/api";
 
 const socketWrapper = ComposedComponent =>
   class SocketWrapped extends Component {
@@ -22,7 +25,6 @@ const socketWrapper = ComposedComponent =>
     scrollToBottom = () => {
       const posts = document.querySelector("div.posts");
       posts.scrollTo({ top: posts.scrollHeight, behavior: "smooth" });
-
     };
 
     socketEvents = () => {
@@ -33,21 +35,24 @@ const socketWrapper = ComposedComponent =>
           isLoading: true
         });
 
-        this.getMessages(user).then(messages => {
-          const parsedMessages = messages.map(JSON.parse);
-          this.setState(
-            {
-              isLoading: false,
-              isLoaded: true,
-              messages: parsedMessages
-            },
-            this.scrollToBottom
-          );
-        });
+        this.getMessages(user)
+          .then(data => {
+            return data.map(JSON.parse);
+          })
+          .then(messages => {
+            this.setState(
+              {
+                isLoading: false,
+                isLoaded: true,
+                messages
+              },
+              this.scrollToBottom
+            );
+          });
       });
 
-      this.socket.on("user_connected", ({ users, user }) => {
-        this.setState({ users, user });
+      this.socket.on("user_connected", users => {
+        this.setState({ users });
       });
       this.socket.on("user_disconnect", users => {
         this.setState({ users });
@@ -70,13 +75,7 @@ const socketWrapper = ComposedComponent =>
 
     getMessages = async ({ active_room }) => {
       try {
-        const {
-          data: { status, message, info }
-        } = await axios.get(`${API_URL_MESSAGES}${active_room}`);
-        if (status !== 200) {
-          throw new Error(message);
-        }
-        return info;
+        return await getMessages(active_room);
       } catch ({ message }) {
         const errors = message instanceof Array ? message : [message];
         this.setState({
@@ -86,15 +85,60 @@ const socketWrapper = ComposedComponent =>
         });
       }
     };
+
     componentDidMount() {
       this.socketEvents();
     }
+
+    createRoom = async ({ roomName, modifier, passwordRoom }) => {
+      try {
+        const room = {
+          room_author: this.state.user._id,
+          name: roomName,
+          public: modifier === "public" ? true : false
+        };
+        if (!room.public) {
+          room.password = passwordRoom;
+        }
+
+        const { _id, name } = await createRoom(room);
+
+        this.setState({
+          user: {
+            ...this.state.user,
+            rooms: [...this.state.user.rooms, { _id, name }]
+          }
+        });
+      } catch (error) {
+        console.log(error);
+        throw new Error("Произошла ошибка, повторите запрос.");
+      }
+    };
+
+    deleteRoom = async id => {
+      try {
+        const deletedRoomId = await deleteRoom(id);
+        const filteredRooms = this.state.user.rooms.filter(
+          ({ _id }) => _id !== deletedRoomId
+        );
+        this.setState({
+          user: {
+            ...this.state.user,
+            rooms: filteredRooms
+          }
+        });
+      } catch (error) {
+        throw new Error("Произошла ошибка, повторите запрос.");
+      }
+    };
 
     render() {
       return (
         <ComposedComponent
           {...this.props}
           {...this.state}
+          createRoom={this.createRoom}
+          deleteRoom={this.deleteRoom}
           sendMessage={this.sendMessage}
         />
       );

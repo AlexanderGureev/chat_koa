@@ -1107,6 +1107,11 @@ body {
 
 }
 
+.deleteRoom {
+    margin-right: 10px;
+    margin-bottom: 6px;
+}
+
 .left-side-bar.active {
     left: 0px;
 }
@@ -1139,6 +1144,12 @@ body {
 }
 .closes:hover::before {
     color: rgb(185, 178, 178);
+}
+
+
+.ant-message-notice-content svg {
+    position: relative;
+    bottom: 3px;
 }
 
 .left-side-bar {
@@ -1252,10 +1263,14 @@ body {
             ul {
                 list-style: none;
                 padding-left: 10px;
-                li a {
-                    display: block;
-                    padding-bottom: 10px;
-                    font-size: 16px;
+                li {
+                    display: flex;
+                    align-items: center;
+                    a {
+                        display: block;
+                        padding-bottom: 10px;
+                        font-size: 16px;
+                    }
                 }
             }
         }
@@ -1463,6 +1478,7 @@ body {
     h3 {
         font-size: 16px;
         padding-top: 20px;
+        color: #fff;
     }
     ul {
         text-align: left;

@@ -1,9 +1,14 @@
-const { Rooms, validateRooms } = require("../../model/rooms");
+const { Rooms, validateRooms, hashPassword } = require("../../model/rooms");
 const { User } = require("../../model/user");
 
 const createRoom = async (room, user_id) => {
   try {
     await validateRooms(room);
+
+    if(!room.public) {
+      const hash = await hashPassword(room.password);
+      room.password = hash;
+    }
     let newRoom = new Rooms(room);
     newRoom = await newRoom.save();
     const user = await User.findById(user_id);

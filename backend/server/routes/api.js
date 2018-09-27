@@ -40,7 +40,6 @@ module.exports = router => {
   });
 
   router.post("/api/room/create", isAuthenticated, async ctx => {
-    console.log(ctx.request.body);
     const { _id, name } = await createRoom(
       ctx.request.body,
       ctx.state.user._id
