@@ -11,6 +11,11 @@ class ChatContainer extends Component {
 
   componentDidMount() {
     window.addEventListener("click", this.onCloseEmojiBox);
+    window.addEventListener("touchstart", this.onCloseEmojiBox);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("click", this.onCloseEmojiBox);
+    window.removeEventListener("touchstart", this.onCloseEmojiBox);
   }
   onCloseEmojiBox = ({ target }) => {
     if (!this.emojiBoxRef.contains(target)) {

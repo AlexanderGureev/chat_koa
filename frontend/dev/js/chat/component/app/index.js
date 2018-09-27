@@ -18,14 +18,14 @@ const App = props => {
     createRoom
   } = props;
 
-  const { rooms = [] } = user;
+  const { rooms = [], _id } = user;
   return (
     <React.Fragment>
       <Preloader />
       <div className="overflow-container">
         <Header />
         <LeftBar rooms={rooms} createRoom={createRoom} deleteRoom={deleteRoom}/>
-        <Content users={users} messages={messages} sendMessage={sendMessage} />
+        <Content users={users} user_id={_id} messages={messages} sendMessage={sendMessage} />
       </div>
     </React.Fragment>
   );

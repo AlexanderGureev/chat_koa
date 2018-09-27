@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import cn from "classnames";
-import withCookies from "./withCookies";
 
 const formatDate = date => {
   if (!date) {
@@ -38,10 +37,11 @@ const formatDate = date => {
   );
 };
 
-const Post = ({ text, user_id, author, date, status, avatarPath, cookies }) => {
+const Post = ({ message, id }) => {
+  const { text, user_id, author, date, status, avatarPath } = message;
   const classes = cn({
     post: true,
-    "my-post": cookies.id === user_id
+    "my-post": id === user_id
   });
 
   const avaStyle = {
@@ -70,4 +70,4 @@ const Post = ({ text, user_id, author, date, status, avatarPath, cookies }) => {
   );
 };
 
-export default withCookies(Post, "id");
+export default Post
