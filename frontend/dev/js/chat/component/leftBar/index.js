@@ -46,7 +46,7 @@ class LeftBar extends Component {
 
   render() {
     const { isOpen } = this.state;
-    const { rooms, createRoom, deleteRoom } = this.props;
+    const { rooms, createRoom, deleteRoom, changeRoom } = this.props;
     const classesBar = cn({
       "left-side-bar": true,
       active: isOpen
@@ -66,6 +66,7 @@ class LeftBar extends Component {
             rooms={rooms}
             createRoom={createRoom}
             deleteRoom={deleteRoom}
+            changeRoom={changeRoom}
           />
         </div>
         <BarFooter />

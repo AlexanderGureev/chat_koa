@@ -53,6 +53,11 @@ class Rooms extends Component {
       message.error(err.message);
     }
   };
+  changeRoom = id => e => {
+    e.preventDefault();
+    this.props.changeRoom(id);
+    //вывести уведомление о смене комнаты
+  }
 
   render() {
     const { visible, confirmLoading } = this.state;
@@ -77,7 +82,9 @@ class Rooms extends Component {
           {rooms.map(({ _id, name }) => (
             <li key={_id}>
               <DeleteRoom name={name} deleteRoom={this.deleteRoom(_id, name)} />
-              <a href="">{name}</a>
+              <a href="#" onClick={this.changeRoom(_id)}>
+                {name}
+              </a>
             </li>
           ))}
         </ul>

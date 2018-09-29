@@ -10,13 +10,10 @@ const {
   Types: { ObjectId }
 } = require("mongoose");
 const sub = redis.createClient(REDIS_URI),
-      pub = redis.createClient(REDIS_URI),
-      client = redis.createClient(REDIS_URI);
-const {
-  newConnection,
-  getAllUserConnection,
-  deleteConnection
-} = require("./socket-connections");
+  pub = redis.createClient(REDIS_URI),
+  client = redis.createClient(REDIS_URI);
+
+const socketManager = require("./socket-connections")();
 const { Rooms, validateRooms } = require("../../model/rooms");
 
 const prefix = "koa:sess:";
@@ -112,7 +109,8 @@ const getOrCreateGeneralRoom = async () => {
       return;
     }
     generalRoom = new Rooms({
-      name: "General"
+      name: "General",
+      room_author: ObjectId()
     });
     const { _id } = await generalRoom.save();
     id_generalRoom = _id;
@@ -159,67 +157,142 @@ const socketMiddleware = io => {
       };
     } catch (error) {
       console.log(error);
-      return next(error);
+      return next(new Error("authentication error"));
     }
     next();
   });
 };
+const joinRooms = socket => {
+  const { rooms } = socket.user;
+  rooms.forEach(({ _id }) => socket.join(_id));
+};
+const leaveRoom = socket => {
+  socket.leave(active_room);
+};
+const saveToMongo = async (room_id, messages) => {
+  try {
+    const room = await Rooms.findById(room_id);
+    room.messages.push(messages);
+    await room.save();
+  } catch (error) {
+    throw error;
+  }
+};
+const changeActiveRoom = async (room_id, user_id) => {
+  try {
+    const user = await User.findById(user_id);
+    user.active_room = room_id;
+    await user.save();
+  } catch (error) {
+    throw error;
+  }
+};
+const handlerNewMessage = socket => message => {
+  const {
+    _id,
+    profile: { avatarPath },
+    username,
+    active_room
+  } = socket.user;
+
+  const newMessage = {
+    _id: ObjectId(),
+    user_id: _id,
+    avatarPath,
+    date: Date.now(),
+    text: message,
+    author: username
+  };
+
+  pub.rpushAsync(`rooms:${active_room}:messages`, JSON.stringify(newMessage));
+  pub.publish(
+    "rooms_messages_latest",
+    JSON.stringify({
+      room: active_room,
+      message: newMessage
+    })
+  );
+  saveToMongo(active_room, JSON.stringify(newMessage));
+};
+const handlerDisconnect = socket => reason => {
+  const { active_room, _id } = socket.user;
+  socket.broadcast.to(active_room).emit("user_disconnect", {
+    users: socketManager.deleteConnection(socket),
+    room_id: active_room
+  });
+
+  changeActiveRoom(active_room, _id);
+};
+const handlerDeleteRoom = socket => id => {
+  socket.leave(id);
+
+  const { rooms } = socket.user;
+  socket.user.rooms = rooms.filter(
+    ({ _id }) => _id.toString() !== id.toString()
+  );
+
+  if (!socket.user.rooms.length) {
+    //ВРЕМЕННО
+    socket.user.active_room = getIdGeneralRoom();
+    socket.emit("connection_success", {
+      users: [],
+      user: socket.user
+    });
+    return;
+  }
+  const { _id } = socket.user.rooms[0];
+  handlerChangeRoom(socket)(_id);
+};
+const handlerChangeRoom = socket => id => {
+  socket.emit("disconnect");
+
+  socket.user.active_room = id;
+  socket.join(id);
+
+  socketManager.newConnection(socket);
+
+  const response = getData(socket);
+
+  socket.emit("connection_success", response);
+  socket.broadcast.to(id).emit("user_connected", response);
+};
+const handlerUpdateRooms = socket => newRoom => socket.user.rooms.push(newRoom);
+const hanglerSocketError = socket => error => {
+  console.log("Received error from client:".bgRed.black, socket.id);
+  console.log(error);
+};
+const getData = ({ user }) => ({
+  users: socketManager.getConnection(user.active_room),
+  user,
+  room_id: user.active_room
+});
 const handlers = io => {
   io.on("connection", socket => {
-    newConnection(socket);
-    const usersOnline = getAllUserConnection();
+    joinRooms(socket);
+    socketManager.newConnection(socket);
 
-    const data = {
-      users: usersOnline,
-      user: socket.user
-    };
+    const { active_room } = socket.user;
+    const response = getData(socket);
 
-    socket.emit("connection_success", data);
-    socket.broadcast.emit("user_connected", data.users);
+    socket.emit("connection_success", response);
+    socket.broadcast.to(active_room).emit("user_connected", response);
 
-    socket.on("disconnect", () => {
-      socket.broadcast.emit("user_disconnect", deleteConnection(socket));
-    });
-
-    socket.on("new_message", message => {
-      const {
-        _id,
-        profile: { avatarPath },
-        username,
-        active_room
-      } = socket.user;
-
-      const newMessage = JSON.stringify({
-        _id: ObjectId(),
-        user_id: _id,
-        avatarPath,
-        date: Date.now(),
-        text: message,
-        author: username
-      });
-
-      pub.rpushAsync(`rooms:${active_room}:messages`, newMessage);
-      pub.publish("rooms_messages_latest", newMessage);
-
-      Rooms.findById({ _id: active_room })
-        .then(room => {
-          if (!room) {
-            throw new Error("room is undefined");
-          }
-          room.messages.push(newMessage);
-          return room.save();
-        })
-        .catch(error => console.error(error));
-    });
+    socket.on("change_room", handlerChangeRoom(socket));
+    socket.on("delete_room", handlerDeleteRoom(socket));
+    socket.on("disconnect", handlerDisconnect(socket));
+    socket.on("new_message", handlerNewMessage(socket));
+    socket.on("update_rooms_list", handlerUpdateRooms(socket));
+    socket.on("error", hanglerSocketError(socket));
   });
 };
 const redisPubSubInit = io => {
-  sub.on("message", function(channel, message) {
-    io.emit(channel, message);
+  sub.on("message", function(channel, data) {
+    const { room, message } = JSON.parse(data);
+    message.room_id = room;
+    io.to(room).emit(channel, JSON.stringify(message));
   });
   sub.subscribe("rooms_messages_latest");
 };
-
 const chatInit = server => {
   const io = require("socket.io")(server);
   getOrCreateGeneralRoom();

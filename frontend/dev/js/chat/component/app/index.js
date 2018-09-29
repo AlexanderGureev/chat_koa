@@ -15,7 +15,8 @@ const App = props => {
     isLoaded,
     sendMessage,
     deleteRoom,
-    createRoom
+    createRoom,
+    changeRoom
   } = props;
 
   const { rooms = [], _id } = user;
@@ -24,7 +25,7 @@ const App = props => {
       <Preloader />
       <div className="overflow-container">
         <Header />
-        <LeftBar rooms={rooms} createRoom={createRoom} deleteRoom={deleteRoom}/>
+        <LeftBar rooms={rooms} createRoom={createRoom} deleteRoom={deleteRoom} changeRoom={changeRoom}/>
         <Content users={users} user_id={_id} messages={messages} sendMessage={sendMessage} />
       </div>
     </React.Fragment>

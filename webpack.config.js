@@ -1,16 +1,22 @@
 const path = require("path");
+const fs = require("fs");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const webpack = require("webpack");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const MinifyPlugin = require("babel-minify-webpack-plugin");
+
+const lessToJs = require("less-vars-to-js");
 
 const mode = process.env.NODE_ENV || "development";
 const rootDir = {
     dev: path.join(__dirname, "frontend", "dev"),
     dist: path.join(__dirname, "frontend", "dist")
 };
+
+const themeVariables = lessToJs(fs.readFileSync(path.join(rootDir.dev, "less", "common", "./ant-theme-vars.less"), "utf8"));
 
 module.exports = {
     // watch: true,
@@ -66,7 +72,8 @@ module.exports = {
             "process.env": {
               NODE_ENV: JSON.stringify(process.env.NODE_ENV)
             }
-        })
+        }),
+        new MinifyPlugin()
         //new BundleAnalyzerPlugin()
     ],
     resolve: {
@@ -84,7 +91,10 @@ module.exports = {
                     loader: "babel-loader",
                     options: {
                         presets: ["env", "react", "stage-0"],
-                        plugins: ["transform-runtime"]
+                        plugins: [ 
+                            "transform-runtime", 
+                            [ "import", { "libraryName": "antd", "style": true } ]
+                        ] 
                     }
                 }
             },
@@ -94,7 +104,13 @@ module.exports = {
                     MiniCssExtractPlugin.loader,
                     "css-loader",
                     "postcss-loader",
-                    "less-loader"
+                    {
+                        loader: "less-loader", 
+                        options: {
+                            javascriptEnabled: true,
+                            modifyVars: themeVariables
+                        }
+                    }
                 ]
             },
             {
