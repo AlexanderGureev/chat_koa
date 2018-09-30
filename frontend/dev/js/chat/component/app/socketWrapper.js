@@ -5,6 +5,7 @@ import {
   createRoom,
   deleteRoom
 } from "../../../home/services/api";
+import { notification } from "antd";
 
 const socketWrapper = ComposedComponent =>
   class SocketWrapped extends Component {
@@ -25,6 +26,24 @@ const socketWrapper = ComposedComponent =>
       this.socketEvents();
     }
 
+    openNotification = () => {
+      const { rooms, active_room } = this.state.user;
+      const { name } = rooms.find(({ _id }) => _id === active_room);
+      
+      const online = this.state.users.length;
+      const cases = ["2", "3", "4"];
+
+      const fn = lastSymbol =>
+        cases.includes(lastSymbol.toString().slice(-1))
+          ? "человека."
+          : "человек.";
+
+      notification.open({
+        message: `Вы зашли в канал: ${name}.`,
+        description: `В данном канале ${online} ${fn(online)}`
+      });
+    };
+
     scrollToBottom = () => {
       const posts = document.querySelector("div.posts");
       posts.scrollTo({ top: posts.scrollHeight, behavior: "smooth" });
@@ -32,11 +51,14 @@ const socketWrapper = ComposedComponent =>
 
     socketEvents = () => {
       this.socket.on("connection_success", ({ users, user }) => {
-        this.setState({
-          users,
-          user,
-          isLoading: true
-        });
+        this.setState(
+          {
+            users,
+            user,
+            isLoading: true
+          },
+          this.openNotification
+        );
 
         this.getMessages(user)
           .then(data => {
@@ -129,7 +151,6 @@ const socketWrapper = ComposedComponent =>
       try {
         await deleteRoom(id);
         this.socket.emit("delete_room", id);
-
       } catch (error) {
         throw new Error("Произошла ошибка, повторите запрос.");
       }
