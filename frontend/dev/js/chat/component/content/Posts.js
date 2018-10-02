@@ -26,28 +26,45 @@ class Posts extends Component {
       this.checkScrollerOpening
     );
     this.position = 3800;
+    this.batchSize = 20;
   }
 
   state = {
     list: [],
-    start: -40,
-    end: -21,
+    start: -1,
+    end: -1,
     isEmpty: false,
     attempts: 0,
     isLockScroll: false,
-    size: 0
+    initialSize: 0,
+    room_id: ""
+  };
+
+  initialState = (messages, active_room, cb = () => {}) => {
+    !messages.length
+      ? this.setState({
+          isEmpty: true,
+          room_id: active_room
+        })
+      : this.setState(
+          {
+            list: [...messages],
+            initialSize: messages.length,
+            room_id: active_room,
+            start: -this.batchSize - messages.length,
+            end: -messages.length - 1
+          },
+          cb
+        );
   };
 
   componentWillMount() {
-    const { messages } = this.props;
-    !messages.length
-      ? this.setState({
-          isEmpty: true
-        })
-      : this.setState({
-          list: [...messages],
-          size: messages.length
-        });
+    const {
+      messages,
+      user: { active_room }
+    } = this.props;
+
+    this.initialState(messages, active_room);
   }
 
   componentDidMount() {
@@ -71,20 +88,30 @@ class Posts extends Component {
     );
   };
 
-  componentWillReceiveProps(nextProps) {
-    const { messages } = nextProps;
-    const { size } = this.state;
+  changeRoom = (messages, room_id, cb) => {
+    this.initialState(messages, room_id, cb);
+  };
+
+  componentWillReceiveProps({ messages, user }) {
+    const { active_room } = user;
+    const { initialSize, list, room_id } = this.state;
+
     const updatePosition = () => {
       this.listRef.forceUpdateGrid();
-      this.listRef.scrollToRow(this.state.list.length);
+      this.listRef.scrollToRow(list.length);
     };
 
-    if (messages.length > size) {
+    if (room_id !== active_room) {
+      this.changeRoom(messages, active_room, updatePosition);
+      return;
+    }
+
+    if (messages.length > initialSize) {
       this.setState(
         {
           list: [...messages],
           isEmpty: false,
-          size: size + 1
+          initialSize: initialSize + 1
         },
         updatePosition
       );
@@ -162,8 +189,8 @@ class Posts extends Component {
       } else {
         this.setState({
           list: [...parsed, ...list],
-          start: startIndex - 20,
-          end: stopIndex - 20,
+          start: startIndex - this.batchSize,
+          end: stopIndex - this.batchSize,
           attempts: attempts + 1
         });
         this.listRef.scrollToPosition(this.position);

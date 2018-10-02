@@ -29,7 +29,7 @@ const socketWrapper = ComposedComponent =>
     openNotification = () => {
       const { rooms, active_room } = this.state.user;
       const { name } = rooms.find(({ _id }) => _id === active_room);
-      
+
       const online = this.state.users.length;
       const cases = ["2", "3", "4"];
 
@@ -44,18 +44,14 @@ const socketWrapper = ComposedComponent =>
       });
     };
 
-    scrollToBottom = () => {
-      // const posts = document.querySelector("div.posts");
-      // posts.scrollTo({ top: posts.scrollHeight, behavior: "smooth" });
-    };
-
     socketEvents = () => {
       this.socket.on("connection_success", ({ users, user }) => {
         this.setState(
           {
             users,
             user,
-            isLoading: true
+            isLoading: true,
+            isLoaded: false
           },
           this.openNotification
         );
@@ -65,14 +61,11 @@ const socketWrapper = ComposedComponent =>
             return data.map(JSON.parse);
           })
           .then(messages => {
-            this.setState(
-              {
-                isLoading: false,
-                isLoaded: true,
-                messages
-              },
-              this.scrollToBottom
-            );
+            this.setState({
+              isLoading: false,
+              isLoaded: true,
+              messages
+            });
           });
       });
       this.socket.on("user_connected", ({ users, room_id }) => {
@@ -92,12 +85,9 @@ const socketWrapper = ComposedComponent =>
         const { active_room } = this.state.user;
 
         if (message.room_id === active_room) {
-          this.setState(
-            {
-              messages: [...this.state.messages, message]
-            },
-            this.scrollToBottom
-          );
+          this.setState({
+            messages: [...this.state.messages, message]
+          });
         } else {
           // увеличить счетчик сообщений комнаты
         }

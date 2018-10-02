@@ -49,12 +49,13 @@ class ChatContainer extends Component {
   };
   setRef = el => (this.emojiBoxRef = el);
   render() {
+    const { isLoaded } = this.props;
     const { message, emojiIsOpen } = this.state;
     const isDisabled = !Boolean(this.removeSpaces(message));
 
     return (
       <div className="chat-container">
-        <Posts {...this.props} />
+        {isLoaded && <Posts {...this.props} />}
         <form action="" className="send-message" onSubmit={this.submitForm}>
           <input
             type="text"

@@ -6,40 +6,14 @@ import LeftBar from "../leftBar";
 import socketWrapper from "./socketWrapper";
 
 const App = props => {
-  const {
-    user,
-    users,
-    messages,
-    errors,
-    isLoading,
-    isLoaded,
-    sendMessage,
-    deleteRoom,
-    createRoom,
-    changeRoom,
-    getMessages
-  } = props;
-
-  const { rooms = [], _id } = user;
+  const { rooms = [] } = props.user;
   return (
     <React.Fragment>
       <Preloader />
       <div className="overflow-container">
         <Header />
-        <LeftBar
-          rooms={rooms}
-          createRoom={createRoom}
-          deleteRoom={deleteRoom}
-          changeRoom={changeRoom}
-        />
-        {isLoaded && (
-          <Content
-            users={users}
-            user={user}
-            messages={messages}
-            sendMessage={sendMessage}
-            getMessages={getMessages}
-          />
+        <LeftBar rooms={rooms} {...props} />
+        <Content {...props} />
         )}
       </div>
     </React.Fragment>

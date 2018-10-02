@@ -40,12 +40,14 @@ const getMessages = async ({ room_id }, { start = 0, end = -1 }) => {
 
     cachingMessage(room_id, room.messages);
 
-    if(start === 0 && end === -1) {
+    if (start === 0 && end === -1) {
       return room.messages;
     }
-    const res = room.messages.filter((message, i) => i >= start && (i <= end || end === -1));
+    const res = room.messages.filter(
+      (message, i, arr) =>
+        i > arr.length - Math.abs(start) && (i <= end || end === -1)
+    );
     return res;
-
   } catch (error) {
     console.error(error);
     throw error;
