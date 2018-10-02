@@ -44,11 +44,12 @@ export const createRoom = async room => {
   }
 };
 
-export const getMessages = async active_room => {
+export const getMessages = async (active_room, start, end) => {
   try {
+    const params = { start, end };
     const {
       data: { status, message, info }
-    } = await axios.get(`${API_URL_MESSAGES}${active_room}`);
+    } = await axios.get(`${API_URL_MESSAGES}${active_room}`, { params });
     if (status !== 200) {
       throw new Error(message);
     }

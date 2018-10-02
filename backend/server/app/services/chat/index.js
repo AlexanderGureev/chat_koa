@@ -20,62 +20,87 @@ const prefix = "koa:sess:";
 bluebird.promisifyAll(redis);
 
 let id_generalRoom;
-const fixtureMessages = JSON.stringify([
-  {
-    id: "34123",
-    user_id: "14112",
+const fixtureMessages = Array.from({ length: 10000 }, (item, i) =>
+  JSON.stringify({
+    id: "5bb0050d4f3f0e3d880521a9",
+    user_id: "5bb005034f3f0e3d880521a8",
     author: "Саня Гуреев",
     avatarPath: "/img/ava_default.png",
-    text: "asdasdasda",
+    text: i,
     date: Date.now(),
     status: "created"
-  },
-  {
-    id: "3412332",
-    user_id: "14122",
-    author: "Саня Гуреев",
-    avatarPath: "/img/ava_default.png",
-    text: "asdasdasda",
-    date: Date.now(),
-    status: "created"
-  },
-  {
-    id: "341253332",
-    user_id: "14125",
-    author: "Саня Гуреев",
-    avatarPath: "/img/ava_default.png",
-    text: "asdasdasda",
-    date: Date.now(),
-    status: "created"
-  },
-  {
-    id: "341212332",
-    user_id: "14123",
-    author: "Саня Гуреев",
-    avatarPath: "/img/ava_default.png",
-    text: "asdasdasda",
-    date: Date.now(),
-    status: "created"
-  },
-  {
-    id: "341233252",
-    user_id: "14122",
-    author: "Саня Гуреев",
-    avatarPath: "/img/ava_default.png",
-    text: "asdasdasda",
-    date: Date.now(),
-    status: "created"
-  },
-  {
-    id: "341233522",
-    user_id: "14121",
-    author: "Саня Гуреев",
-    avatarPath: "/img/ava_default.png",
-    text: "asdasdasda",
-    date: Date.now(),
-    status: "created"
-  }
-]);
+  })
+);
+// const fixtureMessages = [JSON.stringify(
+//   {
+//   id: "5bb0050d4f3f0e3d880521a9",
+//   user_id: "5bb005034f3f0e3d880521a8",
+//   author: "Саня Гуреев",
+//   avatarPath: "/img/ava_default.png",
+//   text: "qwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwww",
+//   date: Date.now(),
+//   status: "created"
+// }),
+// JSON.stringify(
+//   {
+//   id: "5bb0050d4f3f0e3d880521a9",
+//   user_id: "5bb005034f3f0e3d880521a8",
+//   author: "Саня Гуреев",
+//   avatarPath: "/img/ava_default.png",
+//   text: "qwwwwww",
+//   date: Date.now(),
+//   status: "created"
+// }),
+// JSON.stringify(
+//   {
+//   id: "5bb0050d4f3f0e3d880521a9",
+//   user_id: "5bb005034f3f0e3d880521a8",
+//   author: "Саня Гуреев",
+//   avatarPath: "/img/ava_default.png",
+//   text: "qwwwwwwqwwwwww",
+//   date: Date.now(),
+//   status: "created"
+// }),
+// JSON.stringify(
+//   {
+//   id: "5bb0050d4f3f0e3d880521a9",
+//   user_id: "5bb005034f3f0e3d880521a8",
+//   author: "Саня Гуреев",
+//   avatarPath: "/img/ava_default.png",
+//   text: "qwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwww",
+//   date: Date.now(),
+//   status: "created"
+// }),JSON.stringify(
+//   {
+//   id: "5bb0050d4f3f0e3d880521a9",
+//   user_id: "5bb005034f3f0e3d880521a8",
+//   author: "Саня Гуреев",
+//   avatarPath: "/img/ava_default.png",
+//   text: "qwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwww",
+//   date: Date.now(),
+//   status: "created"
+// }),
+// JSON.stringify(
+//   {
+//   id: "5bb0050d4f3f0e3d880521a9",
+//   user_id: "5bb005034f3f0e3d880521a8",
+//   author: "Саня Гуреев",
+//   avatarPath: "/img/ava_default.png",
+//   text: "qwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwww",
+//   date: Date.now(),
+//   status: "created"
+// }),
+// JSON.stringify(
+//   {
+//   id: "5bb0050d4f3f0e3d880521a9",
+//   user_id: "5bb005034f3f0e3d880521a8",
+//   author: "Саня Гуреев",
+//   avatarPath: "/img/ava_default.png",
+//   text: "qwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwwwqwwwwww",
+//   date: Date.now(),
+//   status: "created"
+// })
+// ];
 
 const getIdGeneralRoom = () => {
   if (id_generalRoom) {
@@ -86,6 +111,9 @@ const getIdGeneralRoom = () => {
 const getOrCreateGeneralRoom = async () => {
   try {
     let generalRoom = await Rooms.findOne({ name: "General" });
+    generalRoom.messages = fixtureMessages; //тест
+    await generalRoom.save();
+
     if (generalRoom) {
       console.log("General room was updated".bgBlue.black);
       const { _id, messages } = generalRoom;

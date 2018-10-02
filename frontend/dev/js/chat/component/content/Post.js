@@ -44,21 +44,18 @@ const Post = ({ message, id }) => {
     "my-post": id === user_id
   });
 
-  const avaStyle = {
-    position: "absolute",
-    right: "-40px",
-    top: "-40px",
-    width: "80px",
-    height: "80px",
-    borderRadius: "50%",
-    filter: "drop-shadow(0 0 20px rgba(0, 0, 0, 0.3))",
+  const classesAva = cn({
+    avatar: id !== user_id,
+    "my-avatar": id === user_id
+  });
+  const styles = {
     background: `url(${avatarPath}) center center`,
     backgroundSize: "cover"
   };
 
   return (
     <div className={classes}>
-      <div className="my-avatar" style={avaStyle} />
+      <div className={classesAva} style={styles} />
       <div className="message">
         <div className="text">{text}</div>
         <div className="footer">
@@ -70,4 +67,4 @@ const Post = ({ message, id }) => {
   );
 };
 
-export default Post
+export default Post;

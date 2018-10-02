@@ -45,8 +45,8 @@ const socketWrapper = ComposedComponent =>
     };
 
     scrollToBottom = () => {
-      const posts = document.querySelector("div.posts");
-      posts.scrollTo({ top: posts.scrollHeight, behavior: "smooth" });
+      // const posts = document.querySelector("div.posts");
+      // posts.scrollTo({ top: posts.scrollHeight, behavior: "smooth" });
     };
 
     socketEvents = () => {
@@ -108,9 +108,9 @@ const socketWrapper = ComposedComponent =>
       this.socket.emit("new_message", message);
     };
 
-    getMessages = async ({ active_room }) => {
+    getMessages = async ({ active_room }, start = -20, end = -1) => {
       try {
-        return await getMessages(active_room);
+        return await getMessages(active_room, start, end);
       } catch ({ message }) {
         const errors = message instanceof Array ? message : [message];
         this.setState({
@@ -172,6 +172,7 @@ const socketWrapper = ComposedComponent =>
           deleteRoom={this.deleteRoom}
           changeRoom={this.changeRoom}
           sendMessage={this.sendMessage}
+          getMessages={this.getMessages}
         />
       );
     }

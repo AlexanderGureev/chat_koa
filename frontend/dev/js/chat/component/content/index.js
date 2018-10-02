@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import ChatContainer from "./ChatContainer";
 import RightBar from "./RightBar";
 
-const MainChat = ({users, messages, sendMessage, user_id}) => (
+const MainChat = ({users, messages, sendMessage, getMessages, user}) => (
   <div className="main-chat">
-    <ChatContainer messages={messages} user_id={user_id} sendMessage={sendMessage}/>
+    <ChatContainer messages={messages} user={user} sendMessage={sendMessage} getMessages={getMessages} />
     <RightBar users={users}/>
   </div>
 );

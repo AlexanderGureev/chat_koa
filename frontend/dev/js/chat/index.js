@@ -5,6 +5,7 @@ import { App } from "./component";
 
 ReactDOM.render(<App />, document.getElementById("root-node"));
 
+import "react-virtualized/styles.css";
 import "antd/dist/antd.less";
 import "emoji-mart/css/emoji-mart.css";
 import "animate.css";

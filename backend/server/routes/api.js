@@ -35,7 +35,7 @@ module.exports = router => {
     }
   });
   router.get("/api/messages/:room_id", isAuthenticated, async ctx => {
-    const messages = await getMessages(ctx.params);
+    const messages = await getMessages(ctx.params, ctx.query);
     ctx.body = responseMessage(200, "", messages);
   });
 
