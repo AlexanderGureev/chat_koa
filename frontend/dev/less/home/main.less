@@ -5,8 +5,6 @@
 body {
 	font-size: 16px;
     min-width: 320px;
-    height: 100vh;
-	position: relative;
 	line-height: 1.75;
 	font-family: "Montserrat-ex", sans-serif;
 	font-weight: 400;
@@ -51,7 +49,7 @@ body {
 }
 
 .is-chat {
-    position: relative;
+    position: fixed;
     overflow: hidden;
 }
 #my-header {
@@ -992,9 +990,9 @@ body {
 // CHAT
 .emoji-mart {
     position: absolute;
-    bottom: 40px;
     right: 10px;
     bottom: 60px;
+    height: 350px;
 }
 .emoji-mart-search {
     margin: 5px
@@ -1003,11 +1001,19 @@ body {
     top: 5px;
 }
 .emoji-mart-title-label {
-    font-style: 20px;
+    font-size: 20px;
 }
+.emoji-mart-preview {
+    display: none;
+}
+.emoji-mart-scroll {
+    height: 262px;
+    border-radius: 10px;
+}
+
 .is-chat {
     overflow-x: hidden;
-    min-height: 450px;
+    min-height: 250px;
     a {
         color: #fff;
         font-size: 18px;

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import cn from "classnames";
+import { emojify } from "react-emojione";
 
 const formatDate = date => {
   if (!date) {
@@ -57,7 +58,7 @@ const Post = ({ message, id }) => {
     <div className={classes}>
       <div className={classesAva} style={styles} />
       <div className="message">
-        <div className="text">{text}</div>
+        <div className="text">{emojify(text)}</div>
         <div className="footer">
           <div className="author">{author}</div>
           <div className="date">{formatDate(date)}</div>

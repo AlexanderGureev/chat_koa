@@ -26,7 +26,7 @@ const fixtureMessages = Array.from({ length: 10000 }, (item, i) =>
     user_id: "5bb005034f3f0e3d880521a8",
     author: "Саня Гуреев",
     avatarPath: "/img/ava_default.png",
-    text: i,
+    text: `${i}`,
     date: Date.now(),
     status: "created"
   })

@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import Posts from "./Posts";
-import cn from "classnames";
 import EmojiBox from "./EmojiBox";
 
 class ChatContainer extends Component {
+
   state = {
     message: "",
     emojiIsOpen: false
@@ -38,8 +38,11 @@ class ChatContainer extends Component {
     });
   };
 
-  addEmoji = emoji => {
-    console.log(emoji);
+  addEmoji = ({ colons }) => {
+    const { message } = this.state;
+    this.setState({
+      message: `${message}${colons}`
+    });
   };
   openEmoji = e => {
     e.preventDefault();
