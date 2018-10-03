@@ -49,7 +49,7 @@ body {
 }
 
 .is-chat {
-    position: fixed;
+    position: relative;
     overflow: hidden;
 }
 #my-header {
@@ -993,6 +993,11 @@ body {
     right: 10px;
     bottom: 60px;
     height: 350px;
+    border: none;
+    box-shadow: 0 0 15px rgba(0,0,0, .2);
+}
+.emoji-mart-category-label {
+    font-size: 14px;
 }
 .emoji-mart-search {
     margin: 5px
@@ -1509,32 +1514,17 @@ body {
         .send {
             border: none;
             outline: none;
-            position: absolute;
-            bottom: 13px;
-            right: 35px;
-            width: 25px;
-            height: 25px;
-            padding: 6px 20px;
+            padding: 12px 20px;
             background: url("../../img/send.svg") no-repeat center center;
             cursor: pointer;
             
         }
         .link {
-            position: absolute;
-            bottom: 15px;
-            left: 10px;
-            width: 20px;
-            height: 20px;
-            padding: 6px 20px;
+            padding: 12px 20px;
             background: url("../../img/unlink.svg") no-repeat center center;
         }
         .smile {
-            position: absolute;
-            bottom: 14px;
-            right: 80px;
-            width: 25px;
-            height: 25px;
-            padding: 6px 20px;
+            padding: 12px 20px;
             background: url("../../img/smile.svg") no-repeat center center;
         }
     }
@@ -1559,7 +1549,35 @@ body {
         //transform: scale(1);
     }
 }
-
+.wrap-link {
+    bottom: 0px;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.wrap-smile {
+    right: 55px;
+    bottom: 0px;
+    position: absolute;
+    width: 40px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.btn-wrap {
+    right: 15px;
+    bottom: 0px;
+    position: absolute;
+    width: 40px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .right-side-bar {
     overflow-y: scroll;
     overflow-x: hidden;

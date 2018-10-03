@@ -3,7 +3,6 @@ import Posts from "./Posts";
 import EmojiBox from "./EmojiBox";
 
 class ChatContainer extends Component {
-
   state = {
     message: "",
     emojiIsOpen: false
@@ -38,13 +37,13 @@ class ChatContainer extends Component {
     });
   };
 
-  addEmoji = ({ colons }) => {
+  selectEmoji = ({ colons }) => {
     const { message } = this.state;
     this.setState({
       message: `${message}${colons}`
     });
   };
-  openEmoji = e => {
+  openEmojiBox = e => {
     e.preventDefault();
     this.setState({
       emojiIsOpen: !this.state.emojiIsOpen
@@ -69,13 +68,17 @@ class ChatContainer extends Component {
             value={message}
             onChange={this.onChangeInput}
           />
-          <a href="#" className="link" />
-          <button type="submit" disabled={isDisabled} className="send" />
+          <div className="wrap-link">
+            <a href="#" className="link" />
+          </div>
+          <div className="btn-wrap">
+            <button type="submit" disabled={isDisabled} className="send" />
+          </div>
           <EmojiBox
             setRef={this.setRef}
             isOpen={emojiIsOpen}
-            onSelect={this.addEmoji}
-            openEmojiBox={this.openEmoji}
+            onSelect={this.selectEmoji}
+            openEmojiBox={this.openEmojiBox}
           />
         </form>
       </div>
