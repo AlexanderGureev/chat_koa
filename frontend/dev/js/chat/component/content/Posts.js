@@ -71,13 +71,13 @@ class Posts extends Component {
 
   onResize = width => {
     if (width < 580 && this.currentMinHeight === 190) {
-      this.currentMinHeight = 110;
+      this.currentMinHeight = 115;
       this.cache = new CellMeasurerCache({
         minHeight: this.currentMinHeight,
         fixedWidth: true
       });
     }
-    if (width > 580 && this.currentMinHeight === 110) {
+    if (width > 580 && this.currentMinHeight === 115) {
       this.currentMinHeight = 190;
       this.cache = new CellMeasurerCache({
         minHeight: this.currentMinHeight,
@@ -113,7 +113,7 @@ class Posts extends Component {
 
   componentWillReceiveProps({ messages, user }) {
     const { active_room } = user;
-    const { initialSize, list, room_id } = this.state;
+    const { initialSize, list, room_id, start, end } = this.state;
 
     const updatePosition = () => {
       this.listRef.forceUpdateGrid();
@@ -130,7 +130,9 @@ class Posts extends Component {
         {
           list: [...messages],
           isEmpty: false,
-          initialSize: initialSize + 1
+          initialSize: initialSize + 1,
+          start: start - 1,
+          end: end - 1
         },
         updatePosition
       );
@@ -214,7 +216,8 @@ class Posts extends Component {
             attempts: attempts + 1
           },
           () => {
-            this.scrollToBottom(initialSize);
+            console.log(initialSize + parsed.length - initialSize)
+            this.scrollToBottom(initialSize + parsed.length - initialSize);
           }
         );
       }

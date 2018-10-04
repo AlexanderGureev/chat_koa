@@ -230,6 +230,9 @@
   .load-more {
     margin-left: 40%;
   }
+  .main-chat .chat-container .posts .post {
+    padding: 20px 30px 45px;
+  }
 }
 
 /* Small Devices, Tablets */
@@ -379,7 +382,7 @@
   }
 
   .main-chat .chat-container .posts .post .message .text {
-    font-size: 13px;
+    font-size: 12px;
   }
   .main-chat .chat-container .posts .post .message .footer {
     font-size: 8px;
@@ -446,7 +449,7 @@
   }
 
   .main-chat .send-message > input {
-    font-size: 12px;
+    font-size: 13px;
   }
   .main-chat .send-message .send {
     padding: 10px 20px;
@@ -628,11 +631,33 @@
 }
 
 /* Custom, iPhone Retina */
-@media only screen and (max-width: 320px) {
-  .tooltipster-sidetip.tooltipster-noir.tooltipster-noir-customized
-    .tooltipster-box {
-    width: 280px;
-    top: -67px;
-    font-size: 8px;
+@media only screen and (max-width: 380px) {
+  .main-chat .chat-container .posts .post .avatar {
+    height: 30px!important;
+    left: -13px!important;
+    top: -14px!important;
+    width: 30px!important;
+  }
+  .main-chat .chat-container .posts .post.my-post .my-avatar {
+    height: 30px!important;
+    right: -13px!important;
+    top: -14px!important;
+    width: 30px!important;
+  }
+  .main-chat .chat-container .posts .post .message .text {
+    font-size: 11.5px;
+  }
+  .main-chat .chat-container .posts .post .message .footer {
+    bottom: 5px;
+    font-size: 7px;
+  }
+  .main-chat .chat-container .posts .post, .main-chat .chat-container .posts .post.my-post {
+    min-width: 210px;
+  }
+  .main-chat .chat-container .posts .post {
+    padding: 5px 15px 15px;
+  }
+  .w-post, .w-post-my {
+    padding: 0 15px;
   }
 }
