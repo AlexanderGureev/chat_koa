@@ -20,8 +20,10 @@ const {
 
 require("./api")(router);
 require("./profile")(router);
-require("./chat")(router);
 
+if(env !== "none"){
+  require("./chat")(router);
+}
 //router.get("/api", convert(proxy({ host: "http://localhost:3001"} )));
 
 router.post("/register", formValidation, async ctx =>
@@ -121,7 +123,7 @@ router.get("/auth/twitter/callback", async (ctx, next) =>
   })(ctx)
 );
 
-if (env !== "dev_webpack") {
+if (env !== "none") {
   router.get("*", async (ctx, next) => {
     await ctx.render("index");
   });

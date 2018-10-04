@@ -13,10 +13,11 @@ const bodyParser = require("koa-bodyparser");
 const passport = require("koa-passport");
 const compose = require("koa-compose");
 const CSRF = require("koa-csrf");
-const { SESSION_KEY } = require("../config");
+const { SESSION_KEY, env } = require("../config");
 
 const publicDir = path.join(__dirname, "..", "public");
 const pathToFavicon = path.join(publicDir, "img", "favicon.png");
+const noop = async (ctx, next) => await next();
 
 const CONFIG = {
   key: "chater:session",
@@ -52,7 +53,7 @@ module.exports = app => {
     new CSRF(csrfConfig),
     passport.initialize(),
     passport.session(),
-    static(publicDir),
+    env !== "none" ? static(publicDir) : noop,
     routes(),
     allowedMethods()
     //favicon(pathToFavicon)

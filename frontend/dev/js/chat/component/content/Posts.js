@@ -216,7 +216,6 @@ class Posts extends Component {
             attempts: attempts + 1
           },
           () => {
-            console.log(initialSize + parsed.length - initialSize)
             this.scrollToBottom(initialSize + parsed.length - initialSize);
           }
         );

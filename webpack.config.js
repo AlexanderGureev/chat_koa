@@ -7,6 +7,8 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const webpack = require("webpack");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const MinifyPlugin = require("babel-minify-webpack-plugin");
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const HardSourceWebpackPlugin = require("hard-source-webpack-plugin");
 
 const lessToJs = require("less-vars-to-js");
 
@@ -24,7 +26,7 @@ module.exports = {
     //     aggregateTimeout: 100
     // },
     mode: mode,
-    devtool: mode === "development" ? "eval-source-map" : false,
+    devtool: mode !== "production" ? "cheap-module-eval-source-map" : false,
     entry: {
         home: [path.join(rootDir.dev, "js", "home", "index.js")],
         chat: [path.join(rootDir.dev, "js", "chat", "index.js")]
@@ -35,9 +37,19 @@ module.exports = {
         publicPath: "/"
     },
     optimization: {
+        minimizer: [new UglifyJsPlugin({
+            cache: true,
+            parallel: true
+        })],
+        runtimeChunk: "single",
         splitChunks: {
-          chunks: "all",
-        //   name: false
+            cacheGroups: {
+                    vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: "vendors",
+                    chunks: "all"
+                }
+            }
         }
     },
     plugins: [
@@ -73,7 +85,8 @@ module.exports = {
               NODE_ENV: JSON.stringify(process.env.NODE_ENV)
             }
         }),
-        new MinifyPlugin()
+        new MinifyPlugin(),
+        new HardSourceWebpackPlugin()
         //new BundleAnalyzerPlugin()
     ],
     resolve: {
@@ -107,6 +120,7 @@ module.exports = {
                     {
                         loader: "less-loader", 
                         options: {
+                            cacheDirectory: true,
                             javascriptEnabled: true,
                             modifyVars: themeVariables
                         }
