@@ -18,7 +18,20 @@ const cachingMessage = async (id_rooms, messages) => {
     }
   );
 };
-
+const selectMessages = (messages, start, end) => {
+  if (start === "0" && end === "-1") {
+    return messages;
+  }
+  const convertStart = messages.length - Math.abs(start);
+  const convertEnd = end === "-1" ? messages.length : messages.length - Math.abs(end);
+  let data = [];
+  for (let i = convertStart; i < convertEnd; i++) {
+    if(messages[i]) {
+      data.push(messages[i]);
+    }
+  }
+  return data;
+};
 const getMessages = async ({ room_id }, { start = 0, end = -1 }) => {
   try {
     let messages = await client.lrangeAsync(
@@ -39,15 +52,7 @@ const getMessages = async ({ room_id }, { start = 0, end = -1 }) => {
     console.log(`room: ${room_id}: mongodb given`);
 
     cachingMessage(room_id, room.messages);
-
-    if (start === 0 && end === -1) {
-      return room.messages;
-    }
-    const res = room.messages.filter(
-      (message, i, arr) =>
-        i > arr.length - Math.abs(start) && (i <= end || end === -1)
-    );
-    return res;
+    return selectMessages(room.messages, start, end);
   } catch (error) {
     console.error(error);
     throw error;
