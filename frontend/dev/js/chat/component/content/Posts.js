@@ -39,8 +39,7 @@ class Posts extends Component {
     attempts: 0,
     isLockScroll: false,
     initialSize: 0,
-    room_id: "",
-    scrollToIndex: 0
+    room_id: ""
   };
 
   initialState = (messages, active_room, cb = () => {}) => {
@@ -55,8 +54,7 @@ class Posts extends Component {
             initialSize: messages.length,
             room_id: active_room,
             start: -this.batchSize - messages.length,
-            end: -messages.length - 1,
-            scrollToIndex: messages.length
+            end: -messages.length - 1
           },
           cb
         );
@@ -180,56 +178,56 @@ class Posts extends Component {
     );
   };
 
-  _loadMoreRows = ({ start, end }) => {
+  loadingMessages = async (start, end) => {
     const { user, getMessages } = this.props;
+    const { list, attempts } = this.state;
+
+    const jsonData = await getMessages(user, start, end);
+    const data = jsonData.map(JSON.parse);
+    const [, ...messages] = list;
+
+    if (!data.length) {
+      this.setState({
+        list: [...data, ...messages],
+        isEmpty: true,
+        isLockScroll: false
+      });
+    } else {
+      this.setState(
+        {
+          list: [...data, ...messages],
+          start: start - this.batchSize,
+          end: end - this.batchSize,
+          attempts: attempts + 1,
+          isLockScroll: false
+        },
+        () => {
+          this.scrollToBottom(data.length);
+        }
+      );
+    }
+  };
+
+  _loadMoreRows = ({ start, end }) => {
     const { list, attempts } = this.state;
 
     if (attempts === this.maxAttempts) {
       this.setState({
-        list: [
-          {
-            type: "btn"
-          },
-          ...list
-        ],
+        list: [{ type: "btn" }, ...list],
         isLockScroll: true
       });
       return;
     }
 
-    this.setState({
-      list: [
-        {
-          type: "loader"
-        },
-        ...list
-      ],
-      isLockScroll: true
-    });
-
-    return getMessages(user, start, end).then(data => {
-      const parsed = data.map(JSON.parse);
-      if (!parsed.length) {
-        this.setState({
-          isEmpty: true,
-          isLockScroll: false
-        });
-      } else {
-        const [, ...messages] = list;
-        this.setState(
-          {
-            list: [...parsed, ...messages],
-            start: start - this.batchSize,
-            end: end - this.batchSize,
-            attempts: attempts + 1,
-            isLockScroll: false
-          },
-          () => {
-            this.scrollToBottom(parsed.length);
-          }
-        );
+    this.setState(
+      {
+        list: [{ type: "loader" }, ...list],
+        isLockScroll: true
+      },
+      () => {
+        this.loadingMessages(start, end);
       }
-    });
+    );
   };
 
   checkScrollerOpening = stopIndex => {
