@@ -12,14 +12,14 @@ import LoadMoreBtn from "./LoadMoreBtn";
 import { MessageLoaderRight, MessageLoaderLeft } from "./MessagePreloader";
 import Scroller from "./Scroller";
 import { debounce } from "lodash/fp";
+import LoadingBar from "./LoadingBar";
 import ReactResizeDetector from "react-resize-detector";
 
 class Posts extends Component {
   constructor(props) {
     super(props);
-    this.currentMinHeight = 190;
     this.cache = new CellMeasurerCache({
-      minHeight: this.currentMinHeight,
+      defaultHeight: 90,
       fixedWidth: true
     });
     this.maxAttempts = 2;
@@ -39,7 +39,8 @@ class Posts extends Component {
     attempts: 0,
     isLockScroll: false,
     initialSize: 0,
-    room_id: ""
+    room_id: "",
+    scrollToIndex: 0
   };
 
   initialState = (messages, active_room, cb = () => {}) => {
@@ -54,7 +55,8 @@ class Posts extends Component {
             initialSize: messages.length,
             room_id: active_room,
             start: -this.batchSize - messages.length,
-            end: -messages.length - 1
+            end: -messages.length - 1,
+            scrollToIndex: messages.length
           },
           cb
         );
@@ -68,32 +70,14 @@ class Posts extends Component {
 
     this.initialState(messages, active_room);
   }
-
-  onResize = width => {
-    if (width < 580 && this.currentMinHeight === 190) {
-      this.currentMinHeight = 115;
-      this.cache = new CellMeasurerCache({
-        minHeight: this.currentMinHeight,
-        fixedWidth: true
-      });
-    }
-    if (width > 580 && this.currentMinHeight === 115) {
-      this.currentMinHeight = 190;
-      this.cache = new CellMeasurerCache({
-        minHeight: this.currentMinHeight,
-        fixedWidth: true
-      });
-    }
-  };
-
   componentDidMount() {
-    this.listRef.scrollToPosition(10e6);
+    this.scrollToBottom(this.state.list.length);
   }
 
   loadMore = e => {
     const fn = () => {
       const { start, end } = this.state;
-      this._loadMoreRows({ startIndex: start, stopIndex: end });
+      this._loadMoreRows({ start, end });
     };
 
     const [, ...newList] = this.state.list;
@@ -126,27 +110,40 @@ class Posts extends Component {
     }
 
     if (messages.length > initialSize) {
+      const { scrollHeight, offsetHeight, scrollTop } = document.querySelector(
+        "div.grid"
+      );
+      const newMessage = messages[messages.length - 1];
       this.setState(
         {
-          list: [...messages],
+          list: [...list, newMessage],
           isEmpty: false,
           initialSize: initialSize + 1,
           start: start - 1,
           end: end - 1
         },
-        updatePosition
+        () => {
+          if (offsetHeight + scrollTop === scrollHeight) {
+            updatePosition();
+          }
+        }
       );
     }
   }
 
   isRowLoaded = ({ index }) => !!this.state.list[index];
 
-  getTemplateRow = item =>
-    item.type ? (
+  getTemplateRow = item => {
+    if (!item.type) {
+      return <Post id={this.props.user._id} message={item} />;
+    }
+
+    return item.type === "btn" ? (
       <LoadMoreBtn onClick={this.loadMore} />
     ) : (
-      <Post id={this.props.user._id} message={item} />
+      <LoadingBar />
     );
+  };
 
   rowRenderer = ({ key, index, style, isScrolling, isVisible, parent }) => {
     const { list } = this.state;
@@ -157,7 +154,6 @@ class Posts extends Component {
       "w-post": !isMyPost,
       "w-post-my": isMyPost
     });
-
     // const content = !isVisible ? (
     //   isMyPost ? (
     //     <MessageLoaderRight />
@@ -167,7 +163,6 @@ class Posts extends Component {
     // ) : (
     //   this.getTemplateRow(list[index])
     // );
-
     return (
       <CellMeasurer
         cache={this.cache}
@@ -185,38 +180,52 @@ class Posts extends Component {
     );
   };
 
-  _loadMoreRows = ({ startIndex, stopIndex }) => {
-    this._loadMoreRowsStartIndex = startIndex;
-    this._loadMoreRowsStopIndex = stopIndex;
-
+  _loadMoreRows = ({ start, end }) => {
     const { user, getMessages } = this.props;
-    const { list, attempts, initialSize } = this.state;
+    const { list, attempts } = this.state;
 
     if (attempts === this.maxAttempts) {
       this.setState({
-        list: [{ type: "system" }, ...list],
+        list: [
+          {
+            type: "btn"
+          },
+          ...list
+        ],
         isLockScroll: true
       });
       return;
     }
 
-    return getMessages(user, startIndex, stopIndex).then(data => {
-      const parsed = data.map(JSON.parse);
+    this.setState({
+      list: [
+        {
+          type: "loader"
+        },
+        ...list
+      ],
+      isLockScroll: true
+    });
 
+    return getMessages(user, start, end).then(data => {
+      const parsed = data.map(JSON.parse);
       if (!parsed.length) {
         this.setState({
-          isEmpty: true
+          isEmpty: true,
+          isLockScroll: false
         });
       } else {
+        const [, ...messages] = list;
         this.setState(
           {
-            list: [...parsed, ...list],
-            start: startIndex - this.batchSize,
-            end: stopIndex - this.batchSize,
-            attempts: attempts + 1
+            list: [...parsed, ...messages],
+            start: start - this.batchSize,
+            end: end - this.batchSize,
+            attempts: attempts + 1,
+            isLockScroll: false
           },
           () => {
-            this.scrollToBottom(initialSize + parsed.length - initialSize);
+            this.scrollToBottom(parsed.length);
           }
         );
       }
@@ -232,24 +241,29 @@ class Posts extends Component {
 
   _onRowsRendered = fn => (...args) => {
     const [options] = args;
-
     this.checkScrollerOpeningDebounced(options.startIndex);
-    return fn(...args);
   };
 
   _onScroll = ({ clientHeight, scrollHeight, scrollTop }) => {
     const { start, end, isEmpty, isLockScroll } = this.state;
     if (clientHeight > 0 && !scrollTop && !isEmpty && !isLockScroll) {
-      this._loadMoreRows({ startIndex: start, stopIndex: end });
+      this._loadMoreRows({ start, end });
     }
   };
 
   scrollToBottom = index => {
-    this.listRef.scrollToRow(index);
+    setTimeout(() => {
+      this.listRef.scrollToRow(index);
+      this.listRef.scrollToRow(index);
+    }, 0);
   };
 
   _setRef = ref => {
     this.listRef = ref;
+  };
+
+  onResize = width => {
+    this.cache.clearAll();
   };
 
   render() {
@@ -285,7 +299,8 @@ class Posts extends Component {
                     rowRenderer={this.rowRenderer}
                     width={width}
                     onScroll={this.onScrollDebounced}
-                    scrollToAlignment="end"
+                    overscanRowCount={1}
+                    scrollToAlignment="start"
                   />
                 )}
               </AutoSizer>

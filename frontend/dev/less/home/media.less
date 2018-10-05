@@ -230,9 +230,25 @@
   .load-more {
     margin-left: 40%;
   }
-  .main-chat .chat-container .posts .post {
-    padding: 20px 30px 45px;
+  .main-chat .chat-container .posts .post .avatar {
+    height: 50px;
+    left: -25px;
+    top: -20px;
+    width: 50px;
   }
+  .main-chat .chat-container .posts .post.my-post .my-avatar {
+    height: 50px;
+    right: -25px;
+    top: -20px;
+    width: 50px;
+  }
+  .w-post,
+  .w-post-my {
+    padding: 30px 50px 10px;
+  }
+  // .main-chat .chat-container .posts .post {
+  //   padding: 20px 30px 45px;
+  // }
 }
 
 /* Small Devices, Tablets */
@@ -341,25 +357,22 @@
   .chat-header .logo h1 {
     font-size: 25px;
   }
-  .main-chat .chat-container .posts .post .avatar {
-    width: 40px !important;
-    height: 40px !important;
-    top: -15px !important;
-    left: -20px !important;
-  }
+  // .w-post, .w-post-my {
+  //   padding: 40px 40px 15px;
+  // }
+  // .main-chat .chat-container .posts .post .avatar {
+  //   width: 40px !important;
+  //   height: 40px !important;
+  //   top: -15px !important;
+  //   left: -20px !important;
+  // }
 
-  .main-chat .chat-container .posts .post.my-post .my-avatar {
-    width: 40px !important;
-    height: 40px !important;
-    top: -15px !important;
-    right: -20px !important;
-  }
-  .main-chat .chat-container .posts .post {
-    //margin: 50px 0;
-  }
-  .main-chat .chat-container .posts {
-    //padding: 30px 30px 30px 30px;
-  }
+  // .main-chat .chat-container .posts .post.my-post .my-avatar {
+  //   width: 40px !important;
+  //   height: 40px !important;
+  //   top: -15px !important;
+  //   right: -20px !important;
+  // }
 
   //   .loader-right {
   //     width: 300px;
@@ -373,23 +386,25 @@
   //     left: -35px;
   //     margin-top: 50px;
   // }
-  .w-post,
-  .w-post-my {
-    padding: 0 25px;
-  }
-  .load-more {
-    margin-left: 35%;
-  }
+  // .w-post,
+  // .w-post-my {
+  //   padding: 0 25px;
+  // }
+  // .load-more {
+  //   margin-left: 35%;
+  // }
 
   .main-chat .chat-container .posts .post .message .text {
-    font-size: 12px;
+    font-size: 13px;
   }
   .main-chat .chat-container .posts .post .message .footer {
-    font-size: 8px;
-    bottom: 13px;
+    font-size: 10px;
   }
   .main-chat .chat-container .posts .post {
-    padding: 15px 20px 25px;
+    padding: 10px 30px 30px 35px;
+  }
+  .main-chat .chat-container .posts .post.my-post {
+    padding: 10px 35px 30px 30px;
   }
 
   .right-side-bar {
@@ -464,9 +479,9 @@
     height: 35px;
     width: 35px;
   }
-  .grid {
-    padding: 0;
-  }
+  // .grid {
+  //   padding: 0;
+  // }
   .loader-right {
     width: 250px;
     position: relative;
@@ -547,10 +562,10 @@
     font-size: 16px;
   }
 
-  .main-chat .chat-container .posts .post,
-  .main-chat .chat-container .posts .post.my-post {
-    min-width: 250px;
-  }
+  // .main-chat .chat-container .posts .post,
+  // .main-chat .chat-container .posts .post.my-post {
+  //   min-width: 250px;
+  // }
 
   .tooltipster-sidetip.tooltipster-noir.tooltipster-noir-customized
     .tooltipster-content {
@@ -592,14 +607,31 @@
   .noMatch h3 {
     font-size: 18px;
   }
+  .main-chat .chat-container .posts .post .avatar {
+    height: 30px;
+    left: -15px;
+    top: -10px;
+    width: 30px;
+  }
+  .main-chat .chat-container .posts .post.my-post .my-avatar {
+    height: 30px;
+    right: -15px;
+    top: -10px;
+    width: 30px;
+  }
+  //   .w-post, .w-post-my {
+  //     padding: 40px 20px 15px;
+  // }
+  .main-chat .chat-container .posts .post .message .footer {
+    font-size: 9px;
+  }
+  .w-post,
   .w-post-my {
-    width: 100% !important;
-    left: auto;
-    right: auto;
+    padding: 20px 20px 5px;
   }
-  .main-chat .chat-container .posts .post .message .text {
-    font-size: 10px;
-  }
+  // .main-chat .chat-container .posts .post .message .text {
+  //   font-size: 10px;
+  // }
   .load-more {
     margin-left: 20%;
     font-size: 12px;
@@ -628,36 +660,62 @@
   .chat-header .logo h1 {
     border-bottom: 0.5px solid #fff;
   }
+  .scroller {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+  .main-chat .chat-container .posts .post.my-post,
+  .main-chat .chat-container .posts .post {
+    min-width: 180px;
+  }
+  .loading-bar {
+    margin-left: 45%;
+  }
+  .loading-spinner {
+    transform: scale(.5);
+  }
+  .main-chat .chat-container .posts .post {
+    padding: 10px 15px 20px;
+  }
+  .main-chat .chat-container .posts .post.my-post {
+    padding: 10px 15px 20px;
+  }
 }
 
 /* Custom, iPhone Retina */
-@media only screen and (max-width: 380px) {
-  .main-chat .chat-container .posts .post .avatar {
-    height: 30px!important;
-    left: -13px!important;
-    top: -14px!important;
-    width: 30px!important;
+@media only screen and (max-width: 360px) {
+  .w-post-my {
+    width: 100% !important;
+    left: auto;
+    right: auto;
   }
-  .main-chat .chat-container .posts .post.my-post .my-avatar {
-    height: 30px!important;
-    right: -13px!important;
-    top: -14px!important;
-    width: 30px!important;
-  }
-  .main-chat .chat-container .posts .post .message .text {
-    font-size: 11.5px;
-  }
-  .main-chat .chat-container .posts .post .message .footer {
-    bottom: 5px;
-    font-size: 7px;
-  }
-  .main-chat .chat-container .posts .post, .main-chat .chat-container .posts .post.my-post {
-    min-width: 210px;
-  }
-  .main-chat .chat-container .posts .post {
-    padding: 5px 15px 15px;
-  }
-  .w-post, .w-post-my {
-    padding: 0 15px;
-  }
+  // .main-chat .chat-container .posts .post .avatar {
+  //   height: 30px!important;
+  //   left: -13px!important;
+  //   top: -14px!important;
+  //   width: 30px!important;
+  // }
+  // .main-chat .chat-container .posts .post.my-post .my-avatar {
+  //   height: 30px!important;
+  //   right: -13px!important;
+  //   top: -14px!important;
+  //   width: 30px!important;
+  // }
+  // .main-chat .chat-container .posts .post .message .text {
+  //   font-size: 11.5px;
+  // }
+  // .main-chat .chat-container .posts .post .message .footer {
+  //   bottom: 5px;
+  //   font-size: 7px;
+  // }
+  // .main-chat .chat-container .posts .post, .main-chat .chat-container .posts .post.my-post {
+  //   min-width: 210px;
+  // }
+  // .main-chat .chat-container .posts .post {
+  //   padding: 5px 15px 15px;
+  // }
+  // .w-post, .w-post-my {
+  //   padding: 0 15px;
+  // }
 }
