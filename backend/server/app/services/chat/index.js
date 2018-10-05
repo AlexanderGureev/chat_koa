@@ -20,17 +20,17 @@ const prefix = "koa:sess:";
 bluebird.promisifyAll(redis);
 
 let id_generalRoom;
-const fixtureMessages = Array.from({ length: 10000 }, (item, i) =>
-  JSON.stringify({
-    id: "5bb0050d4f3f0e3d880521a9",
-    user_id: "5bb005034f3f0e3d880521a8",
-    author: "Саня Гуреев",
-    avatarPath: "/img/ava_default.png",
-    text: `${i}`,
-    date: Date.now(),
-    status: "created"
-  })
-);
+// const fixtureMessages = Array.from({ length: 10000 }, (item, i) =>
+//   JSON.stringify({
+//     id: "5bb0050d4f3f0e3d880521a9",
+//     user_id: "5bb005034f3f0e3d880521a8",
+//     author: "Саня Гуреев",
+//     avatarPath: "/img/ava_default.png",
+//     text: `${i}`,
+//     date: Date.now(),
+//     status: "created"
+//   })
+// );
 // const fixtureMessages = [JSON.stringify(
 //   {
 //   id: "5bb0050d4f3f0e3d880521a9",
@@ -111,8 +111,8 @@ const getIdGeneralRoom = () => {
 const getOrCreateGeneralRoom = async () => {
   try {
     let generalRoom = await Rooms.findOne({ name: "General" });
-    generalRoom.messages = fixtureMessages; //тест
-    await generalRoom.save();
+    // generalRoom.messages = fixtureMessages; //тест
+    // await generalRoom.save();
 
     if (generalRoom) {
       console.log("General room was updated".bgBlue.black);
