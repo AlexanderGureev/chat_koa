@@ -11,8 +11,11 @@ const App = props => {
     <React.Fragment>
       <Preloader />
       <div className="overflow-container">
-        <Header />
-        <LeftBar rooms={rooms} {...props} />
+        <Header
+          roomListIsChange={props.roomListIsChange}
+          changeRoomListProcessed={props.changeRoomListProcessed}
+        />
+        { props.isLoaded && <LeftBar rooms={rooms} {...props} /> }
         <Content {...props} />
         )}
       </div>

@@ -60,16 +60,15 @@ class Posts extends Component {
         );
   };
 
-  componentWillMount() {
+  componentDidMount() {
     const {
       messages,
       user: { active_room }
     } = this.props;
 
-    this.initialState(messages, active_room);
-  }
-  componentDidMount() {
-    this.scrollToBottom(this.state.list.length);
+    this.initialState(messages, active_room, () => {
+      this.scrollToBottom(this.state.list.length);
+    });
   }
 
   loadMore = e => {
@@ -152,15 +151,7 @@ class Posts extends Component {
       "w-post": !isMyPost,
       "w-post-my": isMyPost
     });
-    // const content = !isVisible ? (
-    //   isMyPost ? (
-    //     <MessageLoaderRight />
-    //   ) : (
-    //     <MessageLoaderLeft />
-    //   )
-    // ) : (
-    //   this.getTemplateRow(list[index])
-    // );
+
     return (
       <CellMeasurer
         cache={this.cache}
@@ -297,7 +288,7 @@ class Posts extends Component {
                     rowRenderer={this.rowRenderer}
                     width={width}
                     onScroll={this.onScrollDebounced}
-                    overscanRowCount={1}
+                    //overscanRowCount={10}
                     scrollToAlignment="start"
                   />
                 )}

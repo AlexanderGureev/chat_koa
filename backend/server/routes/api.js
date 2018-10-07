@@ -5,7 +5,8 @@ const { responseMessage } = require("../app/services/responseMessage");
 const {
   createRoom,
   deleteRoom,
-  updateRoom
+  updateRoom,
+  getRooms
 } = require("../app/services/chat/rooms");
 
 module.exports = router => {
@@ -34,20 +35,26 @@ module.exports = router => {
       throw error;
     }
   });
+  router.get("/api/rooms", isAuthenticated, async ctx => {
+    const { term } = ctx.query;
+    const data = await getRooms(term);
+    ctx.body = responseMessage(200, "", data);
+  });
+
   router.get("/api/messages/:room_id", isAuthenticated, async ctx => {
     const messages = await getMessages(ctx.params, ctx.query);
     ctx.body = responseMessage(200, "", messages);
   });
 
   router.post("/api/room/create", isAuthenticated, async ctx => {
-    const { _id, name } = await createRoom(
+    const { _id, name, public, room_author } = await createRoom(
       ctx.request.body,
       ctx.state.user._id
     );
     ctx.body = responseMessage(
       200,
       `room: ${_id} successfully created`,
-      JSON.stringify({ _id, name })
+      JSON.stringify({ _id, name, public, room_author })
     );
   });
   router.delete("/api/room/delete/:id", isAuthenticated, async ctx => {

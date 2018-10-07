@@ -19,7 +19,8 @@ const socketWrapper = ComposedComponent =>
       messages: [],
       isLoading: false,
       isLoaded: false,
-      errors: []
+      errors: [],
+      roomListIsChange: false
     };
 
     componentDidMount() {
@@ -122,13 +123,14 @@ const socketWrapper = ComposedComponent =>
           room.password = passwordRoom;
         }
 
-        const { _id, name } = await createRoom(room);
-        this.socket.emit("update_rooms_list", { _id, name });
+        const newRoom = await createRoom(room);
+        this.socket.emit("update_rooms_list", newRoom);
 
         this.setState({
+          roomListIsChange: true,
           user: {
             ...this.state.user,
-            rooms: [...this.state.user.rooms, { _id, name }]
+            rooms: [...this.state.user.rooms, { ...newRoom }]
           }
         });
       } catch (error) {
@@ -140,10 +142,15 @@ const socketWrapper = ComposedComponent =>
     deleteRoom = async id => {
       try {
         await deleteRoom(id);
+        this.setState({ roomListIsChange: true });
         this.socket.emit("delete_room", id);
       } catch (error) {
         throw new Error("Произошла ошибка, повторите запрос.");
       }
+    };
+
+    changeRoomListProcessed = () => {
+      this.setState({ roomListIsChange: false });
     };
 
     changeRoom = id => {
@@ -163,6 +170,7 @@ const socketWrapper = ComposedComponent =>
           changeRoom={this.changeRoom}
           sendMessage={this.sendMessage}
           getMessages={this.getMessages}
+          changeRoomListProcessed={this.changeRoomListProcessed}
         />
       );
     }

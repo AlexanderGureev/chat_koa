@@ -5,7 +5,7 @@ import RightBlockHeader from "./RightBlockHeader";
 const ChatHeader = props => (
   <header className="chat-header">
     <Logo />
-    <RightBlockHeader />
+    <RightBlockHeader {...props}/>
   </header>
 );
 

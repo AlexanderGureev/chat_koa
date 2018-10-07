@@ -61,7 +61,7 @@ class LeftBar extends Component {
         <span className={classesToogle} onClick={this.toggleMenu} />
         <div className="collapsed-bar" id="left-bar">
           <div className="closes" onClick={this.toggleMenu} />
-          <Nav />
+          <Nav user={this.props.user} closeNav={this.toggleMenu}/>
           <Rooms
             rooms={rooms}
             createRoom={createRoom}

@@ -8,6 +8,7 @@ const API_URL_ROOM_CREATE = "api/room/create";
 const API_URL_ROOM_DELETE = "api/room/delete/";
 const API_URL_ROOM_UPDATE = "api/room/update/";
 const API_URL_USER_PROFILE = "api/user/profile";
+const API_URL_ROOMS = "/api/rooms";
 
 const noop = async () =>
   new Promise((res, rej) =>
@@ -75,3 +76,18 @@ export const deleteRoom = async id => {
     throw new Error("Ошибка отправки запроса...");
   }
 };
+
+export const getRooms = async (matchStr = "") => {
+  try {
+    const params = { term: matchStr };
+    const {
+      data: { status, message, info }
+    } = await axios.get(`${API_URL_ROOMS}`, { params });
+    if (status !== 200) {
+      throw new Error(message);
+    }
+    return info;
+  } catch (error) {
+    throw new Error("Ошибка загрузки данных...");
+  }
+}

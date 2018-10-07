@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Search from "./Search";
+import { Tooltip } from "antd";
 
 const RightBlockHeader = props => (
   <div className="flex-container">
@@ -7,11 +8,13 @@ const RightBlockHeader = props => (
       <a href="/">Home</a>
     </div>
 
-    <Search />
+    <Search {...props}/>
 
-    <div className="question">
-      <i className="fas fa-question" />
-    </div>
+    <Tooltip placement="bottom" title={"Помощь"}>
+      <div className="question">
+        <i className="fas fa-question" />
+      </div>
+    </Tooltip>
   </div>
 );
 
