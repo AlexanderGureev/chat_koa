@@ -101,6 +101,34 @@ let id_generalRoom;
 //   status: "created"
 // })
 // ];
+const getUnreadMessages = (user_rooms, dateOffline) =>
+  new Promise((resolve, reject) => {
+    const time = dateOffline.getTime();
+    const ids = user_rooms.map(({ _id }) => _id);
+
+    const resultProcessing = (err, res) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(res);
+    };
+
+    async.reduce(
+      ids,
+      {},
+      async (acc, id) => {
+        const jsonData = await client.lrangeAsync(
+          `rooms:${id}:messages`,
+          0,
+          -1
+        );
+        const room = jsonData.map(JSON.parse);
+        const count = room.filter(({ date }) => date > time).length;
+        return { ...acc, [id]: count };
+      },
+      resultProcessing
+    );
+  }); //Всегда ли есть сообщения в кеше?
 
 const getIdGeneralRoom = () => {
   if (id_generalRoom) {
@@ -173,7 +201,9 @@ const socketMiddleware = io => {
         username,
         email,
         rooms,
-        active_room
+        active_room,
+        offline_date,
+        online_date
       } = await getUser(headers);
       socket.user = {
         _id,
@@ -181,13 +211,35 @@ const socketMiddleware = io => {
         username,
         email,
         rooms,
-        active_room
+        active_room,
+        offline_date,
+        online_date
       };
     } catch (error) {
       console.log(error);
       return next(new Error("authentication error"));
     }
-    next();
+    await next();
+  });
+  io.use(async ({ user }, next) => {
+    user.online_date = new Date();
+    const { offline_date, rooms } = user;
+
+    if (offline_date) {
+      try {
+        const res = await getUnreadMessages(rooms, offline_date);
+        user.rooms = rooms.reduce(
+          (acc, room) => [
+            ...acc,
+            { ...room, unread_messages: res[room._id] || 0 }
+          ],
+          []
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    await next();
   });
 };
 const joinRooms = socket => {
@@ -206,10 +258,12 @@ const saveToMongo = async (room_id, messages) => {
     throw error;
   }
 };
-const changeActiveRoom = async (room_id, user_id) => {
+const saveUserData = async (room_id, user_id, dateOnline) => {
   try {
     const user = await User.findById(user_id);
     user.active_room = room_id;
+    user.online_date = dateOnline;
+    user.offline_date = Date.now();
     await user.save();
   } catch (error) {
     throw error;
@@ -243,13 +297,14 @@ const handlerNewMessage = socket => message => {
   saveToMongo(active_room, JSON.stringify(newMessage));
 };
 const handlerDisconnect = socket => reason => {
-  const { active_room, _id } = socket.user;
+  const { active_room, _id, online_date } = socket.user;
   socket.broadcast.to(active_room).emit("user_disconnect", {
     users: socketManager.deleteConnection(socket),
     room_id: active_room
   });
-
-  changeActiveRoom(active_room, _id);
+  if (reason === "transport close") {
+    saveUserData(active_room, _id, online_date);
+  }
 };
 const handlerDeleteRoom = socket => id => {
   socket.leave(id);
@@ -280,7 +335,6 @@ const handlerChangeRoom = socket => id => {
   socketManager.newConnection(socket);
 
   const response = getData(socket);
-
   socket.emit("connection_success", response);
   socket.broadcast.to(id).emit("user_connected", response);
 };

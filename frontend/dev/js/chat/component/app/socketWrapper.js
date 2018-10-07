@@ -90,7 +90,24 @@ const socketWrapper = ComposedComponent =>
             messages: [...this.state.messages, message]
           });
         } else {
-          // увеличить счетчик сообщений комнаты
+          const { rooms } = this.state.user;
+          const roomsWithMessage = rooms.reduce(
+            (acc, room) =>
+              room._id === message.room_id
+                ? [
+                    ...acc,
+                    { ...room, unread_messages: ++room.unread_messages || 1 } //default value необходимо в случае создании новой комнаты (когда комната только что создана, у нее нет поля прочитанных сообщений)
+                  ]
+                : [...acc, room],
+            []
+          );
+
+          this.setState({
+            user: {
+              ...this.state.user,
+              rooms: roomsWithMessage
+            }
+          });
         }
       });
     };

@@ -42,7 +42,7 @@ const userSchema = mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "rooms"
     },
-    read_messages: {
+    unread_messages: {
       type: Number,
       default: 0
     },
@@ -51,7 +51,9 @@ const userSchema = mongoose.Schema({
   },
   active_room:  mongoose.Schema.Types.ObjectId,
   resetPasswordToken: String,
-  resetPasswordExpires: Date
+  resetPasswordExpires: Date,
+  offline_date: Date,
+  online_date: Date
 });
 
 userSchema.plugin(uniqueValidator, {

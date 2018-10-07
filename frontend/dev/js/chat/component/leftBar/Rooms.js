@@ -61,12 +61,16 @@ class Rooms extends Component {
 
     return (
       <ul className="list-rooms">
-        {rooms.map(({ _id, name }) => (
+        {rooms.map(({ _id, name, unread_messages }) => (
           <li key={_id}>
+            <div className="not-read">
+              <Badge
+                count={unread_messages}
+                overflowCount={9}
+                className="message-counter"
+              />
+            </div>
             <Tooltip placement="top" title={"Перейти в комнату?"}>
-              <div className="not-read">
-                <Badge count={99} overflowCount={9} className="message-counter"/>
-              </div>
               <a href="#" onClick={this.changeRoom(_id)}>
                 {name}
               </a>

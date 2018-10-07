@@ -47,14 +47,14 @@ module.exports = router => {
   });
 
   router.post("/api/room/create", isAuthenticated, async ctx => {
-    const { _id, name, public, room_author } = await createRoom(
+    const { _id, name } = await createRoom(
       ctx.request.body,
       ctx.state.user._id
     );
     ctx.body = responseMessage(
       200,
       `room: ${_id} successfully created`,
-      JSON.stringify({ _id, name, public, room_author })
+      JSON.stringify({ _id, name })
     );
   });
   router.delete("/api/room/delete/:id", isAuthenticated, async ctx => {

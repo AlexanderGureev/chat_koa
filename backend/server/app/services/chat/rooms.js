@@ -20,9 +20,7 @@ const createRoom = async (room, user_id) => {
     const user = await User.findById(user_id);
     user.rooms.push({
       _id: newRoom._id,
-      name: newRoom.name,
-      public: newRoom.public,
-      room_author: newRoom.room_author
+      name: newRoom.name
     });
     await user.save();
     return newRoom;
