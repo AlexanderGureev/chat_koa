@@ -71,7 +71,7 @@ class Rooms extends Component {
               />
             </div>
             <Tooltip placement="top" title={"Перейти в комнату?"}>
-              <a href="#" onClick={this.changeRoom(_id)}>
+              <a href="#" onClick={this.changeRoom(_id)} onTouchStart={this.changeRoom(_id)}>
                 {name}
               </a>
             </Tooltip>
@@ -101,7 +101,7 @@ class Rooms extends Component {
         <h3>
           Rooms
           <Tooltip placement="top" title={"Создать новую комнату?"}>
-            <span className="rooms-add" onClick={this.showModal}>
+            <span className="rooms-add" onClick={this.showModal} onTouchStart={this.showModal}>
               <i className="fas fa-plus" />
             </span>
           </Tooltip>
