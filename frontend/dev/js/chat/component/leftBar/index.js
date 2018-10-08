@@ -3,6 +3,7 @@ import BarFooter from "./BarFooter";
 import Nav from "./Nav";
 import Rooms from "./Rooms";
 import cn from "classnames";
+import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 
 class LeftBar extends Component {
   constructor(props) {
@@ -13,31 +14,26 @@ class LeftBar extends Component {
     isOpen: false
   };
 
-  componentDidMount() {
-    window.addEventListener("click", this.handleCloseMenu);
-    window.addEventListener("touchend", this.handleCloseMenu);
-  }
-  componentWillUnmount() {
-    window.removeEventListener("click", this.handleCloseMenu);
-    window.removeEventListener("touchend", this.handleCloseMenu);
-  }
-
   getModalWindow = () =>
     document.querySelector("div.ant-modal") || { contains: () => {} };
 
   getPopover = () => document.querySelectorAll("div.ant-popover") || [];
 
+  getDomElements = name => document.querySelectorAll(name) || [];
+
   handleCloseMenu = ({ target }) => {
+    const fn = div => div.contains(target);
     if (
       !this.leftBar.current.contains(target) &&
-      !this.getModalWindow().contains(target) &&
-      ![].some.call(this.getPopover(), div => div.contains(target))
+      ![].some.call(this.getDomElements("div.ant-popover"), fn) &&
+      ![].some.call(this.getDomElements("div.ant-modal"), fn)
     ) {
       this.setState({
         isOpen: false
       });
     }
   };
+
   toggleMenu = () => {
     this.setState({
       isOpen: !this.state.isOpen
@@ -57,20 +53,25 @@ class LeftBar extends Component {
     });
 
     return (
-      <div className={classesBar} ref={this.leftBar}>
-        <span className={classesToogle} onClick={this.toggleMenu} />
-        <div className="collapsed-bar" id="left-bar">
-          <div className="closes" onClick={this.toggleMenu} />
-          <Nav user={this.props.user} closeNav={this.toggleMenu}/>
-          <Rooms
-            rooms={rooms}
-            createRoom={createRoom}
-            deleteRoom={deleteRoom}
-            changeRoom={changeRoom}
-          />
+      <ClickAwayListener
+        touchEvent="onTouchStart"
+        onClickAway={this.handleCloseMenu}
+      >
+        <div className={classesBar} ref={this.leftBar}>
+          <span className={classesToogle} onClick={this.toggleMenu} />
+          <div className="collapsed-bar" id="left-bar">
+            <div className="closes" onClick={this.toggleMenu} />
+            <Nav user={this.props.user} closeNav={this.toggleMenu} />
+            <Rooms
+              rooms={rooms}
+              createRoom={createRoom}
+              deleteRoom={deleteRoom}
+              changeRoom={changeRoom}
+            />
+          </div>
+          <BarFooter />
         </div>
-        <BarFooter />
-      </div>
+      </ClickAwayListener>
     );
   }
 }

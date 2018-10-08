@@ -4,16 +4,34 @@ import ModalWithForm from "./ModalWithForm";
 import DeleteRoom from "./DeleteRoom";
 import { message } from "antd";
 import RoomSettings from "./RoomSettings";
+import InvitingModal from "./InvitingModal";
 
 class Rooms extends Component {
   state = {
-    visible: false,
+    visibleModalForm: false,
+    visibleInvitingModal: false,
     confirmLoading: false
   };
 
-  showModal = () => {
+  showInvitingModal = name => () => {
+    this.currentRoomName = name;
     this.setState({
-      visible: true
+      visibleInvitingModal: true
+    });
+  };
+  handleOkInvitingModal = e => {
+    this.setState({
+      visibleInvitingModal: false
+    });
+  };
+  handleCancelInvitingModal = e => {
+    this.setState({
+      visibleInvitingModal: false
+    });
+  };
+  showModalWithForm = () => {
+    this.setState({
+      visibleModalForm: true
     });
   };
   handleCreate = () => {
@@ -28,7 +46,7 @@ class Rooms extends Component {
       try {
         await this.props.createRoom(values);
         form.resetFields();
-        this.setState({ visible: false, confirmLoading: false });
+        this.setState({ visibleModalForm: false, confirmLoading: false });
         message.success(`Комната ${values.roomName} успешно создана.`);
       } catch (err) {
         message.error(err.message);
@@ -40,7 +58,7 @@ class Rooms extends Component {
   };
   handleCancel = () => {
     this.setState({
-      visible: false
+      visibleModalForm: false
     });
   };
   deleteRoom = (id, name) => async e => {
@@ -71,7 +89,11 @@ class Rooms extends Component {
               />
             </div>
             <Tooltip placement="top" title={"Перейти в комнату?"}>
-              <a href="#" onClick={this.changeRoom(_id)} onTouchStart={this.changeRoom(_id)}>
+              <a
+                href="#"
+                onClick={this.changeRoom(_id)}
+                onTouchStart={this.changeRoom(_id)}
+              >
                 {name}
               </a>
             </Tooltip>
@@ -79,6 +101,7 @@ class Rooms extends Component {
               _id={_id}
               name={name}
               deleteRoom={this.deleteRoom(_id, name)}
+              showInvitingModal={this.showInvitingModal(name)}
             />
           </li>
         ))}
@@ -87,12 +110,16 @@ class Rooms extends Component {
   };
 
   render() {
-    const { visible, confirmLoading } = this.state;
+    const {
+      visibleModalForm,
+      confirmLoading,
+      visibleInvitingModal
+    } = this.state;
 
     return (
       <div className="rooms">
         <ModalWithForm
-          visible={visible}
+          visible={visibleModalForm}
           confirmLoading={confirmLoading}
           onCancel={this.handleCancel}
           onCreate={this.handleCreate}
@@ -101,11 +128,22 @@ class Rooms extends Component {
         <h3>
           Rooms
           <Tooltip placement="top" title={"Создать новую комнату?"}>
-            <span className="rooms-add" onClick={this.showModal} onTouchStart={this.showModal}>
+            <span
+              className="rooms-add"
+              onClick={this.showModalWithForm}
+              onTouchStart={this.showModalWithForm}
+            >
               <i className="fas fa-plus" />
             </span>
           </Tooltip>
         </h3>
+        <InvitingModal
+          name={this.currentRoomName}
+          showInvitingModal={this.showInvitingModal}
+          handleOkInvitingModal={this.handleOkInvitingModal}
+          handleCancelInvitingModal={this.handleCancelInvitingModal}
+          visible={visibleInvitingModal}
+        />
         {this.renderListRooms()}
       </div>
     );

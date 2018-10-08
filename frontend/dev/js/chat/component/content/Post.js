@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import cn from "classnames";
 import { emojify } from "react-emojione";
+import Linkify from "react-linkify";
 
 const formatDate = date => {
   if (!date) {
@@ -58,7 +59,9 @@ const Post = ({ message, id }) => {
     <div className={classes}>
       <div className={classesAva} style={styles} />
       <div className="message">
-        <div className="text">{emojify(text)}</div>
+        <div className="text">
+          <Linkify>{emojify(text)}</Linkify>
+        </div>
         <div className="footer">
           <div className="author">{author}</div>
           <div className="date">{formatDate(date)}</div>

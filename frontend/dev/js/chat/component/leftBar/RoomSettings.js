@@ -5,7 +5,7 @@ import DeleteRoom from "./DeleteRoom";
 const Item = Menu.Item;
 const Divider = Menu.Divider;
 
-const RoomSettings = ({ deleteRoom, _id, name }) => {
+const RoomSettings = ({ deleteRoom, name, showInvitingModal }) => {
   const handleMenuClick = e => {
     e.stopPropagation();
   };
@@ -13,13 +13,18 @@ const RoomSettings = ({ deleteRoom, _id, name }) => {
   const renderMenu = (
     <Menu>
       <Item key="0">
-        <a href="#">Настройки</a>
+        <a href="#" onClick={showInvitingModal}>
+          Создать приглашение
+        </a>
       </Item>
       <Item key="1">
+        <a href="#">Настройки</a>
+      </Item>
+      <Item key="2">
         <a href="#">Обзор</a>
       </Item>
       <Divider />
-      <Item key="2">
+      <Item key="3">
         <DeleteRoom
           name={name}
           deleteRoom={deleteRoom}
