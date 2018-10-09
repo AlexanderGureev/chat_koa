@@ -1,11 +1,13 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import io from "socket.io-client";
 import {
   getMessages,
   createRoom,
-  deleteRoom
+  deleteRoom,
+  checkInviteLink
 } from "../../../home/services/api";
 import { notification } from "antd";
+import { BrowserRouter as Router, Route, Redirect, Link, Switch } from "react-router-dom";
 
 const socketWrapper = ComposedComponent =>
   class SocketWrapped extends Component {
@@ -177,18 +179,51 @@ const socketWrapper = ComposedComponent =>
       }
     };
 
+    handlerInvite = async ({ match }) => {
+      try {
+        const {
+          params: { id }
+        } = match;
+  
+        const checkedId = await checkInviteLink(id);
+        console.log("emit")
+        this.socket.emit("call_invitation", checkedId);
+        return;
+      } catch(error) {
+        console.log(error);
+      }
+    }
+
     render() {
       return (
-        <ComposedComponent
-          {...this.props}
-          {...this.state}
-          createRoom={this.createRoom}
-          deleteRoom={this.deleteRoom}
-          changeRoom={this.changeRoom}
-          sendMessage={this.sendMessage}
-          getMessages={this.getMessages}
-          changeRoomListProcessed={this.changeRoomListProcessed}
-        />
+        <Router>
+          <Fragment>
+            <Route
+              path="/chat/:id"
+              render={props => {
+                this.handlerInvite(props);
+                return (
+                  <Redirect to="/chat" />
+                )
+              }}
+            />
+            <Route
+              path="/chat"
+              render={props => (
+                <ComposedComponent
+                  {...this.props}
+                  {...this.state}
+                  createRoom={this.createRoom}
+                  deleteRoom={this.deleteRoom}
+                  changeRoom={this.changeRoom}
+                  sendMessage={this.sendMessage}
+                  getMessages={this.getMessages}
+                  changeRoomListProcessed={this.changeRoomListProcessed}
+                />
+              )}
+            />
+          </Fragment>
+        </Router>
       );
     }
   };

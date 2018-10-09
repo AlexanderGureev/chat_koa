@@ -16,7 +16,8 @@ module.exports = async (app, env) => {
     app.use(middleware);
 
     app.use(async (ctx, next) => {
-      const pathname = ctx.url === "/chat" ? "chat.html" : "index.html";
+      const [, url ] = ctx.url.split("/");
+      const pathname = url === "chat" ? "chat.html" : "index.html";
 
       const filename = path.resolve(config.output.path, pathname);
       ctx.type = "html";

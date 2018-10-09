@@ -5,19 +5,31 @@ import DeleteRoom from "./DeleteRoom";
 import { message } from "antd";
 import RoomSettings from "./RoomSettings";
 import InvitingModal from "./InvitingModal";
+import { getInviteLink } from "../../../home/services/api";
+
+const DEFAULT_LINK = `${location.host}/chat`;
 
 class Rooms extends Component {
   state = {
     visibleModalForm: false,
     visibleInvitingModal: false,
+    inviteLink: "",
     confirmLoading: false
   };
 
-  showInvitingModal = name => () => {
-    this.currentRoomName = name;
-    this.setState({
-      visibleInvitingModal: true
-    });
+  showInvitingModal = (name, id) => async () => {
+    try {
+      this.currentRoomName = name;
+      this.currentRoomId = id;
+      const invite_id = await getInviteLink(id);
+      
+      this.setState({
+        inviteLink: `${DEFAULT_LINK}/${invite_id}`,
+        visibleInvitingModal: true
+      });
+    } catch(error) {
+      console.log(error);
+    }
   };
   handleOkInvitingModal = e => {
     this.setState({
@@ -101,7 +113,7 @@ class Rooms extends Component {
               _id={_id}
               name={name}
               deleteRoom={this.deleteRoom(_id, name)}
-              showInvitingModal={this.showInvitingModal(name)}
+              showInvitingModal={this.showInvitingModal(name, _id)}
             />
           </li>
         ))}
@@ -113,7 +125,8 @@ class Rooms extends Component {
     const {
       visibleModalForm,
       confirmLoading,
-      visibleInvitingModal
+      visibleInvitingModal,
+      inviteLink
     } = this.state;
 
     return (
@@ -138,7 +151,9 @@ class Rooms extends Component {
           </Tooltip>
         </h3>
         <InvitingModal
+          id={this.currentRoomId}
           name={this.currentRoomName}
+          inviteLink={inviteLink}
           showInvitingModal={this.showInvitingModal}
           handleOkInvitingModal={this.handleOkInvitingModal}
           handleCancelInvitingModal={this.handleCancelInvitingModal}

@@ -8,6 +8,8 @@ const API_URL_ROOM_CREATE = "api/room/create";
 const API_URL_ROOM_DELETE = "api/room/delete/";
 const API_URL_ROOM_UPDATE = "api/room/update/";
 const API_URL_USER_PROFILE = "api/user/profile";
+const API_URL_INVITE = "api/invite/";
+const API_URL_CHECK_INVITE = "api/check/";
 const API_URL_ROOMS = "/api/rooms";
 
 const noop = async () =>
@@ -83,6 +85,35 @@ export const getRooms = async (matchStr = "") => {
     const {
       data: { status, message, info }
     } = await axios.get(`${API_URL_ROOMS}`, { params });
+    if (status !== 200) {
+      throw new Error(message);
+    }
+    return info;
+  } catch (error) {
+    throw new Error("Ошибка загрузки данных...");
+  }
+}
+
+export const getInviteLink = async room_id => {
+  try {
+    const {
+      data: { status, message, info }
+    } = await axios.get(`${API_URL_INVITE}${room_id}`);
+    
+    if (status !== 200) {
+      throw new Error(message);
+    }
+    return info;
+  } catch (error) {
+    throw new Error("Ошибка загрузки данных...");
+  }
+}
+export const checkInviteLink = async invitation_id => {
+  try {
+    const {
+      data: { status, message, info }
+    } = await axios.get(`${API_URL_CHECK_INVITE}${invitation_id}`);
+    
     if (status !== 200) {
       throw new Error(message);
     }

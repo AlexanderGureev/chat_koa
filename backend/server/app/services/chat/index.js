@@ -15,6 +15,7 @@ const sub = redis.createClient(REDIS_URI),
 
 const socketManager = require("./socket-connections")();
 const { Rooms, validateRooms } = require("../../model/rooms");
+const Invitation = require("../../model/invitations");
 
 const prefix = "koa:sess:";
 bluebird.promisifyAll(redis);
@@ -343,6 +344,23 @@ const hanglerSocketError = socket => error => {
   console.log("Received error from client:".bgRed.black, socket.id);
   console.log(error);
 };
+const handlerInvitation = socket => async invitation_id => { //Обработка ошибок не работает!!!!!!!
+  try {
+    console.log(socket)
+    const { room_id } = await Invitation.findOne({ invitation_id });
+    const { _id, name } = await Rooms.findById(room_id);
+    const user = await User.findById(socket.user._id);
+
+    user.rooms.push({ _id, name });
+    socket.user.rooms.push({ _id, name })
+
+    handlerChangeRoom(socket)(_id);
+    await user.save();
+  } catch(error) {
+    console.log(error);
+    //throw error;
+  }
+}
 const getData = ({ user }) => ({
   users: socketManager.getConnection(user.active_room),
   user,
@@ -364,6 +382,7 @@ const handlers = io => {
     socket.on("disconnect", handlerDisconnect(socket));
     socket.on("new_message", handlerNewMessage(socket));
     socket.on("update_rooms_list", handlerUpdateRooms(socket));
+    socket.on("call_invitation", handlerInvitation(socket));
     socket.on("error", hanglerSocketError(socket));
   });
 };
