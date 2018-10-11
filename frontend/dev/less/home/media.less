@@ -357,6 +357,12 @@
   .chat-header .logo h1 {
     font-size: 25px;
   }
+  .invite-preloader {
+    display: inline-block;
+    width: 260px;
+    height: 100px;
+    padding-top: 20px;
+  }
   // .w-post, .w-post-my {
   //   padding: 40px 40px 15px;
   // }
@@ -493,6 +499,51 @@
     position: relative;
     left: -22px;
     // margin-top: 50px;
+  }
+  .invite-link img {
+    display: none;
+  }
+  .invite-link .room-info-wrap .room {
+    margin-right: 0;
+  }
+  .invite-link .room-info-wrap {
+    padding: 0;
+  }
+  .invite-link .room-info-wrap a {
+    padding-left: 0;
+    padding-right: 10px;
+  }
+  .invite-link .room-info-wrap .room .room-info {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .invite-link .room-info-wrap .room .room-info>span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 80px;
+  }
+  .invite-link .room-info-wrap .room .room-info-error {
+    padding: 0 10px;
+  }
+  .invite-link .room-info-wrap .room .room-info-error>span{
+    width: 160px;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 170px;
+  }
+  .invite-link .room-info-wrap .room .room-info-error :last-child {
+    width: 160px;
+    font-size: 12px;
+  } 
+  .invite-link .room-info-wrap .btn-invite {
+    font-size: 12px;
+  }
+  .invite-link>span {
+    padding: 0 10px;
+    white-space: nowrap;
   }
 }
 
@@ -667,7 +718,7 @@
   }
   .main-chat .chat-container .posts .post.my-post,
   .main-chat .chat-container .posts .post {
-    min-width: 180px;
+    min-width: 210px;
   }
   .loading-bar {
     margin-left: 45%;
@@ -683,6 +734,12 @@
   }
   .is-chat .ant-drawer .description-item {
     font-size: 12px !important;
+  }
+  .invite-preloader {
+    display: inline-block;
+    width: 160px;
+    height: 90px;
+    padding-top: 20px;
   }
 }
 

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Posts from "./Posts";
 import EmojiBox from "./EmojiBox";
+import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 
 class ChatContainer extends Component {
   state = {
@@ -8,14 +9,6 @@ class ChatContainer extends Component {
     emojiIsOpen: false
   };
 
-  componentDidMount() {
-    window.addEventListener("click", this.onCloseEmojiBox);
-    window.addEventListener("touchstart", this.onCloseEmojiBox);
-  }
-  componentWillUnmount() {
-    window.removeEventListener("click", this.onCloseEmojiBox);
-    window.removeEventListener("touchstart", this.onCloseEmojiBox);
-  }
   onCloseEmojiBox = ({ target }) => {
     if (!this.emojiBoxRef.contains(target)) {
       this.setState({
@@ -36,7 +29,6 @@ class ChatContainer extends Component {
       message: value
     });
   };
-
   selectEmoji = ({ colons }) => {
     const { message } = this.state;
     this.setState({
@@ -54,7 +46,7 @@ class ChatContainer extends Component {
     const { isLoaded } = this.props;
     const { message, emojiIsOpen } = this.state;
     const isDisabled = !Boolean(this.removeSpaces(message));
-
+    console.log(isLoaded)
     return (
       <div className="chat-container">
         {isLoaded && <Posts {...this.props} />}
@@ -74,12 +66,17 @@ class ChatContainer extends Component {
           <div className="btn-wrap">
             <button type="submit" disabled={isDisabled} className="send" />
           </div>
-          <EmojiBox
-            setRef={this.setRef}
-            isOpen={emojiIsOpen}
-            onSelect={this.selectEmoji}
-            openEmojiBox={this.openEmojiBox}
-          />
+          <ClickAwayListener
+            touchEvent="onTouchStart"
+            onClickAway={this.onCloseEmojiBox}
+          >
+            <EmojiBox
+              setRef={this.setRef}
+              isOpen={emojiIsOpen}
+              onSelect={this.selectEmoji}
+              openEmojiBox={this.openEmojiBox}
+            />
+          </ClickAwayListener>
         </form>
       </div>
     );

@@ -109,8 +109,18 @@ class SocketConnection {
   getConnection(active_room) {
     const room_id = active_room.toString();
     const room = this.getRoom(room_id);
-    return [...room.values()];
+    if(room) {
+      return [...room.values()];
+    }
+    return [];
   }
 }
 
-module.exports = () => new SocketConnection();
+let instance;
+module.exports = () => {
+  if(instance) {
+    return instance;
+  } 
+  instance = new SocketConnection();
+  return instance;
+};

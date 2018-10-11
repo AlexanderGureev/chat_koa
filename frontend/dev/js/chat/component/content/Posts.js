@@ -14,6 +14,10 @@ import Scroller from "./Scroller";
 import { debounce } from "lodash/fp";
 import LoadingBar from "./LoadingBar";
 import ReactResizeDetector from "react-resize-detector";
+import withFormatting from "./withFormatting";
+import { checkInviteLink } from "../../../home/services/api";
+
+const FormattedPost = withFormatting(Post);
 
 class Posts extends Component {
   constructor(props) {
@@ -29,6 +33,7 @@ class Posts extends Component {
     );
     this.onScrollDebounced = debounce(500, this._onScroll);
     this.batchSize = 20;
+    this.queueInvites = [];
   }
 
   state = {
@@ -39,7 +44,8 @@ class Posts extends Component {
     attempts: 0,
     isLockScroll: false,
     initialSize: 0,
-    room_id: ""
+    room_id: "",
+    isLoading: false
   };
 
   initialState = (messages, active_room, cb = () => {}) => {
@@ -59,7 +65,6 @@ class Posts extends Component {
           cb
         );
   };
-
   componentDidMount() {
     const {
       messages,
@@ -70,28 +75,6 @@ class Posts extends Component {
       this.scrollToBottom(this.state.list.length);
     });
   }
-
-  loadMore = e => {
-    const fn = () => {
-      const { start, end } = this.state;
-      this._loadMoreRows({ start, end });
-    };
-
-    const [, ...newList] = this.state.list;
-    this.setState(
-      {
-        list: newList,
-        attempts: 0,
-        isLockScroll: false
-      },
-      fn
-    );
-  };
-
-  changeRoom = (messages, room_id, cb) => {
-    this.initialState(messages, room_id, cb);
-  };
-
   componentWillReceiveProps({ messages, user }) {
     const { active_room } = user;
     const { initialSize, list, room_id, start, end } = this.state;
@@ -127,12 +110,93 @@ class Posts extends Component {
       );
     }
   }
+  componentWillUnmount() {
+    clearTimeout(this.timer);
+  }
+  checkQueue = () => {
+    if (this.queueInvites.length) {
+      this.checkInvite(this.queueInvites.shift());
+    }
+  };
+  uploadInvite = async id => {
+    const { addInviteToChecked } = this.props;
+    let invite;
+
+    try {
+      invite = await checkInviteLink(id);
+      invite.inviteNotValid = false;
+
+      addInviteToChecked(id, invite);
+      this.setState(
+        {
+          isLoading: false
+        },
+        this.checkQueue
+      );
+    } catch (error) {
+      invite = { inviteNotValid: true };
+      addInviteToChecked(id, invite);
+      this.setState(
+        {
+          isLoading: false
+        },
+        this.checkQueue
+      );
+    }
+  };
+  checkInvite = id => {
+    const { isLoading } = this.state;
+    const { checkedInvitentions } = this.props;
+
+    if (checkedInvitentions[id]) {
+      return this.checkQueue(); //не все элементы будут загружены с бд, нужна проверка на оставшиеся элементы в очереди
+    }
+
+    if (isLoading) {
+      return this.queueInvites.push(id);
+    }
+
+    this.setState(
+      {
+        isLoading: true
+      },
+      () => this.uploadInvite(id)
+    );
+  };
+
+  loadMore = e => {
+    const fn = () => {
+      const { start, end } = this.state;
+      this._loadMoreRows({ start, end });
+    };
+
+    const [, ...newList] = this.state.list;
+    this.setState(
+      {
+        list: newList,
+        attempts: 0,
+        isLockScroll: false
+      },
+      fn
+    );
+  };
+
+  changeRoom = (messages, room_id, cb) => {
+    this.initialState(messages, room_id, cb);
+  };
 
   isRowLoaded = ({ index }) => !!this.state.list[index];
 
-  getTemplateRow = item => {
+  getTemplateRow = (item, index) => {
     if (!item.type) {
-      return <Post id={this.props.user._id} message={item} />;
+      return (
+        <FormattedPost
+          id={this.props.user._id}
+          message={item}
+          invitations={this.props.checkedInvitentions}
+          checkInvite={this.checkInvite}
+        />
+      );
     }
 
     return item.type === "btn" ? (
@@ -162,7 +226,7 @@ class Posts extends Component {
       >
         {({ measure }) => (
           <div className={classes} onLoad={measure} style={style}>
-            {this.getTemplateRow(list[index])}
+            {this.getTemplateRow(list[index], index)}
           </div>
         )}
       </CellMeasurer>
@@ -193,7 +257,9 @@ class Posts extends Component {
           isLockScroll: false
         },
         () => {
-          this.scrollToBottom(data.length);
+          this.cache.clearAll();
+          this.listRef.recomputeGridSize(0, data.length - 1);
+          this.scrollToBottom(data.length - 1);
         }
       );
     }
@@ -223,6 +289,9 @@ class Posts extends Component {
 
   checkScrollerOpening = stopIndex => {
     const { list } = this.state;
+    if(stopIndex === 0) {
+      return;
+    }
     const isActiveScroller =
       stopIndex < list.length - this.batchSize / 2 ? true : false;
     this.setState({ isActiveScroller });
@@ -241,7 +310,7 @@ class Posts extends Component {
   };
 
   scrollToBottom = index => {
-    setTimeout(() => {
+    this.timer = setTimeout(() => {
       this.listRef.scrollToRow(index);
       this.listRef.scrollToRow(index);
     }, 0);

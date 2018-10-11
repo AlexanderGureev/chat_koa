@@ -22,13 +22,12 @@ class InvitingModal extends Component {
 
   render() {
     const {
-      name,
       visible,
       handleOkInvitingModal,
       handleCancelInvitingModal,
-      inviteLink
+      invitation: { room_name, inviteLink }
     } = this.props;
-    
+
     const { copied } = this.state;
 
     const styles = {
@@ -44,7 +43,7 @@ class InvitingModal extends Component {
     return (
       <div>
         <Modal
-          title={`Пригласить друзей в канал: ${name}`}
+          title={`Пригласить друзей в канал: ${room_name}`}
           visible={visible}
           cancelText="Отмена"
           onOk={handleOkInvitingModal}

@@ -6,14 +6,21 @@ import {
   deleteRoom,
   checkInviteLink
 } from "../../../home/services/api";
-import { notification } from "antd";
-import { BrowserRouter as Router, Route, Redirect, Link, Switch } from "react-router-dom";
+import { notification, message as messageAntd } from "antd";
+import {
+  BrowserRouter as Router,
+  Route,
+  Redirect,
+  Link,
+  Switch
+} from "react-router-dom";
 
 const socketWrapper = ComposedComponent =>
   class SocketWrapped extends Component {
     constructor(props) {
       super(props);
       this.socket = io();
+      this.queueOperations = [];
     }
     state = {
       users: [],
@@ -22,13 +29,20 @@ const socketWrapper = ComposedComponent =>
       isLoading: false,
       isLoaded: false,
       errors: [],
-      roomListIsChange: false
+      roomListIsChange: false,
+      checkedInvitentions: {}
     };
 
     componentDidMount() {
       this.socketEvents();
     }
 
+    checkQueue = () => {
+      if (this.queueOperations.length) {
+        const operation = this.queueOperations.shift();
+        operation();
+      }
+    };
     openNotification = () => {
       const { rooms, active_room } = this.state.user;
       const { name } = rooms.find(({ _id }) => _id === active_room);
@@ -64,11 +78,14 @@ const socketWrapper = ComposedComponent =>
             return data.map(JSON.parse);
           })
           .then(messages => {
-            this.setState({
-              isLoading: false,
-              isLoaded: true,
-              messages
-            });
+            this.setState(
+              {
+                isLoading: false,
+                isLoaded: true,
+                messages
+              },
+              this.checkQueue
+            );
           });
       });
       this.socket.on("user_connected", ({ users, room_id }) => {
@@ -179,48 +196,79 @@ const socketWrapper = ComposedComponent =>
       }
     };
 
-    handlerInvite = async ({ match }) => {
-      try {
-        const {
-          params: { id }
-        } = match;
-  
-        const checkedId = await checkInviteLink(id);
-        console.log("emit")
-        this.socket.emit("call_invitation", checkedId);
+    addInviteToChecked = (id, invite) => {
+      const { checkedInvitentions } = this.state;
+      this.setState({
+        checkedInvitentions: {
+          ...checkedInvitentions,
+          [id]: { ...invite }
+        }
+      });
+    };
+
+    handlerInvite = async id => {
+      if (!this.state.isLoaded) {
+        this.queueOperations.push(() => this.handlerInvite(id));
         return;
-      } catch(error) {
-        console.log(error);
       }
-    }
+
+      const { checkedInvitentions } = this.state;
+      try {
+        let invite;
+
+        if (checkedInvitentions[id]) {
+          invite = checkedInvitentions[id];
+        } else {
+          invite = await checkInviteLink(id);
+          this.addInviteToChecked(id, invite);
+        }
+
+        const isAdded = this.state.user.rooms.find(
+          ({ _id }) => _id === invite.room_id
+        );
+
+        if (isAdded) {
+          return messageAntd.warning(`Канал ${invite.room_name} уже добавлен.`);
+        }
+
+        return this.socket.emit("call_invitation", invite.invitation_id);
+      } catch (error) {
+        console.log(error);
+        messageAntd.error(`Данное приглашение недействительно.`);
+      }
+    };
 
     render() {
       return (
         <Router>
           <Fragment>
             <Route
-              path="/chat/:id"
+              path="/chat/:id?"
               render={props => {
-                this.handlerInvite(props);
-                return (
-                  <Redirect to="/chat" />
-                )
+                const {
+                  match: { params }
+                } = props;
+
+                return params.id ? (
+                  <Redirect
+                    to={{ pathname: "/chat", invite: { id: params.id } }}
+                  />
+                ) : (
+                  <ComposedComponent
+                    {...props}
+                    {...this.props}
+                    {...this.state}
+                    createRoom={this.createRoom}
+                    deleteRoom={this.deleteRoom}
+                    changeRoom={this.changeRoom}
+                    sendMessage={this.sendMessage}
+                    getMessages={this.getMessages}
+                    changeRoomListProcessed={this.changeRoomListProcessed}
+                    handlerInvite={this.handlerInvite}
+                    addInviteToChecked={this.addInviteToChecked}
+                  />
+                );
               }}
-            />
-            <Route
-              path="/chat"
-              render={props => (
-                <ComposedComponent
-                  {...this.props}
-                  {...this.state}
-                  createRoom={this.createRoom}
-                  deleteRoom={this.deleteRoom}
-                  changeRoom={this.changeRoom}
-                  sendMessage={this.sendMessage}
-                  getMessages={this.getMessages}
-                  changeRoomListProcessed={this.changeRoomListProcessed}
-                />
-              )}
             />
           </Fragment>
         </Router>

@@ -9,7 +9,7 @@ const API_URL_ROOM_DELETE = "api/room/delete/";
 const API_URL_ROOM_UPDATE = "api/room/update/";
 const API_URL_USER_PROFILE = "api/user/profile";
 const API_URL_INVITE = "api/invite/";
-const API_URL_CHECK_INVITE = "api/check/";
+const API_URL_CHECK_INVITE = "/api/check/";
 const API_URL_ROOMS = "/api/rooms";
 
 const noop = async () =>
@@ -94,11 +94,12 @@ export const getRooms = async (matchStr = "") => {
   }
 }
 
-export const getInviteLink = async room_id => {
+export const getInviteLink = async (room_id, name) => {
   try {
+    const params = { room_name: name };
     const {
       data: { status, message, info }
-    } = await axios.get(`${API_URL_INVITE}${room_id}`);
+    } = await axios.get(`${API_URL_INVITE}${room_id}`, { params });
     
     if (status !== 200) {
       throw new Error(message);

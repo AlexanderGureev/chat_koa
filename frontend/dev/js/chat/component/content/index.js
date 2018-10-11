@@ -9,7 +9,9 @@ const MainChat = ({
   getMessages,
   user,
   isLoaded,
-  isLoading
+  isLoading,
+  checkedInvitentions,
+  addInviteToChecked
 }) => (
   <div className="main-chat">
     <ChatContainer
@@ -19,6 +21,8 @@ const MainChat = ({
       user={user}
       sendMessage={sendMessage}
       getMessages={getMessages}
+      checkedInvitentions={checkedInvitentions}
+      addInviteToChecked={addInviteToChecked}
     />
     <RightBar users={users} />
   </div>

@@ -4,6 +4,7 @@ const redis = require("redis");
 const { REDIS_URI } = require("../../../config");
 const client = redis.createClient(REDIS_URI);
 const async = require("async");
+const { deleteInvite } = require("../chat/invitations");
 
 const createRoom = async (room, user_id) => {
   try {
@@ -38,6 +39,7 @@ const deleteRoom = async (id, user_id) => {
     }
     if (room.room_author.toString() === user_id.toString()) {
       await Rooms.deleteOne({ _id: id });
+      await deleteInvite(id);
       _removeRoomFromCache(id);
     }
 

@@ -6,16 +6,26 @@ import LeftBar from "../leftBar";
 import socketWrapper from "./socketWrapper";
 
 const App = props => {
-  const { rooms = [] } = props.user;
+  const {
+    user: { rooms = [] },
+    handlerInvite,
+    location
+  } = props;
+
+  if (location.invite) {
+    handlerInvite(location.invite.id);
+    location.invite = null;
+  }
+
   return (
     <React.Fragment>
-      <Preloader />
+      <Preloader/>
       <div className="overflow-container">
         <Header
           roomListIsChange={props.roomListIsChange}
           changeRoomListProcessed={props.changeRoomListProcessed}
         />
-        { props.isLoaded && <LeftBar rooms={rooms} {...props} /> }
+        {props.isLoaded && <LeftBar rooms={rooms} {...props} />}
         <Content {...props} />
         )}
       </div>

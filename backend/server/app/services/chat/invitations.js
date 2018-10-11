@@ -1,10 +1,11 @@
 const randomize = require("randomatic");
 const Invitation = require("../../model/invitations");
 
-const generateInviteLink = async (room_id, user_id) => {
+const generateInviteLink = async (room_id, room_name, user_id) => {
   let invitation = await Invitation.findOne({
     user_id,
     room_id,
+    room_name,
     invitationExpires: {
       $gt: Date.now()
     }
@@ -20,6 +21,7 @@ const generateInviteLink = async (room_id, user_id) => {
   invitation = new Invitation({
     user_id,
     room_id,
+    room_name,
     invitation_id,
     invitationExpires
   });
@@ -40,7 +42,11 @@ const checkInviteLink = async invitation_id => {
   throw new Error("Данное приглашение не действительно.");
 };
 
+const deleteInvite = async room_id => { //если комната удалена глобально, удалить все приглашения для этой комнаты
+  return await Invitation.deleteMany({room_id});
+}
 module.exports = {
   generateInviteLink,
-  checkInviteLink
+  checkInviteLink,
+  deleteInvite
 };

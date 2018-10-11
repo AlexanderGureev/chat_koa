@@ -2,11 +2,7 @@ import React, { Component } from "react";
 
 export default class Preloader extends Component {
   componentDidMount() {
-    window.addEventListener("load", this.activePreloder);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("load", this.activePreloder);
+    this.activePreloder();
   }
 
   activePreloder() {

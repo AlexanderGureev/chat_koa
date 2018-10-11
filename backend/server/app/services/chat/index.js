@@ -346,7 +346,6 @@ const hanglerSocketError = socket => error => {
 };
 const handlerInvitation = socket => async invitation_id => { //Обработка ошибок не работает!!!!!!!
   try {
-    console.log(socket)
     const { room_id } = await Invitation.findOne({ invitation_id });
     const { _id, name } = await Rooms.findById(room_id);
     const user = await User.findById(socket.user._id);

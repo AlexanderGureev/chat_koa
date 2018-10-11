@@ -94,11 +94,12 @@ module.exports = router => {
   });
   router.get("/api/invite/:room_id", isAuthenticated, async ctx => {
     try {
-      const { invitation_id } = await generateInviteLink(
+      const { invitation_id, room_name, invitationExpires } = await generateInviteLink(
         ctx.params.room_id,
+        ctx.query.room_name,
         ctx.state.user._id
       );
-      ctx.body = responseMessage(200, "", invitation_id);
+      ctx.body = responseMessage(200, "", { invitation_id, room_name, invitationExpires });
     } catch (error) {
       ctx.status = 403;
       throw error;
@@ -106,10 +107,12 @@ module.exports = router => {
   });
   router.get("/api/check/:invitation_id", isAuthenticated, async ctx => {
     try {
-      const { invitation_id } = await checkInviteLink(
+      const socketManager = require("../app/services/chat/socket-connections")();
+      const { invitation_id, room_name, room_id } = await checkInviteLink(
         ctx.params.invitation_id,
       );
-      ctx.body = responseMessage(200, "", invitation_id);
+      const room_online = socketManager.getConnection(room_id).length;
+      ctx.body = responseMessage(200, "", { invitation_id, room_name, room_online, room_id });
     } catch (error) {
       ctx.status = 403;
       throw error;

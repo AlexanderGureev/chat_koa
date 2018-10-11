@@ -4,6 +4,9 @@ module.exports = async (ctx, next) => {
   } catch (err) {
     console.error(err);
 
+    const status = ctx.status || 500;
+    ctx.status = 200;
+
     //ctx.status = err.statusCode || err.status || 500;
    
     const { message, errors, cookie } = err;
@@ -34,7 +37,7 @@ module.exports = async (ctx, next) => {
     }
 
     ctx.body = {
-      status: ctx.status,
+      status,
       errors: !validationErrors.length ? [message] : validationErrors
     };
   }

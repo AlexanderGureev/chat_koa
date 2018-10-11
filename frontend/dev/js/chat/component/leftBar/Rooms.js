@@ -7,27 +7,54 @@ import RoomSettings from "./RoomSettings";
 import InvitingModal from "./InvitingModal";
 import { getInviteLink } from "../../../home/services/api";
 
-const DEFAULT_LINK = `${location.host}/chat`;
+const DEFAULT_LINK = `${location.origin}/chat`;
 
 class Rooms extends Component {
   state = {
     visibleModalForm: false,
     visibleInvitingModal: false,
     inviteLink: "",
-    confirmLoading: false
+    confirmLoading: false,
+    invitations: {}
   };
 
   showInvitingModal = (name, id) => async () => {
     try {
+      const { invitations } = this.state;
       this.currentRoomName = name;
       this.currentRoomId = id;
-      const invite_id = await getInviteLink(id);
-      
+
+      if (invitations[id]) {
+        const { invitationExpires } = invitations[id];
+        const time = new Date(invitationExpires).getTime();
+
+        if (time > Date.now()) {
+          this.setState({
+            visibleInvitingModal: true
+          });
+          return;
+        }
+      }
+
+      const {
+        invitation_id,
+        room_name,
+        invitationExpires
+      } = await getInviteLink(id, name);
+
       this.setState({
-        inviteLink: `${DEFAULT_LINK}/${invite_id}`,
-        visibleInvitingModal: true
+        visibleInvitingModal: true,
+        invitations: {
+          ...invitations,
+          [id]: {
+            invitation_id,
+            room_name,
+            invitationExpires,
+            inviteLink: `${DEFAULT_LINK}/${invitation_id}`
+          }
+        }
       });
-    } catch(error) {
+    } catch (error) {
       console.log(error);
     }
   };
@@ -126,7 +153,7 @@ class Rooms extends Component {
       visibleModalForm,
       confirmLoading,
       visibleInvitingModal,
-      inviteLink
+      invitations
     } = this.state;
 
     return (
@@ -150,15 +177,15 @@ class Rooms extends Component {
             </span>
           </Tooltip>
         </h3>
-        <InvitingModal
-          id={this.currentRoomId}
-          name={this.currentRoomName}
-          inviteLink={inviteLink}
-          showInvitingModal={this.showInvitingModal}
-          handleOkInvitingModal={this.handleOkInvitingModal}
-          handleCancelInvitingModal={this.handleCancelInvitingModal}
-          visible={visibleInvitingModal}
-        />
+        {invitations[this.currentRoomId] && (
+          <InvitingModal
+            invitation={invitations[this.currentRoomId]}
+            showInvitingModal={this.showInvitingModal}
+            handleOkInvitingModal={this.handleOkInvitingModal}
+            handleCancelInvitingModal={this.handleCancelInvitingModal}
+            visible={visibleInvitingModal}
+          />
+        )}
         {this.renderListRooms()}
       </div>
     );
