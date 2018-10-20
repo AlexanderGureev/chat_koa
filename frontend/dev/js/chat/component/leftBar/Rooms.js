@@ -6,6 +6,7 @@ import { message } from "antd";
 import RoomSettings from "./RoomSettings";
 import InvitingModal from "./InvitingModal";
 import { getInviteLink } from "../../../home/services/api";
+import cn from "classnames";
 
 const DEFAULT_LINK = `${location.origin}/chat`;
 
@@ -114,8 +115,7 @@ class Rooms extends Component {
     //вывести уведомление о смене комнаты
   };
   renderListRooms = () => {
-    const { rooms } = this.props;
-
+    const { rooms, active_room } = this.props;
     return (
       <ul className="list-rooms">
         {rooms.map(({ _id, name, unread_messages }) => (
@@ -129,6 +129,7 @@ class Rooms extends Component {
             </div>
             <Tooltip placement="top" title={"Перейти в комнату?"}>
               <a
+                className={cn({ "active-room": active_room === _id })}
                 href="#"
                 onClick={this.changeRoom(_id)}
                 onTouchStart={this.changeRoom(_id)}

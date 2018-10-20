@@ -11,6 +11,7 @@ const API_URL_USER_PROFILE = "api/user/profile";
 const API_URL_INVITE = "api/invite/";
 const API_URL_CHECK_INVITE = "/api/check/";
 const API_URL_ROOMS = "/api/rooms";
+const API_URL_ROOM_AUTH = "/api/room/auth";
 
 const noop = async () =>
   new Promise((res, rej) =>
@@ -121,5 +122,22 @@ export const checkInviteLink = async invitation_id => {
     return info;
   } catch (error) {
     throw new Error("Ошибка загрузки данных...");
+  }
+}
+export const checkRoomPassword = async body => {
+  try {
+    const token = await getToken("/api/token");
+    body._csrf = token;
+
+    const {
+      data: { status, message, info }
+    } = await axios.post(`${API_URL_ROOM_AUTH}`, body);
+    
+    if (status !== 200) {
+      throw new Error(message);
+    }
+    return info;
+  } catch (error) {
+    throw new Error("Неверный пароль.");
   }
 }

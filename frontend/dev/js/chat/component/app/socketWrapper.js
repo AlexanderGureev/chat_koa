@@ -4,7 +4,8 @@ import {
   getMessages,
   createRoom,
   deleteRoom,
-  checkInviteLink
+  checkInviteLink,
+  checkRoomPassword
 } from "../../../home/services/api";
 import { notification, message as messageAntd } from "antd";
 import {
@@ -14,6 +15,7 @@ import {
   Link,
   Switch
 } from "react-router-dom";
+import ModalInvitePassword from "./ModalInvitePassword";
 
 const socketWrapper = ComposedComponent =>
   class SocketWrapped extends Component {
@@ -21,6 +23,7 @@ const socketWrapper = ComposedComponent =>
       super(props);
       this.socket = io();
       this.queueOperations = [];
+      this.invite = {};
     }
     state = {
       users: [],
@@ -30,7 +33,9 @@ const socketWrapper = ComposedComponent =>
       isLoaded: false,
       errors: [],
       roomListIsChange: false,
-      checkedInvitentions: {}
+      checkedInvitentions: {},
+      visibleModal: false,
+      confirmLoadingModal: false
     };
 
     componentDidMount() {
@@ -250,7 +255,39 @@ const socketWrapper = ComposedComponent =>
         }
       });
     };
-
+    showModal = () => {
+      setTimeout(() => {
+        this.setState({
+          visibleModal: true
+        });
+      }, 2000);
+    };
+    handleCancel = () => {
+      this.setState({
+        visibleModal: false
+      });
+    };
+    handleCreate = () => {
+      const form = this.formRef.props.form;
+      form.validateFields(async (err, values) => {
+        if (err) {
+          return;
+        }
+        this.setState({ confirmLoadingModal: true });
+        try {
+          await checkRoomPassword({ ...values, room_id: this.invite.room_id });
+          form.resetFields();
+          this.setState({ visibleModal: false, confirmLoadingModal: false });
+          this.socket.emit("call_invitation", this.invite.invitation_id);
+        } catch (err) {
+          messageAntd.error(err.message);
+          this.setState({ confirmLoadingModal: false });
+        }
+      });
+    };
+    saveFormRef = formRef => {
+      this.formRef = formRef;
+    };
     handlerInvite = async id => {
       if (!this.state.isLoaded) {
         this.queueOperations.push(() => this.handlerInvite(id));
@@ -259,24 +296,27 @@ const socketWrapper = ComposedComponent =>
 
       const { checkedInvitentions } = this.state;
       try {
-        let invite;
-
         if (checkedInvitentions[id]) {
-          invite = checkedInvitentions[id];
+          this.invite = checkedInvitentions[id];
         } else {
-          invite = await checkInviteLink(id);
+          this.invite = await checkInviteLink(id);
           this.addInviteToChecked(id, invite);
         }
 
         const isAdded = this.state.user.rooms.find(
-          ({ _id }) => _id === invite.room_id
+          ({ _id }) => _id === this.invite.room_id
         );
 
         if (isAdded) {
-          return messageAntd.warning(`Канал ${invite.room_name} уже добавлен.`);
+          return messageAntd.warning(
+            `Канал ${this.invite.room_name} уже добавлен.`
+          );
         }
 
-        return this.socket.emit("call_invitation", invite.invitation_id);
+        if (!this.invite.room_public) {
+          return this.showModal();
+        }
+        return this.socket.emit("call_invitation", this.invite.invitation_id);
       } catch (error) {
         console.log(error);
         messageAntd.error(`Данное приглашение недействительно.`);
@@ -284,9 +324,18 @@ const socketWrapper = ComposedComponent =>
     };
 
     render() {
+      const { visibleModal, confirmLoadingModal } = this.state;
       return (
         <Router>
           <Fragment>
+            <ModalInvitePassword
+              wrappedComponentRef={this.saveFormRef}
+              invite={this.invite}
+              visible={visibleModal}
+              confirmLoading={confirmLoadingModal}
+              handleCancel={this.handleCancel}
+              onCreate={this.handleCreate}
+            />
             <Route
               path="/chat/:id?"
               render={props => {

@@ -1,5 +1,6 @@
 const randomize = require("randomatic");
 const Invitation = require("../../model/invitations");
+const { Rooms } = require("../../model/rooms");
 
 const generateInviteLink = async (room_id, room_name, user_id) => {
   let invitation = await Invitation.findOne({
@@ -11,6 +12,12 @@ const generateInviteLink = async (room_id, room_name, user_id) => {
     }
   });
 
+  const room = await Rooms.findById(room_id);
+
+  if(!room) {
+    throw new Error("No room found for this invitation");
+  }
+  
   if (invitation) {
     return invitation;
   }
@@ -20,8 +27,9 @@ const generateInviteLink = async (room_id, room_name, user_id) => {
 
   invitation = new Invitation({
     user_id,
-    room_id,
-    room_name,
+    room_id: room._id,
+    room_name: room.name,
+    room_public: room.public,
     invitation_id,
     invitationExpires
   });

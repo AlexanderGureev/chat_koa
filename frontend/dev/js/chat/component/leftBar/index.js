@@ -42,7 +42,7 @@ class LeftBar extends Component {
 
   render() {
     const { isOpen } = this.state;
-    const { rooms, createRoom, deleteRoom, changeRoom } = this.props;
+    const { rooms, createRoom, deleteRoom, changeRoom, user } = this.props;
     const classesBar = cn({
       "left-side-bar": true,
       active: isOpen
@@ -61,9 +61,10 @@ class LeftBar extends Component {
           <span className={classesToogle} onClick={this.toggleMenu} />
           <div className="collapsed-bar" id="left-bar">
             <div className="closes" onClick={this.toggleMenu} />
-            <Nav user={this.props.user} closeNav={this.toggleMenu} />
+            <Nav user={user} closeNav={this.toggleMenu} />
             <Rooms
               rooms={rooms}
+              active_room={user.active_room}
               createRoom={createRoom}
               deleteRoom={deleteRoom}
               changeRoom={changeRoom}

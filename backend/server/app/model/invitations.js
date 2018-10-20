@@ -8,6 +8,7 @@ const invitationsSchema = Schema({
   user_id: Schema.Types.ObjectId,
   room_id: Schema.Types.ObjectId,
   room_name: String,
+  room_public: Boolean,
   invitation_id: String,
   invitationExpires: Date,
 });

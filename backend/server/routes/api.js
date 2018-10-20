@@ -8,6 +8,7 @@ const {
   updateRoom,
   getRooms
 } = require("../app/services/chat/rooms");
+const { checkPassword, Rooms } = require("../app/model/rooms");
 const { generateInviteLink, checkInviteLink } = require("../app/services/chat/invitations");
 
 module.exports = router => {
@@ -92,14 +93,31 @@ module.exports = router => {
       throw error;
     }
   });
+  router.post("/api/room/auth", isAuthenticated, async ctx => {
+    try {
+      const { room_id, passwordRoom } = ctx.request.body;
+      const room = await Rooms.findById(room_id);
+      const isValid = await checkPassword(passwordRoom, room.password);
+
+      if(isValid) {
+        ctx.body = responseMessage(200, "");
+        return;
+      } else {
+        throw new Error("Неверный пароль.");
+      } 
+    } catch (error) {
+      ctx.status = 403;
+      throw error;
+    }
+  });
   router.get("/api/invite/:room_id", isAuthenticated, async ctx => {
     try {
-      const { invitation_id, room_name, invitationExpires } = await generateInviteLink(
+      const { invitation_id, room_name, room_public, invitationExpires } = await generateInviteLink(
         ctx.params.room_id,
         ctx.query.room_name,
         ctx.state.user._id
       );
-      ctx.body = responseMessage(200, "", { invitation_id, room_name, invitationExpires });
+      ctx.body = responseMessage(200, "", { invitation_id, room_name, room_public, invitationExpires });
     } catch (error) {
       ctx.status = 403;
       throw error;
@@ -108,11 +126,11 @@ module.exports = router => {
   router.get("/api/check/:invitation_id", isAuthenticated, async ctx => {
     try {
       const socketManager = require("../app/services/chat/socket-connections")();
-      const { invitation_id, room_name, room_id } = await checkInviteLink(
+      const { invitation_id, room_name, room_id, room_public } = await checkInviteLink(
         ctx.params.invitation_id,
       );
       const room_online = socketManager.getConnection(room_id).length;
-      ctx.body = responseMessage(200, "", { invitation_id, room_name, room_online, room_id });
+      ctx.body = responseMessage(200, "", { invitation_id, room_name, room_public, room_online, room_id });
     } catch (error) {
       ctx.status = 403;
       throw error;
