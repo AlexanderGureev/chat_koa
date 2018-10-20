@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Posts from "./Posts";
 import EmojiBox from "./EmojiBox";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
+import UploadImg from "./UploadImg";
 
 class ChatContainer extends Component {
   state = {
@@ -59,9 +60,7 @@ class ChatContainer extends Component {
             value={message}
             onChange={this.onChangeInput}
           />
-          <div className="wrap-link">
-            <a href="#" className="link" />
-          </div>
+          <UploadImg />
           <div className="btn-wrap">
             <button type="submit" disabled={isDisabled} className="send" />
           </div>

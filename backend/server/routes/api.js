@@ -10,6 +10,7 @@ const {
 } = require("../app/services/chat/rooms");
 const { checkPassword, Rooms } = require("../app/model/rooms");
 const { generateInviteLink, checkInviteLink } = require("../app/services/chat/invitations");
+const { uploadImg } = require("../app/services/chat/uploadImg");
 
 module.exports = router => {
   router.get("/api/token", async ctx => {
@@ -55,6 +56,7 @@ module.exports = router => {
       throw error;
     }
   });
+  router.post("/api/upload/img", isAuthenticated, uploadImg);
   router.post("/api/room/create", isAuthenticated, async ctx => {
     try {
       const { _id, name } = await createRoom(
