@@ -102,11 +102,8 @@ let id_generalRoom;
 //   status: "created"
 // })
 // ];
-const getUnreadMessages = (user_rooms, dateOffline) =>
+const getUnreadMessages = user_rooms =>
   new Promise((resolve, reject) => {
-    const time = dateOffline.getTime();
-    const ids = user_rooms.map(({ _id }) => _id);
-
     const resultProcessing = (err, res) => {
       if (err) {
         return reject(err);
@@ -115,17 +112,22 @@ const getUnreadMessages = (user_rooms, dateOffline) =>
     };
 
     async.reduce(
-      ids,
+      user_rooms,
       {},
-      async (acc, id) => {
+      async (acc, _room) => {
+        if (!_room.leave_date) {
+          return acc;
+        }
+        const { _id, leave_date } = _room;
         const jsonData = await client.lrangeAsync(
-          `rooms:${id}:messages`,
+          `rooms:${_id}:messages`,
           0,
           -1
         );
-        const room = jsonData.map(JSON.parse);
-        const count = room.filter(({ date }) => date > time).length;
-        return { ...acc, [id]: count };
+        const room_messages = jsonData.map(JSON.parse);
+        const count = room_messages.filter(({ date }) => date > leave_date)
+          .length;
+        return { ...acc, [_id]: count };
       },
       resultProcessing
     );
@@ -223,23 +225,28 @@ const socketMiddleware = io => {
     await next();
   });
   io.use(async ({ user }, next) => {
+    const { rooms, active_room } = user;
     user.online_date = new Date();
-    const { offline_date, rooms } = user;
-
-    if (offline_date) {
-      try {
-        const res = await getUnreadMessages(rooms, offline_date);
-        user.rooms = rooms.reduce(
-          (acc, room) => [
-            ...acc,
-            { ...room, unread_messages: res[room._id] || 0 }
-          ],
-          []
-        );
-      } catch (error) {
-        console.log(error);
+    user.rooms = rooms.map(room => {
+      if (`${room._id}` === `${active_room}`) {
+        room.join_date = Date.now();
       }
+      return room;
+    });
+
+    try {
+      const res = await getUnreadMessages(rooms);
+      user.rooms = rooms.reduce(
+        (acc, room) => [
+          ...acc,
+          { ...room, unread_messages: res[room._id] || 0 }
+        ],
+        []
+      );
+    } catch (error) {
+      console.log(error);
     }
+
     await next();
   });
 };
@@ -259,14 +266,22 @@ const saveToMongo = async (room_id, messages) => {
     throw error;
   }
 };
-const saveUserData = async (room_id, user_id, dateOnline) => {
+const saveUserData = async ({ user }) => {
+  const { active_room, _id, online_date, rooms } = user;
   try {
-    const user = await User.findById(user_id);
-    user.active_room = room_id;
-    user.online_date = dateOnline;
+    const user = await User.findById(_id);
+    user.active_room = active_room;
+    user.online_date = online_date;
     user.offline_date = Date.now();
+    user.rooms = rooms.map(room => {
+      if (`${room._id}` === `${active_room}`) {
+        room.leave_date = Date.now();
+      }
+      return room;
+    });
     await user.save();
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
@@ -298,37 +313,42 @@ const handlerNewMessage = socket => message => {
   saveToMongo(active_room, JSON.stringify(newMessage));
 };
 const handlerDisconnect = socket => reason => {
-  const { active_room, _id, online_date } = socket.user;
+  const { active_room } = socket.user;
   socket.broadcast.to(active_room).emit("user_disconnect", {
     users: socketManager.deleteConnection(socket),
     room_id: active_room
   });
   if (reason === "transport close") {
-    saveUserData(active_room, _id, online_date);
+    saveUserData(socket);
   }
 };
-const handlerDeleteRoom = socket => id => {
+const handlerDeleteRoom = socket => ({ id, rooms }) => {
   socket.leave(id);
-
-  const { rooms } = socket.user;
-  socket.user.rooms = rooms.filter(
-    ({ _id }) => _id.toString() !== id.toString()
-  );
+  socket.user.rooms = rooms.filter(({ _id }) => `${_id}` !== `${id}`);
 
   if (!socket.user.rooms.length) {
     //ВРЕМЕННО
     socket.user.active_room = getIdGeneralRoom();
-    socket.emit("connection_success", {
-      users: [],
-      user: socket.user
-    });
+    socket.user.rooms.push({ _id: getIdGeneralRoom(), name: "General"});
+    socket.emit("connection_success", getData(socket));
     return;
   }
   const { _id } = socket.user.rooms[0];
-  handlerChangeRoom(socket)(_id);
+  handlerChangeRoom(socket)({ id: _id, rooms: socket.user.rooms });
 };
-const handlerChangeRoom = socket => id => {
+const handlerChangeRoom = socket => ({ id, rooms }) => {
+  const { active_room } = socket.user;
   socket.emit("disconnect");
+
+  socket.user.rooms = rooms.map(room => {
+    if (`${room._id}` === `${active_room}`) {
+      room.leave_date = Date.now();
+    }
+    if (`${room._id}` === `${id}`) {
+      room.join_date = Date.now();
+    }
+    return room;
+  });
 
   socket.user.active_room = id;
   socket.join(id);
@@ -344,22 +364,21 @@ const hanglerSocketError = socket => error => {
   console.log("Received error from client:".bgRed.black, socket.id);
   console.log(error);
 };
-const handlerInvitation = socket => async invitation_id => { //Обработка ошибок не работает!!!!!!!
+const handlerInvitation = socket => async invitation_id => {
+  //Обработка ошибок не работает!!!!!!!
   try {
-    const { room_id } = await Invitation.findOne({ invitation_id });
-    const { _id, name } = await Rooms.findById(room_id);
-    const user = await User.findById(socket.user._id);
-
-    user.rooms.push({ _id, name });
-    socket.user.rooms.push({ _id, name })
-
-    handlerChangeRoom(socket)(_id);
-    await user.save();
-  } catch(error) {
+    const invite = await Invitation.findOne({ invitation_id });
+    if (!invite) {
+      throw new Error("Invite not found");
+    }
+    const newRoom = { _id: invite.room_id, name: invite.room_name };
+    socket.user.rooms.push(newRoom);
+    handlerChangeRoom(socket)({ id: invite.room_id, rooms: socket.user.rooms });
+  } catch (error) {
     console.log(error);
     //throw error;
   }
-}
+};
 const getData = ({ user }) => ({
   users: socketManager.getConnection(user.active_room),
   user,

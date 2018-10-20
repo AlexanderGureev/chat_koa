@@ -46,7 +46,6 @@ class ChatContainer extends Component {
     const { isLoaded } = this.props;
     const { message, emojiIsOpen } = this.state;
     const isDisabled = !Boolean(this.removeSpaces(message));
-    console.log(isLoaded)
     return (
       <div className="chat-container">
         {isLoaded && <Posts {...this.props} />}

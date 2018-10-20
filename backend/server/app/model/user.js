@@ -47,7 +47,8 @@ const userSchema = mongoose.Schema({
       default: 0
     },
     name: String,
-    join_date: Date
+    join_date: Date,
+    leave_date: Date
   },
   active_room:  mongoose.Schema.Types.ObjectId,
   resetPasswordToken: String,

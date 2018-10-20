@@ -44,6 +44,7 @@ class RightBar extends Component {
 
   render() {
     const { users } = this.props;
+    console.log(users)
     const { isOpen, idOpenProfile, target } = this.state;
     const user = idOpenProfile
           ? users.find(({ _id }) => _id === idOpenProfile)

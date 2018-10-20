@@ -43,9 +43,12 @@ const socketWrapper = ComposedComponent =>
         operation();
       }
     };
-    openNotification = () => {
+
+    getDescriptionNotification = () => {
       const { rooms, active_room } = this.state.user;
-      const { name } = rooms.find(({ _id }) => _id === active_room);
+      const { name, unread_messages = 0, leave_date = "" } = rooms.find(
+        ({ _id }) => _id === active_room
+      );
 
       const online = this.state.users.length;
       const cases = ["2", "3", "4"];
@@ -55,9 +58,47 @@ const socketWrapper = ComposedComponent =>
           ? "человека."
           : "человек.";
 
-      notification.open({
+      const description = (
+        <div className="notify-desc">
+          <p>
+            В данном канале {online} {fn(online)}
+          </p>
+          <p>
+            {leave_date
+              ? `Дата последнего посещения: ${new Date(
+                  leave_date
+                ).toLocaleString()}.`
+              : ""}
+          </p>
+          <p>
+            {unread_messages
+              ? `Количество непрочитанных сообщений: ${unread_messages}.`
+              : ""}
+          </p>
+        </div>
+      );
+
+      return {
         message: `Вы зашли в канал: ${name}.`,
-        description: `В данном канале ${online} ${fn(online)}`
+        description
+      };
+    };
+    openNotification = () =>
+      notification.open(this.getDescriptionNotification());
+
+    markAsRead = () => {
+      const { rooms, active_room } = this.state.user;
+      const updatedRooms = rooms.map(room => {
+        if (room._id === active_room) {
+          room.unread_messages = 0;
+        }
+        return room;
+      });
+      this.setState({
+        user: {
+          ...this.state.user,
+          rooms: updatedRooms
+        }
       });
     };
 
@@ -70,7 +111,10 @@ const socketWrapper = ComposedComponent =>
             isLoading: true,
             isLoaded: false
           },
-          this.openNotification
+          () => {
+            this.openNotification();
+            setTimeout(this.markAsRead, 5000);
+          }
         );
 
         this.getMessages(user)
@@ -177,9 +221,10 @@ const socketWrapper = ComposedComponent =>
 
     deleteRoom = async id => {
       try {
+        const { rooms } = this.state.user;
         await deleteRoom(id);
         this.setState({ roomListIsChange: true });
-        this.socket.emit("delete_room", id);
+        this.socket.emit("delete_room", { id, rooms });
       } catch (error) {
         throw new Error("Произошла ошибка, повторите запрос.");
       }
@@ -190,9 +235,9 @@ const socketWrapper = ComposedComponent =>
     };
 
     changeRoom = id => {
-      const { active_room } = this.state.user;
+      const { active_room, rooms } = this.state.user;
       if (id !== active_room) {
-        this.socket.emit("change_room", id);
+        this.socket.emit("change_room", { id, rooms });
       }
     };
 
