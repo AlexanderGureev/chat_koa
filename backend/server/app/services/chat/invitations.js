@@ -37,13 +37,13 @@ const generateInviteLink = async (room_id, room_name, user_id) => {
 };
 
 const checkInviteLink = async invitation_id => {
+  
   let invitation = await Invitation.findOne({
     invitation_id,
     invitationExpires: {
       $gt: Date.now()
     }
   });
-
   if (invitation) {
     return invitation;
   }

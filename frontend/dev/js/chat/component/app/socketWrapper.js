@@ -300,7 +300,7 @@ const socketWrapper = ComposedComponent =>
           this.invite = checkedInvitentions[id];
         } else {
           this.invite = await checkInviteLink(id);
-          this.addInviteToChecked(id, invite);
+          this.addInviteToChecked(id, this.invite);
         }
 
         const isAdded = this.state.user.rooms.find(
