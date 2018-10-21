@@ -5,11 +5,22 @@ import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 import UploadImg from "./UploadImg";
 
 class ChatContainer extends Component {
+  constructor(props) {
+    super(props);
+    this.timer;
+    this.defaultInterval = 3000;
+    this.isTyping = false;
+  }
   state = {
     message: "",
     emojiIsOpen: false
   };
 
+  componentWillUnmount() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+  }
   onCloseEmojiBox = ({ target }) => {
     if (!this.emojiBoxRef.contains(target)) {
       this.setState({
@@ -17,7 +28,6 @@ class ChatContainer extends Component {
       });
     }
   };
-  removeSpaces = message => message.replace(/\s/g, "");
   submitForm = e => {
     e.preventDefault();
     this.props.sendMessage(this.state.message);
@@ -25,7 +35,24 @@ class ChatContainer extends Component {
       message: ""
     });
   };
+  setTyping = () => {
+    const { setTypingIndicator, clearTypingIndicator } = this.props;
+    const { defaultInterval } = this;
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+    if (!this.isTyping) {
+      setTypingIndicator();
+      this.isTyping = true;
+    }
+    this.timer = setTimeout(() => {
+      this.timer = undefined;
+      this.isTyping = false;
+      clearTypingIndicator();
+    }, defaultInterval);
+  }
   onChangeInput = ({ target: { value } }) => {
+    this.setTyping();
     this.setState({
       message: value
     });
@@ -46,7 +73,8 @@ class ChatContainer extends Component {
   render() {
     const { isLoaded } = this.props;
     const { message, emojiIsOpen } = this.state;
-    const isDisabled = !Boolean(this.removeSpaces(message));
+    const isDisabled = !Boolean(message.trim().length);
+
     return (
       <div className="chat-container">
         {isLoaded && <Posts {...this.props} />}

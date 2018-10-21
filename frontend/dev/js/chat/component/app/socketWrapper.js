@@ -35,20 +35,19 @@ const socketWrapper = ComposedComponent =>
       roomListIsChange: false,
       checkedInvitentions: {},
       visibleModal: false,
-      confirmLoadingModal: false
+      confirmLoadingModal: false,
+      queueTypingText: []
     };
 
     componentDidMount() {
       this.socketEvents();
     }
-
     checkQueue = () => {
       if (this.queueOperations.length) {
         const operation = this.queueOperations.shift();
         operation();
       }
     };
-
     getDescriptionNotification = () => {
       const { rooms, active_room } = this.state.user;
       const { name, unread_messages = 0, leave_date = "" } = rooms.find(
@@ -90,7 +89,6 @@ const socketWrapper = ComposedComponent =>
     };
     openNotification = () =>
       notification.open(this.getDescriptionNotification());
-
     markAsRead = () => {
       const { rooms, active_room } = this.state.user;
       const updatedRooms = rooms.map(room => {
@@ -178,6 +176,7 @@ const socketWrapper = ComposedComponent =>
           });
         }
       });
+      this.socket.on("typing", queueTypingText => this.setState({ queueTypingText }));
     };
 
     sendMessage = message => {
@@ -245,6 +244,9 @@ const socketWrapper = ComposedComponent =>
         this.socket.emit("change_room", { id, rooms });
       }
     };
+
+    setTypingIndicator = () => this.socket.emit("user_typing_start");
+    clearTypingIndicator = () => this.socket.emit("user_typing_end");
 
     addInviteToChecked = (id, invite) => {
       const { checkedInvitentions } = this.state;
@@ -360,6 +362,8 @@ const socketWrapper = ComposedComponent =>
                     changeRoomListProcessed={this.changeRoomListProcessed}
                     handlerInvite={this.handlerInvite}
                     addInviteToChecked={this.addInviteToChecked}
+                    setTypingIndicator={this.setTypingIndicator}
+                    clearTypingIndicator={this.clearTypingIndicator}
                   />
                 );
               }}

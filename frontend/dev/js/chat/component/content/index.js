@@ -11,7 +11,10 @@ const MainChat = ({
   isLoaded,
   isLoading,
   checkedInvitentions,
-  addInviteToChecked
+  addInviteToChecked,
+  setTypingIndicator,
+  clearTypingIndicator,
+  queueTypingText
 }) => (
   <div className="main-chat">
     <ChatContainer
@@ -23,8 +26,10 @@ const MainChat = ({
       getMessages={getMessages}
       checkedInvitentions={checkedInvitentions}
       addInviteToChecked={addInviteToChecked}
+      setTypingIndicator={setTypingIndicator}
+      clearTypingIndicator={clearTypingIndicator}
     />
-    <RightBar users={users} />
+    <RightBar users={users} queueTypingText={queueTypingText} />
   </div>
 );
 

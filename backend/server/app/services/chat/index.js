@@ -21,6 +21,7 @@ const prefix = "koa:sess:";
 bluebird.promisifyAll(redis);
 
 let id_generalRoom;
+let queueTypingText = [];
 // const fixtureMessages = Array.from({ length: 10000 }, (item, i) =>
 //   JSON.stringify({
 //     id: "5bb0050d4f3f0e3d880521a9",
@@ -379,6 +380,16 @@ const handlerInvitation = socket => async invitation_id => {
     //throw error;
   }
 };
+const handlerTypingStart = (socket, io) => () => {
+  const { active_room, _id, username } = socket.user;
+  queueTypingText.push({ _id, username });
+  io.to(active_room).emit("typing", queueTypingText);
+}
+const handlerTypingEnd = (socket, io) => () => {
+  const { active_room } = socket.user;
+  queueTypingText = queueTypingText.filter(({ _id }) => _id !== socket.user._id);
+  io.to(active_room).emit("typing", queueTypingText);
+}
 const getData = ({ user }) => ({
   users: socketManager.getConnection(user.active_room),
   user,
@@ -395,6 +406,8 @@ const handlers = io => {
     socket.emit("connection_success", response);
     socket.broadcast.to(active_room).emit("user_connected", response);
 
+    socket.on("user_typing_start", handlerTypingStart(socket, io));
+    socket.on("user_typing_end", handlerTypingEnd(socket, io));
     socket.on("change_room", handlerChangeRoom(socket));
     socket.on("delete_room", handlerDeleteRoom(socket));
     socket.on("disconnect", handlerDisconnect(socket));

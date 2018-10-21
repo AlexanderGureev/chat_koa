@@ -45,7 +45,7 @@ class UploadImg extends Component {
         return;
       }
 
-      console.log('Received values of form: ', values);
+      console.log("Received values of form: ", values);
       form.resetFields();
       this.setState({ visible: false });
     });
@@ -55,10 +55,21 @@ class UploadImg extends Component {
       visible: false
     });
   };
+  getForm = () => {
+    const { getFieldDecorator } = this.props.form;
+
+    return (
+      <Form layout="vertical">
+        <FormItem label="Добавить комментарий (необязательно)">
+          {getFieldDecorator("message-text")(<Input type="text" />)}
+        </FormItem>
+      </Form>
+    );
+  };
 
   render() {
     const { token, filePath, fileName } = this.state;
-    const { getFieldDecorator } = this.props.form;
+    const headers = { "X-CSRF-Token": `${token}` };
 
     return (
       <div className="wrap-link">
@@ -67,7 +78,7 @@ class UploadImg extends Component {
           name="message_img"
           showUploadList={false}
           action="/api/upload/img"
-          headers={{ "X-CSRF-Token": `${token}` }}
+          headers={headers}
         >
           <a href="#" className="link" />
         </Upload>
@@ -83,15 +94,7 @@ class UploadImg extends Component {
             <img src={filePath} className="message-image" alt="message-image" />
             <span>{fileName}</span>
           </div>
-          <Form layout="vertical">
-            <FormItem label="Добавить комментарий (необязательно)">
-              {getFieldDecorator("message-text")(
-                <Input
-                  type="text"
-                />
-              )}
-            </FormItem>
-          </Form>
+          {this.getForm()}
         </Modal>
       </div>
     );

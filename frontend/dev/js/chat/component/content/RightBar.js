@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import User from "./User";
 import MiniProfile from "./MiniProfile";
 
@@ -9,18 +9,25 @@ class RightBar extends Component {
   }
   state = {
     isOpen: false,
-    idOpenProfile: "",
+    user: "",
     target: null
   };
 
-  componentDidMount() {
-    this.miniProfile = null;
-    window.addEventListener("click", this.handlerCloseProfile);
-    window.addEventListener("touchstart", this.handlerCloseProfile);
-  }
-  componentWillUnmount() {
-    window.removeEventListener("click", this.handlerCloseProfile);
-    window.removeEventListener("touchstart", this.handlerCloseProfile);
+  componentWillReceiveProps(nextProps) {
+    const { users } = nextProps;
+    const { user, isOpen } = this.state;
+
+    if (!isOpen) {
+      return;
+    }
+    const res = users.find(({ _id }) => _id === user._id);
+    if (!res) {
+      this.setState({
+        isOpen: false,
+        user: "",
+        target: null
+      });
+    }
   }
   handlerCloseProfile = ({ target }) => {
     if (
@@ -33,32 +40,33 @@ class RightBar extends Component {
   };
   handlerOpenProfile = _id => e => {
     e.preventDefault();
+    const user = this.props.users.find(user => user._id === _id);
+    if (!user) {
+      return;
+    }
     this.setState({
       isOpen: true,
-      idOpenProfile: _id,
+      user: { ...user },
       target: e.currentTarget
     });
   };
-
   setRef = el => (this.miniProfile = el);
-
   render() {
-    const { users } = this.props;
-    const { isOpen, idOpenProfile, target } = this.state;
-    const user = idOpenProfile
-          ? users.find(({ _id }) => _id === idOpenProfile)
-          : null;
+    const { users, queueTypingText } = this.props;
+    const { isOpen, user, target } = this.state;
 
     return (
-      <React.Fragment>
+      <Fragment>
         {user && (
           <MiniProfile
             setRef={this.setRef}
             isOpen={isOpen}
             user={user}
             target={target}
+            handleClose={this.handlerCloseProfile}
           />
         )}
+
         <div className="right-side-bar">
           <h3>
             Online -<span className="online-count"> {users.length} </span>
@@ -69,11 +77,12 @@ class RightBar extends Component {
                 key={user._id}
                 handlerOpenProfile={this.handlerOpenProfile(user._id)}
                 {...user}
+                isTyping={queueTypingText.some(({ _id }) => _id === user._id)}
               />
             ))}
           </ul>
         </div>
-      </React.Fragment>
+      </Fragment>
     );
   }
 }

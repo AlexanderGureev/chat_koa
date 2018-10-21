@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import cn from "classnames";
+import Spinner from "react-spinkit";
 
 const User = props => {
   const classes = cn({
@@ -10,12 +11,16 @@ const User = props => {
   const {
     username,
     profile: { avatarPath },
-    handlerOpenProfile
+    handlerOpenProfile,
+    isTyping
   } = props;
 
   return (
     <li className={classes} onClick={handlerOpenProfile}>
-      <img src={avatarPath} alt="avatar" />
+      <div className="wrap-rb-online">
+        <img src={avatarPath} alt="avatar" />
+        {isTyping && <Spinner name="ball-beat" color="steelblue" overrideSpinnerClassName="spinner-typing"/>}
+      </div>
       <span className="name">{username}</span>
     </li>
   );
