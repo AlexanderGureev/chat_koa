@@ -49,12 +49,31 @@
 class SocketConnection {
   constructor() {
     this.activeConnection = new Map();
+    this.queueTypingText = new Map();
   }
 
+  get typingText() {
+    return this.queueTypingText;
+  }
   get connection() {
     return this.activeConnection;
   }
 
+  setUserTyping(room_id, {user}) {
+    const id = room_id.toString();
+    const { _id, username } = user;
+    const typingText = this.queueTypingText.get(id) || [];
+    this.queueTypingText.set(id, [ ...typingText, { _id, username }]);
+    return [ ...this.queueTypingText.get(id) ];
+  }
+  deleteUserTyping(room_id, { user }) {
+    const id = room_id.toString();
+    const typingText = this.queueTypingText.get(id);
+    const filteredRoom = typingText.filter(({ _id }) => _id !== user._id);
+    this.queueTypingText.set(id, filteredRoom);
+    return [ ...this.queueTypingText.get(id) ];
+  }
+  
   getRoom(id) {
     return this.activeConnection.get(id);
   }

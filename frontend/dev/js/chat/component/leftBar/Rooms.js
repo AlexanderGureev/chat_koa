@@ -9,6 +9,7 @@ import { getInviteLink } from "../../../home/services/api";
 import cn from "classnames";
 
 const DEFAULT_LINK = `${location.origin}/chat`;
+const optionsTooltip = { placement: "top", mouseEnterDelay: 0, mouseLeaveDelay: 0 };
 
 class Rooms extends Component {
   state = {
@@ -127,7 +128,7 @@ class Rooms extends Component {
                 className="message-counter"
               />
             </div>
-            <Tooltip placement="top" title={"Перейти в комнату?"}>
+            <Tooltip {...optionsTooltip} title={"Перейти в комнату?"}>
               <a
                 className={cn({ "active-room": active_room === _id })}
                 href="#"
@@ -168,7 +169,7 @@ class Rooms extends Component {
         />
         <h3>
           Rooms
-          <Tooltip placement="top" title={"Создать новую комнату?"}>
+          <Tooltip {...optionsTooltip} title={"Создать новую комнату?"}>
             <span
               className="rooms-add"
               onClick={this.showModalWithForm}

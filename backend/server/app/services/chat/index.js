@@ -381,13 +381,13 @@ const handlerInvitation = socket => async invitation_id => {
   }
 };
 const handlerTypingStart = (socket, io) => () => {
-  const { active_room, _id, username } = socket.user;
-  queueTypingText.push({ _id, username });
+  const { active_room } = socket.user;
+  const queueTypingText = socketManager.setUserTyping(active_room, socket);
   io.to(active_room).emit("typing", queueTypingText);
 }
 const handlerTypingEnd = (socket, io) => () => {
   const { active_room } = socket.user;
-  queueTypingText = queueTypingText.filter(({ _id }) => _id !== socket.user._id);
+  const queueTypingText = socketManager.deleteUserTyping(active_room, socket);
   io.to(active_room).emit("typing", queueTypingText);
 }
 const getData = ({ user }) => ({
