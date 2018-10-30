@@ -18,6 +18,8 @@ const EmojiBox = ({ isOpen, onSelect, setRef, openEmojiBox }) => {
           color="#4d73cb"
           onSelect={onSelect}
           style={styles}
+          showSkinTones={false}
+          skin={1}
         />
       </Fade>
     </div>

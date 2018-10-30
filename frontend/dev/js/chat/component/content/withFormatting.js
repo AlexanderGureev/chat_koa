@@ -4,6 +4,20 @@ import Linkify from "react-linkify";
 import { Link } from "react-router-dom";
 import { Button, Icon, Badge } from "antd";
 import InvitePreloader from "./InvitePreloader";
+import { uniqueId } from "lodash";
+import ReactPlayer from "react-player";
+import Img from "react-image";
+import Spinner from "react-spinkit";
+
+const ORIGIN = `${location.origin}/chat/`;
+const regExpRelativeLink = /\/img\/upload\/[^<>\s]+\.(png|jpg|svg|gif)\b/gi;
+const regExpAbsoluteLink = /(https|http):\/\/[^<>\s]+\/[^<>\s]+\.(png|jpg|svg|gif)\b/gi;
+const templateInvite = ORIGIN + `[a-zA-Z0-9]{6}`;
+
+const linkifyYouTubeUrl = url => {
+  const regExp = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
+  return url.match(regExp);
+};
 
 const withFormatting = WrappedComponent =>
   class withFormattingPost extends Component {
@@ -58,6 +72,27 @@ const withFormatting = WrappedComponent =>
         </div>
       );
     };
+    templateImage = searchImg =>
+      searchImg.length
+        ? searchImg.map(mass => (
+            <div className="img-wrap" key={uniqueId()}>
+              <Img
+              className="img-message"
+              src={mass[0]}
+              loader={<Spinner name="ball-scale-multiple" />}
+            />
+            </div>
+          ))
+        : null;
+
+    templateVideoPlayer = searchVideo => {
+      return searchVideo && (
+        <div className="video-wrap">
+          <ReactPlayer url={searchVideo[0]} controls={true} />
+        </div>
+      );
+    };
+
     renderInvite = () => {
       const { inviteNotValid = true } = this.props.invitations[this.invite];
       return inviteNotValid
@@ -66,26 +101,36 @@ const withFormatting = WrappedComponent =>
     };
     parser = () => {
       const { text } = this.props.message;
-      const origin = `${location.origin}/chat/`;
-      const template = origin + `[a-zA-Z0-9]{6}`;
+      const regExp = new RegExp(templateInvite);
 
-      const regExp = new RegExp(template);
+      const searchInvite = text.match(regExp);
+      const searchVideo = linkifyYouTubeUrl(text);
 
-      const searchResults = text.match(regExp);
-      if (!searchResults) {
+      let i, searchImg = [];
+      while (i = regExpAbsoluteLink.exec(text)) {
+        searchImg.push(i);
+      }
+
+      if (!searchInvite) {
         return (
           <WrappedComponent {...this.props}>
-            <Linkify>{emojify(text)}</Linkify>
+            <Linkify>
+              <div>
+                {emojify(text)}
+                {this.templateImage(searchImg)}
+                {this.templateVideoPlayer(searchVideo)}
+              </div>
+            </Linkify>
           </WrappedComponent>
         );
       }
 
-      const parsed = searchResults[0].split("/");
+      const parsed = searchInvite[0].split("/");
       this.invite = parsed[parsed.length - 1];
 
-      const leftOfTheLink = text.substr(0, searchResults.index);
+      const leftOfTheLink = text.substr(0, searchInvite.index);
       const rightOfTheLink = text.substr(
-        searchResults.index + searchResults[0].length
+        searchInvite.index + searchInvite[0].length
       );
 
       const { invitations } = this.props;
@@ -99,6 +144,8 @@ const withFormatting = WrappedComponent =>
               <InvitePreloader />
             )}
             {emojify(rightOfTheLink)}
+            {this.templateImage(searchImg)}
+            {this.templateVideoPlayer(searchVideo)}
           </Linkify>
         </WrappedComponent>
       );
