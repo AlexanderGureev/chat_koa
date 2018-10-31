@@ -21,13 +21,15 @@ const linkifyYouTubeUrl = url => {
 
 const withFormatting = WrappedComponent =>
   class withFormattingPost extends Component {
-    componentDidMount() {
-      if (!this.invite) {
-        return;
+    shouldComponentUpdate(nextProps, nextState) {
+      //остаются лишние ререндеры инвайтов
+      if (this.invite) {
+        setTimeout(() => {
+          this.props.checkInvite(this.invite);
+        }, 0);
+        return true;
       }
-      setTimeout(() => {
-        this.props.checkInvite(this.invite);
-      }, 0);
+      return false;
     }
     templateValidInvite = () => {
       const { room_name, room_online } = this.props.invitations[this.invite];
@@ -77,19 +79,23 @@ const withFormatting = WrappedComponent =>
         ? searchImg.map(mass => (
             <div className="img-wrap" key={uniqueId()}>
               <Img
-              className="img-message"
-              src={mass[0]}
-              loader={<Spinner name="ball-scale-multiple" />}
-            />
+                className="img-message"
+                src={mass[0]}
+                loader={<Spinner name="ball-scale-multiple" />}
+              />
             </div>
           ))
         : null;
 
     templateVideoPlayer = searchVideo => {
-      return searchVideo && (
-        <div className="video-wrap">
-          <ReactPlayer url={searchVideo[0]} controls={true} />
-        </div>
+      return (
+        searchVideo && (
+          <ReactPlayer
+            url={searchVideo[0]}
+            controls={true}
+            className="video-wrap"
+          />
+        )
       );
     };
 
@@ -106,8 +112,9 @@ const withFormatting = WrappedComponent =>
       const searchInvite = text.match(regExp);
       const searchVideo = linkifyYouTubeUrl(text);
 
-      let i, searchImg = [];
-      while (i = regExpAbsoluteLink.exec(text)) {
+      let i,
+        searchImg = [];
+      while ((i = regExpAbsoluteLink.exec(text))) {
         searchImg.push(i);
       }
 

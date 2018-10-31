@@ -19,7 +19,7 @@ class ChatContainer extends Component {
 
   findRoomName() {
     const { active_room, rooms = [] } = this.props.user;
-    if(!this.props.isLoaded) {
+    if (!this.props.isLoaded) {
       return { name: "..." };
     }
     this.currentRoom = rooms.find(({ _id }) => _id === active_room);
@@ -30,15 +30,14 @@ class ChatContainer extends Component {
       clearTimeout(this.timer);
     }
   }
-  componentWillReceiveProps({ user }) {
-    const { active_room } = user;
-    if(!this.currentRoom) {
+  componentWillReceiveProps(props) {
+    const { active_room } = props.user;
+    if (!this.currentRoom) {
       return;
-    } 
- 
+    }
     const { _id } = this.currentRoom;
-    if(active_room !== _id) {
-      this.setState({ message: ""});
+    if (active_room !== _id) {
+      this.setState({ message: "" });
     }
   }
   onCloseEmojiBox = ({ target }) => {
@@ -70,7 +69,7 @@ class ChatContainer extends Component {
       this.isTyping = false;
       clearTypingIndicator();
     }, defaultInterval);
-  }
+  };
   onChangeInput = ({ target: { value } }) => {
     this.setTyping();
     this.setState({
@@ -95,7 +94,7 @@ class ChatContainer extends Component {
     const { message, emojiIsOpen } = this.state;
     const isDisabled = !Boolean(message.trim().length);
     const { name } = this.findRoomName();
-    
+
     return (
       <div className="chat-container">
         {isLoaded && <Posts {...this.props} />}

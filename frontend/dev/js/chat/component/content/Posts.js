@@ -49,10 +49,12 @@ class Posts extends Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    const { initialSize, isActiveScroller } = this.state;
+    const { initialSize, isActiveScroller, list, isLoading } = this.state;
     if (
       nextProps.messages.length > initialSize ||
-      nextState.isActiveScroller !== isActiveScroller
+      nextState.isActiveScroller !== isActiveScroller ||
+      nextState.list.length > list.length ||
+      nextState.isLoading !== isLoading
     ) {
       return true;
     }
@@ -113,7 +115,7 @@ class Posts extends Component {
           end: end - 1
         },
         () => {
-          if (offsetHeight + scrollTop === scrollHeight) {
+          if (Math.round(offsetHeight + scrollTop) === scrollHeight) {
             updatePosition();
           }
         }
@@ -268,7 +270,7 @@ class Posts extends Component {
         },
         () => {
           this.cache.clearAll();
-          this.listRef.recomputeGridSize(0, data.length - 1);
+          this.listRef.recomputeRowHeights();
           this.scrollToBottom(data.length - 1);
         }
       );
@@ -345,7 +347,7 @@ class Posts extends Component {
         <InfiniteLoader
           isRowLoaded={this.isRowLoaded}
           loadMoreRows={() => {}}
-          rowCount={Infinity}
+          rowCount={list.length + 1}
         >
           {({ onRowsRendered, registerChild }) => (
             <div className="posts">
@@ -366,7 +368,7 @@ class Posts extends Component {
                     rowRenderer={this.rowRenderer}
                     width={width}
                     onScroll={this.onScrollDebounced}
-                    //overscanRowCount={10}
+                    overscanRowCount={1}
                     scrollToAlignment="start"
                   />
                 )}

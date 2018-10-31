@@ -69,7 +69,7 @@ class RightBar extends Component {
 
         <div className="right-side-bar">
           <h3>
-            Online -<span className="online-count"> {users.length} </span>
+            В сети -<span className="online-count"> {users.length} </span>
           </h3>
           <ul className="userOnline" ref={this.listUsers}>
             {users.map(user => (

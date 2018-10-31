@@ -1,29 +1,25 @@
 import React, { Component } from "react";
-import Fade from "@material-ui/core/Fade";
+// import Fade from "@material-ui/core/Fade";
+import withAnimation from "./Fade";
 import { Picker } from "emoji-mart";
 
-const EmojiBox = ({ isOpen, onSelect, setRef, openEmojiBox }) => {
-  const styles = {
-    display: isOpen ? "block" : "none"
-  };
+const AnimatedPicker = withAnimation(Picker);
 
-  return (
-    <div className="emoji-box" ref={setRef}>
-      <div className="wrap-smile" onClick={openEmojiBox}>
-        <a href="#" className="smile" />
-      </div>
-      <Fade in={isOpen}>
-        <Picker
-          className="emoji-picker"
-          color="#4d73cb"
-          onSelect={onSelect}
-          style={styles}
-          showSkinTones={false}
-          skin={1}
-        />
-      </Fade>
+const EmojiBox = ({ isOpen, onSelect, setRef, openEmojiBox }) => (
+  <div className="emoji-box" ref={setRef}>
+    <div className="wrap-smile" onClick={openEmojiBox}>
+      <a href="#" className="smile" />
     </div>
-  );
-};
+
+    <AnimatedPicker
+      in={isOpen}
+      className="emoji-picker"
+      color="#4d73cb"
+      onSelect={onSelect}
+      showSkinTones={false}
+      skin={1}
+    />
+  </div>
+);
 
 export default EmojiBox;
