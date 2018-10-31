@@ -48,6 +48,16 @@ class Posts extends Component {
     isLoading: false
   };
 
+  shouldComponentUpdate(nextProps, nextState) {
+    const { initialSize, isActiveScroller } = this.state;
+    if (
+      nextProps.messages.length > initialSize ||
+      nextState.isActiveScroller !== isActiveScroller
+    ) {
+      return true;
+    }
+    return false;
+  }
   initialState = (messages, active_room, cb = () => {}) => {
     !messages.length
       ? this.setState({
@@ -289,17 +299,16 @@ class Posts extends Component {
 
   checkScrollerOpening = stopIndex => {
     const { list } = this.state;
-    if(stopIndex === 0) {
+    if (stopIndex === 0) {
       return;
     }
-    const isActiveScroller =
-      stopIndex < list.length - this.batchSize / 2 ? true : false;
+    const isActiveScroller = stopIndex < list.length - list.length * 0.2 ? true : false;
     this.setState({ isActiveScroller });
   };
 
   _onRowsRendered = fn => (...args) => {
     const [options] = args;
-    this.checkScrollerOpeningDebounced(options.startIndex);
+    this.checkScrollerOpeningDebounced(options.stopIndex);
   };
 
   _onScroll = ({ clientHeight, scrollHeight, scrollTop }) => {

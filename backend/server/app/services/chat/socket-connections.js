@@ -60,18 +60,26 @@ class SocketConnection {
   }
 
   setUserTyping(room_id, {user}) {
-    const id = room_id.toString();
-    const { _id, username } = user;
-    const typingText = this.queueTypingText.get(id) || [];
-    this.queueTypingText.set(id, [ ...typingText, { _id, username }]);
-    return [ ...this.queueTypingText.get(id) ];
+    try {
+      const id = room_id.toString();
+      const { _id, username } = user;
+      const typingText = this.queueTypingText.get(id) || [];
+      this.queueTypingText.set(id, [ ...typingText, { _id, username }]);
+      return [ ...this.queueTypingText.get(id) ];
+    } catch(error) {
+      console.log(error);
+    }
   }
   deleteUserTyping(room_id, { user }) {
-    const id = room_id.toString();
-    const typingText = this.queueTypingText.get(id);
-    const filteredRoom = typingText.filter(({ _id }) => _id !== user._id);
-    this.queueTypingText.set(id, filteredRoom);
-    return [ ...this.queueTypingText.get(id) ];
+    try {
+      const id = room_id.toString();
+      const typingText = this.queueTypingText.get(id) || []; //есть проблема, при смене комнаты пропадает очередь, значение по умолчанию временно!!!
+      const filteredRoom = typingText.filter(({ _id }) => _id !== user._id);
+      this.queueTypingText.set(id, filteredRoom);
+      return [ ...this.queueTypingText.get(id) ];
+    } catch(error) {
+      console.log(error);
+    }
   }
   
   getRoom(id) {

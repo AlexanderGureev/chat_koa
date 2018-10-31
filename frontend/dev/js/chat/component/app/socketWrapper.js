@@ -180,6 +180,7 @@ const socketWrapper = ComposedComponent =>
     };
 
     sendMessage = message => {
+      this.clearTypingIndicator();
       this.socket.emit("new_message", message);
     };
 
@@ -240,6 +241,9 @@ const socketWrapper = ComposedComponent =>
 
     changeRoom = id => {
       const { active_room, rooms } = this.state.user;
+      if(this.state.queueTypingText.length) {
+        this.clearTypingIndicator();
+      }
       if (id !== active_room) {
         this.socket.emit("change_room", { id, rooms });
       }

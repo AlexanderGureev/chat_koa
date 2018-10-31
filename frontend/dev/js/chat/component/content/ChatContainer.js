@@ -10,15 +10,35 @@ class ChatContainer extends Component {
     this.timer;
     this.defaultInterval = 3000;
     this.isTyping = false;
+    this.currentRoom;
   }
   state = {
     message: "",
     emojiIsOpen: false
   };
 
+  findRoomName() {
+    const { active_room, rooms = [] } = this.props.user;
+    if(!this.props.isLoaded) {
+      return { name: "..." };
+    }
+    this.currentRoom = rooms.find(({ _id }) => _id === active_room);
+    return this.currentRoom;
+  }
   componentWillUnmount() {
     if (this.timer) {
       clearTimeout(this.timer);
+    }
+  }
+  componentWillReceiveProps({ user }) {
+    const { active_room } = user;
+    if(!this.currentRoom) {
+      return;
+    } 
+ 
+    const { _id } = this.currentRoom;
+    if(active_room !== _id) {
+      this.setState({ message: ""});
     }
   }
   onCloseEmojiBox = ({ target }) => {
@@ -74,7 +94,8 @@ class ChatContainer extends Component {
     const { isLoaded } = this.props;
     const { message, emojiIsOpen } = this.state;
     const isDisabled = !Boolean(message.trim().length);
-
+    const { name } = this.findRoomName();
+    
     return (
       <div className="chat-container">
         {isLoaded && <Posts {...this.props} />}
@@ -83,7 +104,7 @@ class ChatContainer extends Component {
             type="text"
             name="message"
             id="input-message"
-            placeholder="Write something"
+            placeholder={`Написать в #${name}`}
             autoComplete="off"
             value={message}
             onChange={this.onChangeInput}
