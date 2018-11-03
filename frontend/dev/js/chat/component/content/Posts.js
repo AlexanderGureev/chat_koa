@@ -13,7 +13,6 @@ import { MessageLoaderRight, MessageLoaderLeft } from "./MessagePreloader";
 import Scroller from "./Scroller";
 import { debounce } from "lodash/fp";
 import LoadingBar from "./LoadingBar";
-import ReactResizeDetector from "react-resize-detector";
 import withFormatting from "./withFormatting";
 import { checkInviteLink } from "../../../home/services/api";
 
@@ -32,6 +31,7 @@ class Posts extends Component {
       this.checkScrollerOpening
     );
     this.onScrollDebounced = debounce(500, this._onScroll);
+    this.onResizeDebounced = debounce(500, this.onResize);
     this.batchSize = 20;
     this.queueInvites = [];
   }
@@ -245,6 +245,12 @@ class Posts extends Component {
     );
   };
 
+  recomputeRowHeights = newSize => {
+    this.cache.clearAll();
+    this.listRef.recomputeRowHeights();
+    this.scrollToBottom(newSize);
+  };
+
   loadingMessages = async (start, end) => {
     const { user, getMessages } = this.props;
     const { list, attempts } = this.state;
@@ -254,25 +260,23 @@ class Posts extends Component {
     const [, ...messages] = list;
 
     if (!data.length) {
-      this.setState({
-        list: [...data, ...messages],
-        isEmpty: true,
-        isLockScroll: false
-      });
+      this.setState(
+        {
+          list: [...data, ...messages],
+          isEmpty: true,
+          isLockScroll: false
+        }, this.forceUpdate //force update для обновления количества элементов в листе, т.к мы убираем прелоадер
+      );
     } else {
       this.setState(
         {
           list: [...data, ...messages],
-          start: start - this.batchSize,
-          end: end - this.batchSize,
+          start: start - data.length,
+          end: end - data.length,
           attempts: attempts + 1,
           isLockScroll: false
         },
-        () => {
-          this.cache.clearAll();
-          this.listRef.recomputeRowHeights();
-          this.scrollToBottom(data.length - 1);
-        }
+        () => this.recomputeRowHeights(data.length - 1)
       );
     }
   };
@@ -293,9 +297,7 @@ class Posts extends Component {
         list: [{ type: "loader" }, ...list],
         isLockScroll: true
       },
-      () => {
-        this.loadingMessages(start, end);
-      }
+      () => this.loadingMessages(start, end)
     );
   };
 
@@ -304,7 +306,8 @@ class Posts extends Component {
     if (stopIndex === 0) {
       return;
     }
-    const isActiveScroller = stopIndex < list.length - list.length * 0.2 ? true : false;
+    const isActiveScroller =
+      stopIndex < list.length - list.length * 0.2 ? true : false;
     this.setState({ isActiveScroller });
   };
 
@@ -331,52 +334,45 @@ class Posts extends Component {
     this.listRef = ref;
   };
 
-  onResize = width => {
+  onResize = ({ height, width }) => {
     this.cache.clearAll();
   };
 
   render() {
     const { list, isActiveScroller } = this.state;
     return (
-      <ReactResizeDetector
-        handleWidth={true}
-        refreshMode="debounce"
-        refreshRate={500}
-        onResize={this.onResize}
+      <InfiniteLoader
+        isRowLoaded={this.isRowLoaded}
+        loadMoreRows={() => {}}
+        rowCount={list.length}
       >
-        <InfiniteLoader
-          isRowLoaded={this.isRowLoaded}
-          loadMoreRows={() => {}}
-          rowCount={list.length + 1}
-        >
-          {({ onRowsRendered, registerChild }) => (
-            <div className="posts">
-              <Scroller
-                isActive={isActiveScroller}
-                onClick={() => this.scrollToBottom(list.length)}
-              />
-              <AutoSizer>
-                {({ height, width }) => (
-                  <List
-                    className="grid"
-                    onRowsRendered={this._onRowsRendered(onRowsRendered)}
-                    height={height - 53}
-                    deferredMeasurementCache={this.cache}
-                    rowHeight={this.cache.rowHeight}
-                    rowCount={list.length}
-                    ref={this._setRef}
-                    rowRenderer={this.rowRenderer}
-                    width={width}
-                    onScroll={this.onScrollDebounced}
-                    overscanRowCount={1}
-                    scrollToAlignment="start"
-                  />
-                )}
-              </AutoSizer>
-            </div>
-          )}
-        </InfiniteLoader>
-      </ReactResizeDetector>
+        {({ onRowsRendered, registerChild }) => (
+          <div className="posts">
+            <Scroller
+              isActive={isActiveScroller}
+              onClick={() => this.scrollToBottom(list.length)}
+            />
+            <AutoSizer onResize={this.onResizeDebounced}>
+              {({ height, width }) => (
+                <List
+                  className="grid"
+                  onRowsRendered={this._onRowsRendered(onRowsRendered)}
+                  height={height - 53}
+                  deferredMeasurementCache={this.cache}
+                  rowHeight={this.cache.rowHeight}
+                  rowCount={list.length}
+                  ref={this._setRef}
+                  rowRenderer={this.rowRenderer}
+                  width={width}
+                  onScroll={this.onScrollDebounced}
+                  overscanRowCount={1}
+                  scrollToAlignment="start"
+                />
+              )}
+            </AutoSizer>
+          </div>
+        )}
+      </InfiniteLoader>
     );
   }
 }

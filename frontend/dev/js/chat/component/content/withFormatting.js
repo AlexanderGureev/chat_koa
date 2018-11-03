@@ -21,15 +21,24 @@ const linkifyYouTubeUrl = url => {
 
 const withFormatting = WrappedComponent =>
   class withFormattingPost extends Component {
-    shouldComponentUpdate(nextProps, nextState) {
-      //остаются лишние ререндеры инвайтов
+    // shouldComponentUpdate(nextProps, nextState) {
+    //   //остаются лишние ререндеры инвайтов
+    //   if (this.invite) {
+    //     setTimeout(() => {
+    //       this.props.checkInvite(this.invite);
+    //     }, 0);
+    //     return true;
+    //   }
+    //   return false;
+    // }
+    componentDidMount() {
       if (this.invite) {
         setTimeout(() => {
           this.props.checkInvite(this.invite);
         }, 0);
-        return true;
+        return;
       }
-      return false;
+      return;
     }
     templateValidInvite = () => {
       const { room_name, room_online } = this.props.invitations[this.invite];
@@ -78,11 +87,12 @@ const withFormatting = WrappedComponent =>
       searchImg.length
         ? searchImg.map(mass => (
             <div className="img-wrap" key={uniqueId()}>
-              <Img
+              <img src={mass[0]} alt="img-message" />
+              {/* <Img
                 className="img-message"
                 src={mass[0]}
                 loader={<Spinner name="ball-scale-multiple" />}
-              />
+              /> */}
             </div>
           ))
         : null;
