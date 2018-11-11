@@ -1,4 +1,8 @@
-![Chater logo](https://chater-koa.herokuapp.com/img/logo.svg | width=80)
+<p>
+<img src="https://chater-koa.herokuapp.com/img/logo.svg" width="80"/>
+<span>test</span>
+</p>
+
 # LiveChat for React and koa 2
 This is an open source application written using the koa and react. The goal of the project is to implement all the basic chat functionality.
 
@@ -11,7 +15,9 @@ Be sure that you have the node >= 10.0.0 and npm installed. Next, clone this rep
 
 ```bash
 cd backend/server
-yarn dev-front or yarn dev
+yarn dev-front 
+or 
+yarn dev
 ```
 
 To build a production version use:
