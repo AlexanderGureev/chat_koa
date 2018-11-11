@@ -1353,6 +1353,28 @@ a.delete:hover {
   z-index: 1;
   animation: scrollerAnimation 0.5s ease;
 }
+.scroller-badge {
+  position: absolute;
+  top: -10px;
+  right: 0;
+}
+.scroller-badge  > sup {
+  box-shadow: none;
+  background: linear-gradient(90deg, #4d73cb, #5d7eca);
+}
+
+.w-post.unread-message .post::before {
+  content: "";
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(0,0,0,.3);
+  right: -20px;
+  top: 45%;
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: linear-gradient(90deg, #4d73cb, #5d7eca);
+}
+
 
 @keyframes scrollerAnimation {
   0% {

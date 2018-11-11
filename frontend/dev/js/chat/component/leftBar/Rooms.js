@@ -113,7 +113,6 @@ class Rooms extends Component {
   changeRoom = id => e => {
     e.preventDefault();
     this.props.changeRoom(id);
-    //вывести уведомление о смене комнаты
   };
   renderListRooms = () => {
     const { rooms, active_room } = this.props;

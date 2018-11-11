@@ -17,7 +17,7 @@ class ChatContainer extends Component {
     emojiIsOpen: false
   };
 
-  findRoomName() {
+  findCurrentRoom() {
     const { active_room, rooms = [] } = this.props.user;
     if (!this.props.isLoaded) {
       return { name: "..." };
@@ -93,11 +93,11 @@ class ChatContainer extends Component {
     const { isLoaded } = this.props;
     const { message, emojiIsOpen } = this.state;
     const isDisabled = !Boolean(message.trim().length);
-    const { name } = this.findRoomName();
+    const { name, unread_messages } = this.findCurrentRoom();
 
     return (
       <div className="chat-container">
-        {isLoaded && <Posts {...this.props} />}
+        {isLoaded && <Posts {...this.props} unReadMessages={unread_messages} />}
         <form action="" className="send-message" onSubmit={this.submitForm}>
           <input
             type="text"

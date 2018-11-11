@@ -45,22 +45,27 @@ class Posts extends Component {
     isLockScroll: false,
     initialSize: 0,
     room_id: "",
-    isLoading: false
+    isLoading: false,
+    unReadMessagesOnScroller: 0,
+    unReadMessages: 0,
+    isActiveScroller: false
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    const { initialSize, isActiveScroller, list, isLoading } = this.state;
+    const { initialSize, isActiveScroller, list, isLoading, unReadMessagesOnScroller, unReadMessages } = this.state;
     if (
       nextProps.messages.length > initialSize ||
       nextState.isActiveScroller !== isActiveScroller ||
       nextState.list.length > list.length ||
-      nextState.isLoading !== isLoading
+      nextState.isLoading !== isLoading ||
+      nextState.unReadMessagesOnScroller !== unReadMessagesOnScroller || 
+      nextState.unReadMessages !== unReadMessages
     ) {
       return true;
     }
     return false;
   }
-  initialState = (messages, active_room, cb = () => {}) => {
+  initialState = (messages, active_room, unReadMessages, cb = () => {}) => {
     !messages.length
       ? this.setState({
           isEmpty: true,
@@ -69,6 +74,7 @@ class Posts extends Component {
       : this.setState(
           {
             list: [...messages],
+            unReadMessages,
             initialSize: messages.length,
             room_id: active_room,
             start: -this.batchSize - messages.length,
@@ -80,16 +86,21 @@ class Posts extends Component {
   componentDidMount() {
     const {
       messages,
-      user: { active_room }
+      user: { active_room },
+      unReadMessages
     } = this.props;
 
-    this.initialState(messages, active_room, () => {
+    this.initialState(messages, active_room, unReadMessages, () => {
       this.scrollToBottom(this.state.list.length);
     });
   }
-  componentWillReceiveProps({ messages, user }) {
+  componentWillReceiveProps({ messages, user, unReadMessages }) {
     const { active_room } = user;
-    const { initialSize, list, room_id, start, end } = this.state;
+    const { initialSize, list, room_id, start, end, unReadMessagesOnScroller } = this.state;
+
+    if(unReadMessages !== this.state.unReadMessages) { //заглушка для непрочитанных сообщений
+      this.setState({ unReadMessages })
+    }
 
     const updatePosition = () => {
       this.listRef.forceUpdateGrid();
@@ -117,6 +128,8 @@ class Posts extends Component {
         () => {
           if (Math.round(offsetHeight + scrollTop) === scrollHeight) {
             updatePosition();
+          } else {
+            this.setState({ unReadMessagesOnScroller: unReadMessagesOnScroller + 1 });
           }
         }
       );
@@ -219,15 +232,17 @@ class Posts extends Component {
   };
 
   rowRenderer = ({ key, index, style, isScrolling, isVisible, parent }) => {
-    const { list } = this.state;
+    const { list, unReadMessages } = this.state;
     const { user } = this.props;
     const isMyPost = list[index].user_id === user._id;
+    const isUnread = index > list.length - 1 - unReadMessages;
 
     const classes = cn({
       "w-post": !isMyPost,
-      "w-post-my": isMyPost
+      "w-post-my": isMyPost,
+      "unread-message": isUnread
     });
-
+   
     return (
       <CellMeasurer
         cache={this.cache}
@@ -301,19 +316,24 @@ class Posts extends Component {
     );
   };
 
+  checkUnreadMessages = stopIndex => {
+    const { list, unReadMessagesOnScroller } = this.state;
+    if(unReadMessagesOnScroller > 0 && stopIndex > list.length - 1 - unReadMessagesOnScroller && stopIndex <= list.length - 1) {
+      this.setState({ unReadMessagesOnScroller: unReadMessagesOnScroller - 1 });
+    } 
+  }
   checkScrollerOpening = stopIndex => {
     const { list } = this.state;
     if (stopIndex === 0) {
       return;
     }
-    const isActiveScroller =
-      stopIndex < list.length - list.length * 0.2 ? true : false;
+    const isActiveScroller = stopIndex < list.length - 1 ? true : false;
     this.setState({ isActiveScroller });
   };
-
   _onRowsRendered = fn => (...args) => {
     const [options] = args;
     this.checkScrollerOpeningDebounced(options.stopIndex);
+    this.checkUnreadMessages(options.stopIndex);
   };
 
   _onScroll = ({ clientHeight, scrollHeight, scrollTop }) => {
@@ -338,8 +358,16 @@ class Posts extends Component {
     this.cache.clearAll();
   };
 
+  onClickScroller = () => {
+    const { unreadMessages, list } = this.state;
+    if(unreadMessages) {
+      this.setState({ unreadMessages: 0 });
+    }
+    this.scrollToBottom(list.length);
+  };
+
   render() {
-    const { list, isActiveScroller } = this.state;
+    const { list, isActiveScroller, unReadMessagesOnScroller } = this.state;
     return (
       <InfiniteLoader
         isRowLoaded={this.isRowLoaded}
@@ -349,8 +377,9 @@ class Posts extends Component {
         {({ onRowsRendered, registerChild }) => (
           <div className="posts">
             <Scroller
+              unreadMessages={unReadMessagesOnScroller}
               isActive={isActiveScroller}
-              onClick={() => this.scrollToBottom(list.length)}
+              onClick={this.onClickScroller}
             />
             <AutoSizer onResize={this.onResizeDebounced}>
               {({ height, width }) => (

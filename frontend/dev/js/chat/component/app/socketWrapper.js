@@ -24,6 +24,7 @@ const socketWrapper = ComposedComponent =>
       this.socket = io();
       this.queueOperations = [];
       this.invite = {};
+      this.unreadMessageTime = 5000;
     }
     state = {
       users: [],
@@ -116,7 +117,7 @@ const socketWrapper = ComposedComponent =>
           },
           () => {
             this.openNotification();
-            setTimeout(this.markAsRead, 5000);
+            setTimeout(this.markAsRead, this.unreadMessageTime);
           }
         );
 
