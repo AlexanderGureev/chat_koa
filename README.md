@@ -1,4 +1,4 @@
-![Chater logo](https://chater-koa.herokuapp.com/img/logo.svg){:height="80px" width="80px"}
+![Chater logo](https://chater-koa.herokuapp.com/img/logo.svg | width=80
 # LiveChat for React and koa 2
 This is an open source application written using the koa and react. The goal of the project is to implement all the basic chat functionality.
 
