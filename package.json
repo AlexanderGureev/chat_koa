@@ -9,8 +9,7 @@
     "watch": "webpack --watch",
     "createPublic": "./createPublic.sh",
     "start": "NODE_ENV=development webpack",
-    "build": "NODE_ENV=production webpack",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "NODE_ENV=production webpack"
   },
   "devDependencies": {
     "autoprefixer": "^8.6.5",
