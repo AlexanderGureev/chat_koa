@@ -1,6 +1,18 @@
-import { Upload, message, Button, Icon, Modal, Form, Input } from "antd";
+import {
+  Upload,
+  message,
+  Button,
+  Icon,
+  Modal,
+  Form,
+  Input,
+  Row,
+  Col
+} from "antd";
 import React, { Component } from "react";
 import getToken from "../../../home/services/csrfToken";
+import EmojiBox from "./EmojiBox";
+import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 
 const FormItem = Form.Item;
 
@@ -9,13 +21,13 @@ class UploadImg extends Component {
     token: "",
     visible: false,
     filePath: "",
-    fileName: ""
+    fileName: "",
+    emojiIsOpen: false
   };
   async componentDidMount() {
     const token = await getToken("/api/token");
     this.setState({ token });
   }
-
   onChange = info => {
     if (info.file.status === "done") {
       const {
@@ -39,13 +51,14 @@ class UploadImg extends Component {
     });
   };
   handleOk = e => {
+    const { filePath } = this.state;
     const form = this.props.form;
-    form.validateFields((err, values) => {
+    form.validateFields((err, { messageText }) => {
       if (err) {
         return;
       }
 
-      console.log("Received values of form: ", values);
+      this.props.sendMessage(`${location.origin}/${filePath} ${messageText}`);
       form.resetFields();
       this.setState({ visible: false });
     });
@@ -55,13 +68,50 @@ class UploadImg extends Component {
       visible: false
     });
   };
+  selectEmoji = ({ colons }) => {
+    const { getFieldValue, setFieldsValue } = this.props.form;
+    const messageText = `${getFieldValue("messageText")}${colons}`;
+    setFieldsValue({ messageText });
+  };
+  openEmojiBox = e => {
+    e.preventDefault();
+    this.setState({
+      emojiIsOpen: !this.state.emojiIsOpen
+    });
+  };
+  setRef = el => (this.emojiBoxRef = el);
+  onCloseEmojiBox = ({ target }) => {
+    if (!this.emojiBoxRef.contains(target)) {
+      this.setState({
+        emojiIsOpen: false
+      });
+    }
+  };
   getForm = () => {
     const { getFieldDecorator } = this.props.form;
+    const { emojiIsOpen } = this.state;
 
     return (
-      <Form layout="vertical">
+      <Form layout="vertical" className="upload-form-message">
         <FormItem label="Добавить комментарий (необязательно)">
-          {getFieldDecorator("message-text")(<Input type="text" />)}
+          {getFieldDecorator("messageText")(
+            <Input
+              type="text"
+              suffix={
+                <ClickAwayListener
+                  touchEvent="onTouchStart"
+                  onClickAway={this.onCloseEmojiBox}
+                >
+                  <EmojiBox
+                    setRef={this.setRef}
+                    isOpen={emojiIsOpen}
+                    onSelect={this.selectEmoji}
+                    openEmojiBox={this.openEmojiBox}
+                  />
+                </ClickAwayListener>
+              }
+            />
+          )}
         </FormItem>
       </Form>
     );

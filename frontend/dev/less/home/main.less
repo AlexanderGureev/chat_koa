@@ -986,6 +986,7 @@ a.delete:hover {
 }
 
 // CHAT
+
 .emoji-mart {
   position: absolute;
   right: 10px;
@@ -1013,7 +1014,17 @@ a.delete:hover {
   height: 262px;
   border-radius: 10px;
 }
-
+.upload-form-message .emoji-mart {
+  height: 300px;
+  right: -12px;
+  bottom: 40px;
+}
+.upload-form-message .emoji-mart-scroll  {
+  height: 203px;
+}
+.ant-modal-close {
+  z-index: 0;
+}
 .is-chat {
   overflow-x: hidden;
   min-height: 250px;
@@ -1549,13 +1560,15 @@ a.delete:hover {
       padding: 5px 13px;
       background: url("../../img/unlink.svg") no-repeat center center;
     }
-    .smile {
-      padding: 12px 20px;
-      background: url("../../img/smile.svg") no-repeat center center;
-    }
   }
 }
-
+.smile {
+  padding: 12px 20px;
+  background: url("../../img/smile.svg") no-repeat center center;
+}
+.upload-form-message .smile {
+  padding: 5px 12px;
+}
 .loading-bar {
   margin-left: 50%;
 }
@@ -1589,7 +1602,7 @@ a.delete:hover {
   justify-content: center;
   align-items: center;
 }
-.wrap-smile {
+.send-message .wrap-smile {
   right: 55px;
   bottom: 0px;
   position: absolute;
@@ -2326,7 +2339,7 @@ p.info {
 }
 .img-wrap img {
   max-width: 350px;
-  height: auto;
+  height: 200px;
 }
 .ant-btn.ant-btn-loading:not(.ant-btn-circle):not(.ant-btn-circle-outline):not(.ant-btn-icon-only) .anticon {
   position: relative;

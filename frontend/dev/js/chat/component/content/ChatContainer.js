@@ -90,7 +90,7 @@ class ChatContainer extends Component {
   };
   setRef = el => (this.emojiBoxRef = el);
   render() {
-    const { isLoaded } = this.props;
+    const { isLoaded, sendMessage } = this.props;
     const { message, emojiIsOpen } = this.state;
     const isDisabled = !Boolean(message.trim().length);
     const { name, unread_messages } = this.findCurrentRoom();
@@ -108,7 +108,7 @@ class ChatContainer extends Component {
             value={message}
             onChange={this.onChangeInput}
           />
-          <UploadImg />
+          <UploadImg sendMessage={sendMessage}/>
           <div className="btn-wrap">
             <button type="submit" disabled={isDisabled} className="send" />
           </div>
