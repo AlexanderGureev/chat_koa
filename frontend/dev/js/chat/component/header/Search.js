@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { Icon, Input, AutoComplete } from "antd";
 import { getRooms } from "../../../home/services/api";
 import { uniqueId } from "lodash";
+import { debounce } from "lodash/fp";
+
 // const Search = props => (
 //   <div className="search">
 //     <input type="text" name="search" id="searchInput" placeholder="Search" />
@@ -18,7 +20,9 @@ class Search extends Component {
   constructor(props) {
     super(props);
     this.founds = {};
+    this.handleSearchDebounced = debounce(500, this.handleSearch);
   }
+
   state = {
     inputText: "",
     dataSource: []
@@ -62,6 +66,7 @@ class Search extends Component {
     if (!this.founds[value]) {
       this.founds[value] = await getRooms(value);
     }
+    console.log(this.founds[value])
     this.setState({
       dataSource: [...this.founds[value]]
     });
@@ -75,7 +80,7 @@ class Search extends Component {
           dataSource={dataSource.map(this.renderOption)}
           style={{ width: 200 }}
           onSelect={this.onSelect}
-          onSearch={this.handleSearch}
+          onSearch={this.handleSearchDebounced}
           onChange={this.onChange}
           placeholder="Поиск каналов"
           optionLabelProp="text"

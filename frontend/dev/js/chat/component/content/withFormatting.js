@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Component, Fragment, PureComponent } from "react";
 import { emojify } from "react-emojione";
 import Linkify from "react-linkify";
 import { Link } from "react-router-dom";
@@ -9,28 +9,10 @@ import ReactPlayer from "react-player";
 import Img from "react-image";
 import Spinner from "react-spinkit";
 
-const ORIGIN = `${location.origin}/chat/`;
-const regExpRelativeLink = /\/img\/upload\/[^<>\s]+\.(png|jpg|svg|gif)\b/gi;
-const regExpAbsoluteLink = /(https|http):\/\/[^<>\s]+\/[^<>\s]+\.(png|jpg|svg|gif)\b/gi;
-const templateInvite = ORIGIN + `[a-zA-Z0-9]{6}`;
-
-const linkifyYouTubeUrl = url => {
-  const regExp = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
-  return url.match(regExp);
-};
 
 const withFormatting = WrappedComponent =>
-  class withFormattingPost extends Component {
-    // shouldComponentUpdate(nextProps, nextState) {
-    //   //остаются лишние ререндеры инвайтов
-    //   if (this.invite) {
-    //     setTimeout(() => {
-    //       this.props.checkInvite(this.invite);
-    //     }, 0);
-    //     return true;
-    //   }
-    //   return false;
-    // }
+  class withFormattingPost extends PureComponent {
+    
     componentDidMount() {
       if (this.invite) {
         setTimeout(() => {
@@ -40,6 +22,11 @@ const withFormatting = WrappedComponent =>
       }
       return;
     }
+
+    linkifyYouTubeUrl = url => {
+      const regExp = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
+      return url.match(regExp);
+    };
     templateValidInvite = () => {
       const { room_name, room_online } = this.props.invitations[this.invite];
       return (
@@ -83,20 +70,15 @@ const withFormatting = WrappedComponent =>
         </div>
       );
     };
-    templateImage = searchImg =>
-      searchImg.length
+    templateImage = searchImg => {
+      return searchImg.length
         ? searchImg.map(mass => (
             <div className="img-wrap" key={uniqueId()}>
               <img src={mass[0]} alt="img-message" />
-              {/* <Img
-                className="img-message"
-                src={mass[0]}
-                loader={<Spinner name="ball-scale-multiple" />}
-              /> */}
             </div>
           ))
         : null;
-
+    };
     templateVideoPlayer = searchVideo => {
       return (
         searchVideo && (
@@ -108,25 +90,55 @@ const withFormatting = WrappedComponent =>
         )
       );
     };
-
     renderInvite = () => {
       const { inviteNotValid = true } = this.props.invitations[this.invite];
       return inviteNotValid
         ? this.templateNotValidInvite()
         : this.templateValidInvite();
     };
-    parser = () => {
-      const { text } = this.props.message;
+    searchInvite = text => {
+      const ORIGIN = `${location.origin}/chat/`;
+      const templateInvite = ORIGIN + `[a-zA-Z0-9]{6}`;
       const regExp = new RegExp(templateInvite);
-
       const searchInvite = text.match(regExp);
-      const searchVideo = linkifyYouTubeUrl(text);
+
+      if (!searchInvite) {
+        return;
+      }
+
+      const parsed = searchInvite[0].split("/");
+      const invite = parsed[parsed.length - 1];
+
+      const leftOfTheLink = text.substr(0, searchInvite.index);
+      const rightOfTheLink = text.substr(
+        searchInvite.index + searchInvite[0].length
+      );
+
+      return {
+        invite,
+        leftOfTheLink: emojify(leftOfTheLink),
+        rightOfTheLink: emojify(rightOfTheLink)
+      };
+    };
+    searchImg = text => {
+      const regExpRelativeLink = /\/img\/upload\/[^<>\s]+\.(png|jpg|svg|gif)\b/gi;
+      const regExpAbsoluteLink = /(https|http):\/\/[^<>\s]+\/[^<>\s]+\.(png|jpg|svg|gif)\b/gi;
 
       let i,
         searchImg = [];
       while ((i = regExpAbsoluteLink.exec(text))) {
         searchImg.push(i);
       }
+
+      return searchImg;
+    };
+
+    parser = () => {
+      const { text } = this.props.message;
+
+      const searchInvite = this.searchInvite(text);
+      const searchVideo = this.linkifyYouTubeUrl(text);
+      const searchImg = this.searchImg(text);
 
       if (!searchInvite) {
         return (
@@ -142,25 +154,20 @@ const withFormatting = WrappedComponent =>
         );
       }
 
-      const parsed = searchInvite[0].split("/");
-      this.invite = parsed[parsed.length - 1];
-
-      const leftOfTheLink = text.substr(0, searchInvite.index);
-      const rightOfTheLink = text.substr(
-        searchInvite.index + searchInvite[0].length
-      );
+      const { invite, leftOfTheLink, rightOfTheLink } = searchInvite;
+      this.invite = invite;
 
       const { invitations } = this.props;
       return (
         <WrappedComponent {...this.props}>
           <Linkify>
-            {emojify(leftOfTheLink)}
+            {leftOfTheLink}
             {invitations[this.invite] ? (
               this.renderInvite()
             ) : (
               <InvitePreloader />
             )}
-            {emojify(rightOfTheLink)}
+            {rightOfTheLink}
             {this.templateImage(searchImg)}
             {this.templateVideoPlayer(searchVideo)}
           </Linkify>

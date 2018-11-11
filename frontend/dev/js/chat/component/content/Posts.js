@@ -357,7 +357,7 @@ class Posts extends Component {
                 <List
                   className="grid"
                   onRowsRendered={this._onRowsRendered(onRowsRendered)}
-                  height={height - 53}
+                  height={height - 50}
                   deferredMeasurementCache={this.cache}
                   rowHeight={this.cache.rowHeight}
                   rowCount={list.length}
