@@ -56,7 +56,7 @@ class Posts extends Component {
     if (
       nextProps.messages.length > initialSize ||
       nextState.isActiveScroller !== isActiveScroller ||
-      nextState.list.length > list.length ||
+      nextState.list.length !== list.length ||
       nextState.isLoading !== isLoading ||
       nextState.unReadMessagesOnScroller !== unReadMessagesOnScroller || 
       nextState.unReadMessages !== unReadMessages
@@ -260,7 +260,7 @@ class Posts extends Component {
     );
   };
 
-  recomputeRowHeights = newSize => {
+  recomputeRowHeights = (newSize = 0) => {
     this.cache.clearAll();
     this.listRef.recomputeRowHeights();
     this.scrollToBottom(newSize);
@@ -280,7 +280,7 @@ class Posts extends Component {
           list: [...data, ...messages],
           isEmpty: true,
           isLockScroll: false
-        }, this.forceUpdate //force update для обновления количества элементов в листе, т.к мы убираем прелоадер
+        }, () => this.recomputeRowHeights()
       );
     } else {
       this.setState(
@@ -306,13 +306,15 @@ class Posts extends Component {
       });
       return;
     }
-
     this.setState(
       {
         list: [{ type: "loader" }, ...list],
         isLockScroll: true
       },
-      () => this.loadingMessages(start, end)
+      () => { 
+        this.recomputeRowHeights();
+        this.loadingMessages(start, end);
+      }
     );
   };
 
@@ -359,9 +361,9 @@ class Posts extends Component {
   };
 
   onClickScroller = () => {
-    const { unreadMessages, list } = this.state;
-    if(unreadMessages) {
-      this.setState({ unreadMessages: 0 });
+    const { unReadMessagesOnScroller, list } = this.state;
+    if(unReadMessagesOnScroller) {
+      this.setState({ unReadMessagesOnScroller: 0 });
     }
     this.scrollToBottom(list.length);
   };

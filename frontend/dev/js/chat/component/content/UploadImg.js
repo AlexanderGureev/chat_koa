@@ -28,21 +28,41 @@ class UploadImg extends Component {
     const token = await getToken("/api/token");
     this.setState({ token });
   }
+  setLoader = () => this.loader = message.loading("Загрузка изображения...", 0);
+  stopLoader = (cb = () => {}) => {
+    if(this.loader) {
+      this.loader();
+      this.loader = null;
+    }
+   setTimeout(cb, 1000);
+  }
   onChange = info => {
-    if (info.file.status === "done") {
+    const { file: { status, name, response } } = info;
+
+    if(status === "uploading" && !this.loader) {
+      this.setLoader();
+    }
+
+    if (status === "done") {
+
+      if(response.status !== 200) {
+        this.stopLoader(() => message.error(`${name} file upload failed.`));
+        return;
+      }
+
       const {
         info: { filePath }
-      } = info.file.response;
+      } = response;
 
       this.setState({
-        fileName: info.file.name,
+        fileName: name,
         filePath,
         visible: true
       });
 
-      message.success(`${info.file.name} file uploaded successfully`);
-    } else if (info.file.status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
+      this.stopLoader(() => message.success(`${name} file uploaded successfully`));
+    } else if (status === "error") {
+      this.stopLoader(() => message.error(`${name} file upload failed.`));
     }
   };
   showModal = () => {
@@ -66,11 +86,13 @@ class UploadImg extends Component {
   handleCancel = e => {
     this.setState({
       visible: false
-    });
+    },);
+    this.props.form.resetFields();
   };
   selectEmoji = ({ colons }) => {
     const { getFieldValue, setFieldsValue } = this.props.form;
-    const messageText = `${getFieldValue("messageText")}${colons}`;
+    const msg = getFieldValue("messageText") || "";
+    const messageText = `${msg}${colons}`;
     setFieldsValue({ messageText });
   };
   openEmojiBox = e => {
