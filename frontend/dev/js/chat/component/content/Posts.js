@@ -75,6 +75,7 @@ class Posts extends Component {
           {
             list: [...messages],
             unReadMessages,
+            unReadMessagesOnScroller: unReadMessages,
             initialSize: messages.length,
             room_id: active_room,
             start: -this.batchSize - messages.length,
@@ -91,9 +92,14 @@ class Posts extends Component {
     } = this.props;
 
     this.initialState(messages, active_room, unReadMessages, () => {
-      this.scrollToBottom(this.state.list.length);
+      if(!unReadMessages) {
+        this.scrollToBottom(this.state.list.length);
+        return;
+      }
+      this.scrollToBottom(this.state.list.length - unReadMessages);
     });
   }
+
   componentWillReceiveProps({ messages, user, unReadMessages }) {
     const { active_room } = user;
     const { initialSize, list, room_id, start, end, unReadMessagesOnScroller } = this.state;

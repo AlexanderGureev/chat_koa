@@ -185,8 +185,13 @@ const socketWrapper = ComposedComponent =>
       this.socket.emit("new_message", message);
     };
 
-    getMessages = async ({ active_room }, start = -20, end = -1) => {
+    getMessages = async (user, start = -20, end = -1) => {
       try {
+        const { active_room, rooms } = user;
+        const { unread_messages } = rooms.find(({ _id }) => _id === active_room);
+        if(unread_messages > 15) {
+          start = -(unread_messages + 20);
+        }
         return await getMessages(active_room, start, end);
       } catch ({ message }) {
         const errors = message instanceof Array ? message : [message];
