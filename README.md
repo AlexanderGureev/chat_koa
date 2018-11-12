@@ -7,6 +7,12 @@
 ## Demo
 https://chater-koa.herokuapp.com
 
+###Mobile version
+<img src="https://chater-koa.herokuapp.com/img/desktop.png"/>
+
+###Desktop version
+<img src="https://chater-koa.herokuapp.com/img/modile.jpeg"/>
+
 ### Requires
 
   - Node.js 
