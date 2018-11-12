@@ -7,11 +7,11 @@
 ## Demo
 https://chater-koa.herokuapp.com
 
-### Desktop version
-<img src="https://chater-koa.herokuapp.com/img/desktop.png" width="600px" align="center" />
-
-### Mobile version
-<img src="https://chater-koa.herokuapp.com/img/modile.jpeg" width="300px" align="center"/>
+<p align="center"> 
+	<h2>Desktop and mobile version</h2>
+	<img  src="https://chater-koa.herokuapp.com/img/desktop.png"  width="450px"/>
+	<img  src="https://chater-koa.herokuapp.com/img/modile.jpeg"  width="242px"/>
+</p>
 
 ### Requires
 
