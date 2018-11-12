@@ -14,12 +14,10 @@ https://chater-koa.herokuapp.com
   - NPM (Node Package Manager) or Yarn
   - Redis
   - Mongodb
-  - gulp
-  - webpack
 
 ## Development
 
-Make sure your system meets the requirements above, as well as redis.service and mongodb.service is enabled. Next, clone this repository and run:
+Make sure your system meets the requirements above, as well redis.service and mongodb.service is enabled. Next, clone this repository and run:
 
 ```bash
 cd chat_koa
