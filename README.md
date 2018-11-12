@@ -8,15 +8,25 @@ This is an open source application written using the koa and react. The goal of 
 ## Demo
 https://chater-koa.herokuapp.com
 
+### Requires
+
+  - Node.js 
+  - NPM (Node Package Manager) or Yarn
+  - Redis
+  - Mongodb
+  - gulp
+  - webpack
+
 ## Development
 
-Be sure that you have the node >= 10.0.0 and npm installed. Next, clone this repository and run:
+Make sure your system meets the requirements above, as well as redis.service and mongodb.service is enabled. Next, clone this repository and run:
 
 ```bash
+cd chat_koa
+yarn install
 cd backend/server
-yarn dev-front 
-or 
-yarn dev
+yarn install
+yarn dev-front or yarn dev
 ```
 
 To build a production version use:
@@ -30,4 +40,4 @@ yarn build
 
 ## Features
 
-Few main features
+Few main features...
