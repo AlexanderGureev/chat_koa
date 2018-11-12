@@ -1,9 +1,6 @@
-<p>
-  <img src="https://chater-koa.herokuapp.com/img/logo.svg" width="80"/>
-  <h1>LiveChat for React and koa 2</h1>
-</p>
+## LiveChat for React and koa 2</h1>
 
-This is an open source application written using the koa and react. The goal of the project is to implement all the basic chat functionality.
+<img src="https://chater-koa.herokuapp.com/img/logo.svg" align="left" width="90"/> This is an open source application written using the koa and react. The goal of the project is to implement all the basic chat functionality.
 
 ## Demo
 https://chater-koa.herokuapp.com
