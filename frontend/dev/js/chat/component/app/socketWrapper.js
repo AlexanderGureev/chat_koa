@@ -116,7 +116,7 @@ const socketWrapper = ComposedComponent =>
             isLoaded: false
           },
           () => {
-            this.openNotification();
+            //this.openNotification();
             setTimeout(this.markAsRead, this.unreadMessageTime);
           }
         );

@@ -8,6 +8,7 @@ const {
   updateRoom,
   getRooms
 } = require("../app/services/chat/rooms");
+const { getUsers } = require("../app/services/chat/getUsers");
 const { checkPassword, Rooms } = require("../app/model/rooms");
 const { generateInviteLink, checkInviteLink } = require("../app/services/chat/invitations");
 const { uploadImg } = require("../app/services/chat/uploadImg");
@@ -42,6 +43,15 @@ module.exports = router => {
     try {
       const { term } = ctx.query;
       const data = await getRooms(term);
+      ctx.body = responseMessage(200, "", data);
+    } catch (error) {
+      throw error;
+    }
+  });
+  router.get("/api/users", isAuthenticated, async ctx => {
+    try {
+      const { term } = ctx.query;
+      const data = await getUsers(term);
       ctx.body = responseMessage(200, "", data);
     } catch (error) {
       throw error;
