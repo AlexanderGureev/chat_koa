@@ -1,159 +1,142 @@
-// import React, { Component } from "react";
-// import { Icon, Input, AutoComplete } from "antd";
-// import { getRooms } from "../../../home/services/api";
-// import { uniqueId } from "lodash";
-// import { debounce } from "lodash/fp";
-
-// const Search = props => (
-//   <div className="search">
-//     <input type="text" name="search" id="searchInput" placeholder="Search" />
-//     <span className="find">
-//       <i className="fas fa-search" />
-//     </span>
-//   </div>
-// );
-
-// const Option = AutoComplete.Option;
-// const OptGroup = AutoComplete.OptGroup;
-
-// class Search extends Component {
-//   constructor(props) {
-//     super(props);
-//     this.founds = {};
-//     this.handleSearchDebounced = debounce(500, this.handleSearch);
-//   }
-
-//   state = {
-//     inputText: "",
-//     dataSource: []
-//   };
-
-//   componentDidUpdate() {
-//     const { changeRoomListProcessed, roomListIsChange } = this.props;
-//     if (roomListIsChange) {
-//       this.founds = {};
-//       changeRoomListProcessed();
-//     }
-//   }
-
-//   onBlur = e => {
-//     this.setState({ inputText: "" });
-//   };
-//   onSelect = (...args) => {
-//     console.log("onSelect", args);
-//   };
-//   onChange = value => {
-//     this.setState({ inputText: value });
-//   };
-//   renderStatus = isPublic =>
-//     !isPublic && (
-//       <span className="protected-room">
-//         <Icon type="lock" theme="outlined" />
-//       </span>
-//     );
-
-//   renderOption = room => (
-//     <Option key={room._id} text={room.name} className="li-search">
-//       {room.name}
-//       {this.renderStatus(room.public)}
-//     </Option>
-//   );
-
-//   handleSearch = async value => {
-//     if (!value) {
-//       return;
-//     }
-//     if (!this.founds[value]) {
-//       this.founds[value] = await getRooms(value);
-//     }
-//     console.log(this.founds[value])
-//     this.setState({
-//       dataSource: [...this.founds[value]]
-//     });
-//   };
-
-//   render() {
-//     const { dataSource, inputText } = this.state;
-//     return (
-//       <div className="search">
-//         <AutoComplete
-//           dataSource={dataSource.map(this.renderOption)}
-//           style={{ width: 200 }}
-//           onSelect={this.onSelect}
-//           onSearch={this.handleSearchDebounced}
-//           onChange={this.onChange}
-//           placeholder="Поиск каналов"
-//           optionLabelProp="text"
-//           onBlur={this.onBlur}
-//           value={inputText}
-//         >
-//           <Input
-//             className="find-input"
-//             suffix={<Icon type="search" className="certain-category-icon" />}
-//           />
-//         </AutoComplete>
-//       </div>
-//     );
-//   }
-// }
-import React, { Component } from "react";
-import { Select, Spin } from "antd";
+import React, { Component, Fragment } from "react";
+import Select, { components } from "react-select";
+import { AutoSizer, List } from "react-virtualized";
+import { Icon } from "antd";
 import debounce from "lodash/debounce";
 import { getRooms, getUsers } from "../../../home/services/api";
-import { uniqueId } from "lodash";
+import cn from "classnames";
 
-const Option = Select.Option;
+const filterOptions = [
+  { value: "Users", label: "Users" },
+  { value: "Rooms", label: "Rooms" }
+];
+const getHeaderText = filter => {
+  const filterOptionsText = {
+    Users: "Пользователи",
+    Rooms: "Комнаты",
+    default: "Параметры поиска"
+  };
 
-class UserRemoteSelect extends Component {
+  if (!filter) {
+    return filterOptionsText.default;
+  }
+  const { value } = filter[0];
+  return filterOptionsText[value];
+};
+const LoadingIndicator = props => <Icon type="loading" />;
+const DropdownIndicator = props => {
+  return (
+    components.DropdownIndicator && (
+      <components.DropdownIndicator {...props}>
+        <Icon type="search" className="certain-category-icon" />
+      </components.DropdownIndicator>
+    )
+  );
+};
+const MenuList = props => {
+  const { value, notFound } = props.selectProps;
+  const headerText = getHeaderText(value);
+
+  const rowRenderer = ({ key, index, isScrolling, isVisible, style }) => (
+    <div key={key} style={style} className="search-list-li">
+      {props.children[index]}
+    </div>
+  );
+
+  return (
+    <Fragment>
+      <div className="search-params">{headerText}</div>
+      {notFound && <div className="search-result">Нет результатов</div>}
+      <AutoSizer disableHeight>
+        {({ width }) => (
+          <List
+            width={width}
+            height={props.options.length * 50}
+            rowHeight={50}
+            rowCount={props.options.length}
+            rowRenderer={rowRenderer}
+          />
+        )}
+      </AutoSizer>
+    </Fragment>
+  );
+};
+
+class Search extends Component {
   constructor(props) {
     super(props);
-    this.defaultValue = ["Users", "Rooms"];
     this.foundsUsers = {};
     this.foundsRooms = {};
-    this.handleSearchDebounced = debounce(this.handleSearch, 500);
+    this.handleSearchDebounced = debounce(this.handleInputChange, 500);
   }
 
   state = {
-    data: [],
-    filter: [],
-    defaultValue: ["Users", "Rooms"],
-    fetching: false
+    filter: "",
+    value: null,
+    options: [...filterOptions],
+    isLoading: false,
+    notFound: false
   };
 
-  componentDidUpdate() {
-    const { changeRoomListProcessed, roomListIsChange } = this.props;
-    if (roomListIsChange) {
-      this.foundsRooms = {};
-      changeRoomListProcessed();
+  onChange = value => {
+    if (!value.length) {
+      this.setState({
+        value: null,
+        filter: "",
+        options: [...filterOptions],
+        notFound: false
+      });
+      return;
     }
-  }
+
+    const [item] = value;
+    const isFilterOption = filterOptions.find(
+      ({ value }) => item.value === value
+    );
+    if (isFilterOption) {
+      this.setState({
+        value: [{...isFilterOption}],
+        filter: item.value,
+        options: []
+      });
+    }
+  };
 
   getUsers = async value => {
     if (!this.foundsUsers[value]) {
-      this.setState({ fetching: true });
+      this.setState({ isLoading: true });
       this.foundsUsers[value] = await getUsers(value);
-      this.setState({ fetching: false });
+      this.setState({ isLoading: false });
     }
 
     this.setState({
-      data: [...this.foundsUsers[value]]
+      options: this.foundsUsers[value].map(({ _id, username }) => ({
+        value: _id,
+        label: username
+      })),
+      notFound: !Boolean(this.foundsUsers[value].length || 0)
     });
   };
+
   getRooms = async value => {
     if (!this.foundsRooms[value]) {
-      this.setState({ fetching: true });
+      this.setState({ isLoading: true });
       this.foundsRooms[value] = await getRooms(value);
-      this.setState({ fetching: false });
+      this.setState({ isLoading: false });
     }
 
     this.setState({
-      data: [...this.foundsRooms[value]]
+      options: this.foundsRooms[value].map(({ _id, name }) => ({
+        value: _id,
+        label: name
+      })),
+      notFound: !Boolean(this.foundsRooms[value].length || 0)
     });
   };
 
-  handleSearch = async value => {
-    const [ filter ] = this.state.filter;
-    if (!filter.length || !value) {
+  handleInputChange = value => {
+    const { filter } = this.state;
+    if (!filter || !value) {
       return;
     }
 
@@ -164,49 +147,45 @@ class UserRemoteSelect extends Component {
     }
   };
 
-  handleChange = value => {
-
-    if (!value.length) {
-      this.setState({
-        filter: [],
-        defaultValue: [...this.defaultValue]
-      });
-      return;
-    }
-
-    const [val] = value;
-    const isFilterOption = this.defaultValue.includes(val);
-    if (isFilterOption) {
-      this.setState({
-        filter: [val],
-        data: [],
-        defaultValue: [],
-        fetching: false
-      });
-    }
+  onFocus = () => {
+    this.setState({ isFocus: true });
   };
-
+  onBlur = () => {
+    this.setState({ isFocus: false });
+  };
+  onMenuClose = () => {
+    this.setState({ notFound: false });
+  };
   render() {
-    const { fetching, data, filter, defaultValue } = this.state;
+    const { isLoading, value, options, isFocus, notFound } = this.state;
+    const classes = cn({
+      search: true,
+      "search-focused": isFocus
+    });
+
     return (
-      <div className="search">
+      <div className={classes} ref={el => (this.searchContainer = el)}>
         <Select
-          mode="multiple"
-          value={filter}
-          placeholder="Select users"
-          notFoundContent={fetching ? <Spin size="small" /> : null}
-          filterOption={false}
-          onSearch={this.handleSearchDebounced}
-          onChange={this.handleChange}
-          style={{ width: "300px" }}
-        >
-          {defaultValue
-            .map(value => <Option key={value}>{value}</Option>)
-            .concat(data.map(d => <Option key={d._id}>{d.name || d.username}</Option>))}
-        </Select>
+          className="chat-search-container"
+          classNamePrefix="chat-search"
+          isMulti
+          isLoading={isLoading}
+          onChange={this.onChange}
+          onSearch={this.onSearch}
+          value={value}
+          options={options}
+          notFound={notFound}
+          components={{ MenuList, DropdownIndicator, LoadingIndicator }}
+          onInputChange={this.handleSearchDebounced}
+          placeholder="Поиск"
+          onFocus={this.onFocus}
+          onBlur={this.onBlur}
+          filterOption={(options, str) => true}
+          onMenuClose={this.onMenuClose}
+        />
       </div>
     );
   }
 }
 
-export default UserRemoteSelect;
+export default Search;
