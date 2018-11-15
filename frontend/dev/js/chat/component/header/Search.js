@@ -33,6 +33,52 @@ const DropdownIndicator = props => {
     )
   );
 };
+const getUserTemplate = ({ value, label, data }, innerProps) => {
+  return (
+    <div {...innerProps}>
+      <div className="search-user-li">
+        <span>{label}</span>
+        <img src={data.avatarPath} alt="img-ava" />
+      </div>
+    </div>
+  );
+};
+const getRoomTemplate = ({ value, label, data }, innerProps) => {
+  const isPublic = data ? data.public : null;
+
+  return (
+    <div {...innerProps}>
+      <div className="search-room-li">
+        <span>{label}</span>
+        {isPublic === false ? (
+          <span className="protected-room">
+            <Icon type="lock" theme="outlined" />
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
+};
+const getFilterTemplate = ({ value, label }, innerProps) => {
+  return (
+    <div {...innerProps}>
+      <div className="search-filter-li">
+        <span>{label}</span>
+        <Icon type="filter" />
+      </div>
+    </div>
+  );
+};
+const CustomOption = props => {
+  const { innerProps, data } = props;
+  const { searchFilter } = props.selectProps;
+
+  return searchFilter === "Users"
+    ? getUserTemplate(data, innerProps)
+    : searchFilter === "Rooms"
+    ? getRoomTemplate(data, innerProps)
+    : getFilterTemplate(data, innerProps);
+};
 const MenuList = props => {
   const { value, notFound } = props.selectProps;
   const headerText = getHeaderText(value);
@@ -43,16 +89,19 @@ const MenuList = props => {
     </div>
   );
 
+  const defaultRowHeight = 50;
+  const height = props.options.length > 2 ? 300 : props.options.length * defaultRowHeight;
+
   return (
     <Fragment>
       <div className="search-params">{headerText}</div>
-      {notFound && <div className="search-result">Нет результатов</div>}
+      {notFound && <div className="search-not-found">Нет результатов</div>}
       <AutoSizer disableHeight>
         {({ width }) => (
           <List
             width={width}
-            height={props.options.length * 50}
-            rowHeight={50}
+            height={height}
+            rowHeight={defaultRowHeight}
             rowCount={props.options.length}
             rowRenderer={rowRenderer}
           />
@@ -61,13 +110,41 @@ const MenuList = props => {
     </Fragment>
   );
 };
+const searchMethod = instance => async (value, filter) => {
+  const { cache, api, requiredFields } = instance.cacheAndMethods[filter];
+  if (!cache[value]) {
+    instance.setState({ isLoading: true });
+    cache[value] = await api(value);
+    instance.setState({ isLoading: false });
+  }
+
+  const options = cache[value].map(result => ({
+    value: result[requiredFields[0]],
+    label: result[requiredFields[1]],
+    data: { ...result }
+  }));
+  const notFound = !Boolean(cache[value].length || 0);
+  instance.setState({ options, notFound });
+};
 
 class Search extends Component {
   constructor(props) {
     super(props);
-    this.foundsUsers = {};
-    this.foundsRooms = {};
-    this.handleSearchDebounced = debounce(this.handleInputChange, 500);
+    this.cacheAndMethods = {
+      Users: {
+        cache: {},
+        searchMethod: searchMethod(this),
+        api: getUsers,
+        requiredFields: ["_id", "username"]
+      },
+      Rooms: {
+        cache: {},
+        searchMethod: searchMethod(this),
+        api: getRooms,
+        requiredFields: ["_id", "name"]
+      }
+    };
+    this.handleInputChangeDebounced = debounce(this.handleInputChange, 500);
   }
 
   state = {
@@ -95,43 +172,11 @@ class Search extends Component {
     );
     if (isFilterOption) {
       this.setState({
-        value: [{...isFilterOption}],
+        value: [{ ...isFilterOption }],
         filter: item.value,
         options: []
       });
     }
-  };
-
-  getUsers = async value => {
-    if (!this.foundsUsers[value]) {
-      this.setState({ isLoading: true });
-      this.foundsUsers[value] = await getUsers(value);
-      this.setState({ isLoading: false });
-    }
-
-    this.setState({
-      options: this.foundsUsers[value].map(({ _id, username }) => ({
-        value: _id,
-        label: username
-      })),
-      notFound: !Boolean(this.foundsUsers[value].length || 0)
-    });
-  };
-
-  getRooms = async value => {
-    if (!this.foundsRooms[value]) {
-      this.setState({ isLoading: true });
-      this.foundsRooms[value] = await getRooms(value);
-      this.setState({ isLoading: false });
-    }
-
-    this.setState({
-      options: this.foundsRooms[value].map(({ _id, name }) => ({
-        value: _id,
-        label: name
-      })),
-      notFound: !Boolean(this.foundsRooms[value].length || 0)
-    });
   };
 
   handleInputChange = value => {
@@ -139,12 +184,8 @@ class Search extends Component {
     if (!filter || !value) {
       return;
     }
-
-    if (filter === "Users") {
-      this.getUsers(value);
-    } else {
-      this.getRooms(value);
-    }
+    const { searchMethod } = this.cacheAndMethods[filter];
+    searchMethod(value, filter);
   };
 
   onFocus = () => {
@@ -156,8 +197,9 @@ class Search extends Component {
   onMenuClose = () => {
     this.setState({ notFound: false });
   };
+
   render() {
-    const { isLoading, value, options, isFocus, notFound } = this.state;
+    const { isLoading, value, options, isFocus, notFound, filter } = this.state;
     const classes = cn({
       search: true,
       "search-focused": isFocus
@@ -174,14 +216,21 @@ class Search extends Component {
           onSearch={this.onSearch}
           value={value}
           options={options}
+          searchFilter={filter}
           notFound={notFound}
-          components={{ MenuList, DropdownIndicator, LoadingIndicator }}
-          onInputChange={this.handleSearchDebounced}
+          components={{
+            MenuList,
+            DropdownIndicator,
+            LoadingIndicator,
+            Option: CustomOption
+          }}
+          onInputChange={this.handleInputChangeDebounced}
           placeholder="Поиск"
           onFocus={this.onFocus}
           onBlur={this.onBlur}
           filterOption={(options, str) => true}
           onMenuClose={this.onMenuClose}
+          menuIsOpen={true}
         />
       </div>
     );

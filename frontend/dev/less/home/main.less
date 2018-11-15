@@ -1119,12 +1119,12 @@ a.delete:hover {
 .chat-header .flex-container .search.search-focused {
   width: 300px;
 }
-.search-params, .search-result  {
+.search-params, .search-not-found  {
   text-align: center;
   padding: 5px;
   font-size: 14px;
 }
-.search-result {
+.search-not-found {
   font-size: 12px;
 }
 .search-list-li > div {
@@ -1159,6 +1159,39 @@ a.delete:hover {
 }
 .chat-search__indicators > .anticon-loading {
   margin-right: 12px;
+}
+.search-list-li > div {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+.search-list-li {
+  cursor: pointer;
+  transition: .3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+.search-list-li:hover {
+  background-color: #4d73cb54;
+}
+.search-user-li, .search-room-li, .search-filter-li {
+  width: 100%;
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+.search-list-li span {
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  font-size: 15px;
+}
+.search-user-li img {
+  width: 30px;
+  border-radius: 50%;
 }
 
 @keyframes searchFilterAnimation {
@@ -2204,13 +2237,8 @@ p.info {
   background: rgba(0, 0, 0, 0.12);
 }
 
-.li-search {
-  position: relative;
-}
 .protected-room {
-  position: absolute;
-  right: 10px;
-  top: 0;
+  display: flex;
 }
 .list-rooms li {
   position: relative;
