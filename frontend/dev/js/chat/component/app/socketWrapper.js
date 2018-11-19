@@ -162,6 +162,9 @@ const socketWrapper = ComposedComponent =>
               },
               this.checkQueue
             );
+          })
+          .catch(error => {
+            console.log(error)
           });
       });
       this.socket.on("user_connected", ({ users, room_id }) => {
@@ -266,7 +269,7 @@ const socketWrapper = ComposedComponent =>
       try {
         const { rooms } = this.state.user;
         await deleteRoom(id);
-        this.setState({ roomListIsChange: true });
+        this.setState({ cache: { needsUpdating: true } });
         this.socket.emit("delete_room", { id, rooms });
       } catch (error) {
         throw new Error("Произошла ошибка, повторите запрос.");

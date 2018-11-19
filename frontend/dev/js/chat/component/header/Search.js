@@ -4,8 +4,9 @@ import { AutoSizer, List } from "react-virtualized";
 import { Icon } from "antd";
 import debounce from "lodash/debounce";
 import { getRooms, getUsers } from "../../../home/services/api";
-import { Badge } from 'antd';
+import { Badge, Popover } from 'antd';
 import cn from "classnames";
+import UserPopover from "./UserPopover";
 
 const filterOptions = [
   { value: "Users", label: "Пользователи" },
@@ -34,25 +35,24 @@ const DropdownIndicator = props => {
     )
   );
 };
-const onMouseEnter = event => {
-  console.log("onMouseEnter")
-};
 const handlerClickOption = (event, callback) => callback();
-
 const getUserTemplate = ({ data }, innerProps) => {
   const { username, avatarPath } = data;
 
   return (
-    <div {...innerProps} onMouseEnter={onMouseEnter}>
-      <div className="search-user-li">
-        <span>{username}</span>
-        <div className="search-wrap-img">
-          <img src={avatarPath} alt="img-ava" />
+    <UserPopover userData={data}>
+      <div {...innerProps} onClick={() => {}}>
+        <div className="search-user-li">
+          <span>{username}</span>
+          <div className="search-wrap-img">
+            <img src={avatarPath} alt="img-ava" />
+          </div>
         </div>
       </div>
-    </div>
+    </UserPopover>
   );
 };
+
 const getRoomTemplate = ({ data }, innerProps, { onClickRoom }) => {
   const isPublic = data ? data.public : null;
   const callback = () => { 
@@ -87,11 +87,13 @@ const getFilterTemplate = ({ label }, innerProps) => {
 const CustomOption = props => {
   const { innerProps, data, selectProps } = props;
 
-  return selectProps.searchFilter === "Users"
-    ? getUserTemplate(data, innerProps)
-    : selectProps.searchFilter === "Rooms"
-    ? getRoomTemplate(data, innerProps, selectProps)
-    : getFilterTemplate(data, innerProps);
+  if (selectProps.searchFilter === "Users") {
+    return getUserTemplate(data, innerProps);
+  }
+  if (selectProps.searchFilter === "Rooms") {
+    return getRoomTemplate(data, innerProps, selectProps);
+  }
+  return getFilterTemplate(data, innerProps);
 };
 
 const MenuList = props => {
@@ -211,14 +213,17 @@ class Search extends Component {
       return;
     }
     const { searchMethod } = this.cacheAndMethods[filter];
-    console.log(this.cacheAndMethods[filter].cache)
     searchMethod(value, filter);
   };
 
   onFocus = () => this.setState({ isFocus: true });
-  onBlur = () => this.setState({ isFocus: false });
+  onBlur = e => {
+    if(!e.target.value || !this.state.filter) {
+      return this.setState({ isFocus: false });
+    }
+    this.setState({ ...this.state, isFocus: false, options: [] });
+  }
   onMenuClose = () => this.setState({ notFound: false });
-
 
   render() {
     const { isLoading, value, options, isFocus, notFound, filter, isSelect } = this.state;
