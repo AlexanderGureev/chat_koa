@@ -1146,9 +1146,11 @@ a.delete:hover {
   border-style: none !important;
   box-shadow: 0 2px 20px rgba(0,0,0, .2);
 }
+.chat-search__multi-value {
+  min-width: 70px !important;
+}
 .chat-search__multi-value__remove {
   cursor: pointer;
-  transition: .3s ease;
 }
 .chat-search__multi-value__remove:hover {
   background: linear-gradient(90deg,#4d73cb,#5d7eca) !important;
@@ -1183,15 +1185,28 @@ a.delete:hover {
   display: flex;
   justify-content: space-between;
 }
+.chat-search__value-container {
+  flex-wrap: nowrap !important;
+}
 .search-list-li span {
   white-space: nowrap; 
   overflow: hidden; 
   text-overflow: ellipsis; 
-  font-size: 15px;
+  font-size: 14px;
 }
 .search-user-li img {
   width: 30px;
   border-radius: 50%;
+}
+
+.search-wrap-img {
+  position: relative;
+
+  >span {
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+  }
 }
 
 @keyframes searchFilterAnimation {
@@ -1546,7 +1561,7 @@ a.delete:hover {
         padding: 10px 30px 30px 50px;
         border-radius: 15px;
         background-color: #fff;
-        box-shadow: 0 0 35px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 0 25px rgba(0,0,0,.10);
         background: linear-gradient(to left, rgb(227, 234, 247), #fff);
 
         .avatar {
@@ -1867,7 +1882,7 @@ div.tooltipstered {
     background-color: rgba(36, 73, 156, 0.5);
     top: 0;
     width: 100%;
-    height: 60%;
+    height: 55%;
     z-index: 0;
   }
   .tooltipster-content {

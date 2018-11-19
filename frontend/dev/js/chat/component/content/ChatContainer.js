@@ -22,6 +22,7 @@ class ChatContainer extends Component {
     if (!this.props.isLoaded) {
       return { name: "..." };
     }
+    
     this.currentRoom = rooms.find(({ _id }) => _id === active_room);
     return this.currentRoom;
   }

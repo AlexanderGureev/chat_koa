@@ -4,11 +4,12 @@ import { AutoSizer, List } from "react-virtualized";
 import { Icon } from "antd";
 import debounce from "lodash/debounce";
 import { getRooms, getUsers } from "../../../home/services/api";
+import { Badge } from 'antd';
 import cn from "classnames";
 
 const filterOptions = [
-  { value: "Users", label: "Users" },
-  { value: "Rooms", label: "Rooms" }
+  { value: "Users", label: "Пользователи" },
+  { value: "Rooms", label: "Комнаты" }
 ];
 const getHeaderText = filter => {
   const filterOptionsText = {
@@ -33,23 +34,36 @@ const DropdownIndicator = props => {
     )
   );
 };
-const getUserTemplate = ({ value, label, data }, innerProps) => {
+const onMouseEnter = event => {
+  console.log("onMouseEnter")
+};
+const handlerClickOption = (event, callback) => callback();
+
+const getUserTemplate = ({ data }, innerProps) => {
+  const { username, avatarPath } = data;
+
   return (
-    <div {...innerProps}>
+    <div {...innerProps} onMouseEnter={onMouseEnter}>
       <div className="search-user-li">
-        <span>{label}</span>
-        <img src={data.avatarPath} alt="img-ava" />
+        <span>{username}</span>
+        <div className="search-wrap-img">
+          <img src={avatarPath} alt="img-ava" />
+        </div>
       </div>
     </div>
   );
 };
-const getRoomTemplate = ({ value, label, data }, innerProps) => {
+const getRoomTemplate = ({ data }, innerProps, { onClickRoom }) => {
   const isPublic = data ? data.public : null;
+  const callback = () => { 
+    onClickRoom(data._id, data.name, data.public);
+    innerProps.onClick();
+  }
 
   return (
-    <div {...innerProps}>
+    <div {...innerProps} onMouseEnter={onMouseEnter} onClick={e => handlerClickOption(e, callback)}>
       <div className="search-room-li">
-        <span>{label}</span>
+        <span>{data.name}</span>
         {isPublic === false ? (
           <span className="protected-room">
             <Icon type="lock" theme="outlined" />
@@ -59,7 +73,7 @@ const getRoomTemplate = ({ value, label, data }, innerProps) => {
     </div>
   );
 };
-const getFilterTemplate = ({ value, label }, innerProps) => {
+const getFilterTemplate = ({ label }, innerProps) => {
   return (
     <div {...innerProps}>
       <div className="search-filter-li">
@@ -69,16 +83,17 @@ const getFilterTemplate = ({ value, label }, innerProps) => {
     </div>
   );
 };
-const CustomOption = props => {
-  const { innerProps, data } = props;
-  const { searchFilter } = props.selectProps;
 
-  return searchFilter === "Users"
+const CustomOption = props => {
+  const { innerProps, data, selectProps } = props;
+
+  return selectProps.searchFilter === "Users"
     ? getUserTemplate(data, innerProps)
-    : searchFilter === "Rooms"
-    ? getRoomTemplate(data, innerProps)
+    : selectProps.searchFilter === "Rooms"
+    ? getRoomTemplate(data, innerProps, selectProps)
     : getFilterTemplate(data, innerProps);
 };
+
 const MenuList = props => {
   const { value, notFound } = props.selectProps;
   const headerText = getHeaderText(value);
@@ -111,7 +126,7 @@ const MenuList = props => {
   );
 };
 const searchMethod = instance => async (value, filter) => {
-  const { cache, api, requiredFields } = instance.cacheAndMethods[filter];
+  const { cache, api } = instance.cacheAndMethods[filter];
   if (!cache[value]) {
     instance.setState({ isLoading: true });
     cache[value] = await api(value);
@@ -119,8 +134,6 @@ const searchMethod = instance => async (value, filter) => {
   }
 
   const options = cache[value].map(result => ({
-    value: result[requiredFields[0]],
-    label: result[requiredFields[1]],
     data: { ...result }
   }));
   const notFound = !Boolean(cache[value].length || 0);
@@ -134,14 +147,12 @@ class Search extends Component {
       Users: {
         cache: {},
         searchMethod: searchMethod(this),
-        api: getUsers,
-        requiredFields: ["_id", "username"]
+        api: getUsers
       },
       Rooms: {
         cache: {},
         searchMethod: searchMethod(this),
-        api: getRooms,
-        requiredFields: ["_id", "name"]
+        api: getRooms
       }
     };
     this.handleInputChangeDebounced = debounce(this.handleInputChange, 500);
@@ -152,7 +163,20 @@ class Search extends Component {
     value: null,
     options: [...filterOptions],
     isLoading: false,
-    notFound: false
+    notFound: false,
+    isSelect: false
+  };
+
+  componentDidUpdate() {
+    const { cacheUpdateProcessed, cache: { needsUpdating } } = this.props;
+    if (needsUpdating) {
+      this.clearCache("Rooms")
+      cacheUpdateProcessed();
+    }
+  }
+
+  clearCache = filter => {
+    this.cacheAndMethods[filter].cache = {};
   };
 
   onChange = value => {
@@ -161,7 +185,8 @@ class Search extends Component {
         value: null,
         filter: "",
         options: [...filterOptions],
-        notFound: false
+        notFound: false,
+        isSelect: false
       });
       return;
     }
@@ -174,7 +199,8 @@ class Search extends Component {
       this.setState({
         value: [{ ...isFilterOption }],
         filter: item.value,
-        options: []
+        options: [],
+        isSelect: true
       });
     }
   };
@@ -185,21 +211,17 @@ class Search extends Component {
       return;
     }
     const { searchMethod } = this.cacheAndMethods[filter];
+    console.log(this.cacheAndMethods[filter].cache)
     searchMethod(value, filter);
   };
 
-  onFocus = () => {
-    this.setState({ isFocus: true });
-  };
-  onBlur = () => {
-    this.setState({ isFocus: false });
-  };
-  onMenuClose = () => {
-    this.setState({ notFound: false });
-  };
+  onFocus = () => this.setState({ isFocus: true });
+  onBlur = () => this.setState({ isFocus: false });
+  onMenuClose = () => this.setState({ notFound: false });
+
 
   render() {
-    const { isLoading, value, options, isFocus, notFound, filter } = this.state;
+    const { isLoading, value, options, isFocus, notFound, filter, isSelect } = this.state;
     const classes = cn({
       search: true,
       "search-focused": isFocus
@@ -230,7 +252,8 @@ class Search extends Component {
           onBlur={this.onBlur}
           filterOption={(options, str) => true}
           onMenuClose={this.onMenuClose}
-          menuIsOpen={true}
+          onClickRoom={this.props.changeRoom}
+          blurInputOnSelect={isSelect}
         />
       </div>
     );

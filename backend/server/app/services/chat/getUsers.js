@@ -7,14 +7,14 @@ const async = require("async");
 const _removeUserFromCache = async _id =>
   await client.hdelAsync(`list:users`, `${_id}`);
 
-const _cachingUser= async ({ _id, username, email, profile }) => {
-  const data = JSON.stringify({ _id, username, email, avatarPath: profile.avatarPath });
+const updateUserDataInCache= async ({ _id, username, email, profile, offline_date, online_date }) => {
+  const data = JSON.stringify({ _id, username, email, avatarPath: profile.avatarPath, offline_date, online_date });
   return await client.hsetAsync(`list:users`, `${_id}`, data);
 };
 
 const _cachingUsers = async users => {
-  const callback = async ({ _id, username, email, profile }) => {
-    const data = JSON.stringify({ _id, username, email, avatarPath: profile.avatarPath });
+  const callback = async ({ _id, username, email, profile, offline_date, online_date }) => {
+    const data = JSON.stringify({ _id, username, email, avatarPath: profile.avatarPath, offline_date, online_date });
     await client.hsetAsync(`list:users`, `${_id}`, data);
   };
 
@@ -28,9 +28,9 @@ const _getMatches = (list, matchStr) => {
   const end = matchStr.length;
 
   return list.reduce((acc, user) => {
-    const { _id, username, email, avatarPath } = user;
+    const { _id, username, email, avatarPath, offline_date, online_date } = user;
     return username.slice(0, end) === matchStr
-      ? [...acc, { _id, username, email, avatarPath }]
+      ? [...acc, { _id, username, email, avatarPath, offline_date, online_date }]
       : acc;
   }, []);
 };
@@ -52,5 +52,6 @@ const getUsers = async matchStr => {
 };
 
 module.exports = {
-  getUsers
+  getUsers,
+  updateUserDataInCache
 };

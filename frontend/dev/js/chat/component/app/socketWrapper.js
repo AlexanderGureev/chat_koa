@@ -15,7 +15,9 @@ import {
   Link,
   Switch
 } from "react-router-dom";
-import ModalInvitePassword from "./ModalInvitePassword";
+import ModalPasswordCheck from "./ModalPasswordCheck";
+
+messageAntd.config({ maxCount: 1 });
 
 const socketWrapper = ComposedComponent =>
   class SocketWrapped extends Component {
@@ -25,6 +27,7 @@ const socketWrapper = ComposedComponent =>
       this.queueOperations = [];
       this.invite = {};
       this.unreadMessageTime = 5000;
+      this.onClickModalRedefined = () => {};
     }
     state = {
       users: [],
@@ -33,23 +36,47 @@ const socketWrapper = ComposedComponent =>
       isLoading: false,
       isLoaded: false,
       errors: [],
-      roomListIsChange: false,
+      cache: {
+        needsUpdating: false,
+      },
       checkedInvitentions: {},
-      visibleModal: false,
-      confirmLoadingModal: false,
+      modal: {
+        visible: false,
+        roomName: "",
+        confirmLoading: false
+      },
       queueTypingText: []
     };
 
     componentDidMount() {
       this.socketEvents();
     }
+
     checkQueue = () => {
       if (this.queueOperations.length) {
         const operation = this.queueOperations.shift();
         operation();
       }
     };
+
+    createNotification = (type, message) => {
+      switch (type) {
+        case "warning":
+          messageAntd.warning(message);
+          break;
+        case "success":
+          messageAntd.success(message);
+          break;
+        case "error":
+          messageAntd.error(message);
+          break;
+        default:
+          messageAntd.info(message);
+          break;
+      }
+    };
     getDescriptionNotification = () => {
+      const key = "updatable";
       const { rooms, active_room } = this.state.user;
       const { name, unread_messages = 0, leave_date = "" } = rooms.find(
         ({ _id }) => _id === active_room
@@ -84,12 +111,13 @@ const socketWrapper = ComposedComponent =>
       );
 
       return {
+        key,
         message: `Вы зашли в канал: ${name}.`,
         description
       };
     };
-    openNotification = () =>
-      notification.open(this.getDescriptionNotification());
+    openNotification = () => notification.open(this.getDescriptionNotification());
+
     markAsRead = () => {
       const { rooms, active_room } = this.state.user;
       const updatedRooms = rooms.map(room => {
@@ -177,7 +205,9 @@ const socketWrapper = ComposedComponent =>
           });
         }
       });
-      this.socket.on("typing", queueTypingText => this.setState({ queueTypingText }));
+      this.socket.on("typing", queueTypingText =>
+        this.setState({ queueTypingText })
+      );
     };
 
     sendMessage = message => {
@@ -188,8 +218,10 @@ const socketWrapper = ComposedComponent =>
     getMessages = async (user, start = -20, end = -1) => {
       try {
         const { active_room, rooms } = user;
-        const { unread_messages } = rooms.find(({ _id }) => _id === active_room);
-        if(unread_messages > 15) {
+        const { unread_messages } = rooms.find(
+          ({ _id }) => _id === active_room
+        );
+        if (unread_messages > 15) {
           start = -(unread_messages + 20);
         }
         return await getMessages(active_room, start, end);
@@ -218,7 +250,7 @@ const socketWrapper = ComposedComponent =>
         this.socket.emit("update_rooms_list", newRoom);
 
         this.setState({
-          roomListIsChange: true,
+          cache: { needsUpdating: true },
           user: {
             ...this.state.user,
             rooms: [...this.state.user.rooms, { ...newRoom }]
@@ -241,17 +273,46 @@ const socketWrapper = ComposedComponent =>
       }
     };
 
-    changeRoomListProcessed = () => {
-      this.setState({ roomListIsChange: false });
+    cacheUpdateProcessed = () => {
+      this.setState({ cache: { needsUpdating: false } });
     };
 
-    changeRoom = id => {
+    changeRoom = (id, name, isPublic) => {
       const { active_room, rooms } = this.state.user;
-      if(this.state.queueTypingText.length) {
+      const room = rooms.find(({ _id }) => _id === id);
+
+      if (this.state.queueTypingText.length) {
         this.clearTypingIndicator();
       }
+
+      if (!room) {
+        const newRoom = { _id: id, name };
+        const callback = () =>
+          this.createNotification("success", `Канал ${name} успешно добавлен.`);
+
+        if (isPublic) {
+          this.socket.emit("change_room", { id, rooms }, newRoom);
+          return callback();
+        }
+
+        this.onClickModalRedefined = this.onClickModal(
+          id,
+          "change_room",
+          callback,
+          { id, rooms },
+          newRoom
+        );
+        this.showModal(name);
+        return;
+      }
+
       if (id !== active_room) {
         this.socket.emit("change_room", { id, rooms });
+      } else {
+        this.createNotification(
+          "success",
+          `Вы уже находитесь в комнате ${room.name}.`
+        );
       }
     };
 
@@ -267,33 +328,43 @@ const socketWrapper = ComposedComponent =>
         }
       });
     };
-    showModal = () => {
+
+    showModal = (roomName, timeOut = 0) => {
       setTimeout(() => {
         this.setState({
-          visibleModal: true
+          modal: {
+            visible: true,
+            roomName
+          }
         });
-      }, 2000);
+      }, timeOut);
     };
-    handleCancel = () => {
-      this.setState({
-        visibleModal: false
-      });
-    };
-    handleCreate = () => {
+    handleCancel = () => this.setState({ modal: { ...this.state.modal, visible: false } });
+
+    onClickModal = (roomId, eventName, callback = () => {}, ...args) => () => {
+      const { modal } = this.state;
       const form = this.formRef.props.form;
       form.validateFields(async (err, values) => {
         if (err) {
+          console.log(err);
           return;
         }
-        this.setState({ confirmLoadingModal: true });
+        this.setState({ modal: { ...modal, confirmLoading: true } });
         try {
-          await checkRoomPassword({ ...values, room_id: this.invite.room_id });
-          form.resetFields();
-          this.setState({ visibleModal: false, confirmLoadingModal: false });
-          this.socket.emit("call_invitation", this.invite.invitation_id);
+          await checkRoomPassword({ ...values, room_id: roomId });
+          this.setState(
+            { modal: { ...modal, visible: false, confirmLoading: false } },
+            form.resetFields
+          );
+          this.socket.emit(eventName, ...args);
+          callback();
         } catch (err) {
-          messageAntd.error(err.message);
-          this.setState({ confirmLoadingModal: false });
+          console.log(err);
+          this.createNotification("error", err.message);
+          this.setState(
+            { modal: { ...modal, visible: true, confirmLoading: false } },
+            form.resetFields
+          );
         }
       });
     };
@@ -320,33 +391,40 @@ const socketWrapper = ComposedComponent =>
         );
 
         if (isAdded) {
-          return messageAntd.warning(
-            `Канал ${this.invite.room_name} уже добавлен.`
+          return this.createNotification(
+            "warning",
+            `Комната ${this.invite.room_name} уже добавлена.`
           );
         }
 
         if (!this.invite.room_public) {
-          return this.showModal();
+          this.onClickModalRedefined = this.onClickModal(
+            this.invite.room_id,
+            "call_invitation",
+            this.invite.invitation_id
+          );
+          return this.showModal(this.invite.room_name, 2000);
         }
+
         return this.socket.emit("call_invitation", this.invite.invitation_id);
       } catch (error) {
         console.log(error);
-        messageAntd.error(`Данное приглашение недействительно.`);
+        this.createNotification("error", `Данное приглашение недействительно.`);
       }
     };
 
     render() {
-      const { visibleModal, confirmLoadingModal } = this.state;
+      const { visible, roomName, confirmLoading } = this.state.modal;
       return (
         <Router>
           <Fragment>
-            <ModalInvitePassword
+            <ModalPasswordCheck
               wrappedComponentRef={this.saveFormRef}
-              invite={this.invite}
-              visible={visibleModal}
-              confirmLoading={confirmLoadingModal}
+              roomName={roomName}
+              visible={visible}
+              confirmLoading={confirmLoading}
               handleCancel={this.handleCancel}
-              onCreate={this.handleCreate}
+              onClick={this.onClickModalRedefined}
             />
             <Route
               path="/chat/:id?"
@@ -369,7 +447,7 @@ const socketWrapper = ComposedComponent =>
                     changeRoom={this.changeRoom}
                     sendMessage={this.sendMessage}
                     getMessages={this.getMessages}
-                    changeRoomListProcessed={this.changeRoomListProcessed}
+                    cacheUpdateProcessed={this.cacheUpdateProcessed}
                     handlerInvite={this.handlerInvite}
                     addInviteToChecked={this.addInviteToChecked}
                     setTypingIndicator={this.setTypingIndicator}

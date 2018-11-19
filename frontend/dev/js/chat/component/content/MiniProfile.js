@@ -23,19 +23,20 @@ const StyledPaper = withStyles({
 })(Paper);
 
 class MiniProfile extends Component {
-  onlineStatusTemplate = () => {
-    const { offline_date, online_date } = this.props.user;
-    const offlineDate = new Date(offline_date).getTime();
-    const onlineDate = new Date(online_date).getTime();
-    const isOnline = offlineDate < onlineDate;
+  // onlineStatusTemplate = () => {
+  //   const { offline_date, online_date } = this.props.user;
+  //   const offlineDate = new Date(offline_date).getTime();
+  //   const onlineDate = new Date(online_date).getTime();
+  //   const isOnline = offlineDate < onlineDate;
 
-    return (
-      <div className="wrap-online-date">
-      {!isOnline ? <span>Был в сети </span> : <Badge status="success" />  }
-      {!isOnline ? <FormattedDate>{offlineDate}</FormattedDate> : <span> В сети</span>}
-    </div>
-    )
-  }
+  //   return (
+  //     <div className="wrap-online-date">
+  //     {!isOnline ? <span>Был в сети </span> : <Badge status="success" />  }
+  //     {!isOnline ? <FormattedDate>{offlineDate}</FormattedDate> : <span> В сети</span>}
+  //   </div>
+  //   )
+  // }
+
   render() {
     const {
       isOpen,
@@ -75,7 +76,7 @@ class MiniProfile extends Component {
                     <div className="header">
                       <img src={profile.avatarPath} alt="avatar" />
                       <strong>{username}</strong>
-                      { this.onlineStatusTemplate() }
+                      {/* { this.onlineStatusTemplate() } */}
                     </div>
                     <div className="content">
                       <ul>

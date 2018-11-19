@@ -7,10 +7,10 @@ const ModalInvitePassword = Form.create()(
   class extends React.Component {
     render() {
       const {
-        invite,
+        roomName,
         visible,
         handleCancel,
-        onCreate,
+        onClick,
         confirmLoading,
         form
       } = this.props;
@@ -18,9 +18,9 @@ const ModalInvitePassword = Form.create()(
 
       return (
         <Modal
-          title={`Комната: ${invite.room_name}`}
+          title={`Комната: ${roomName}`}
           visible={visible}
-          onOk={onCreate}
+          onOk={onClick}
           confirmLoading={confirmLoading}
           onCancel={handleCancel}
           width={400}

@@ -22,8 +22,9 @@ const App = props => {
       <Preloader/>
       <div className="overflow-container">
         <Header
-          roomListIsChange={props.roomListIsChange}
-          changeRoomListProcessed={props.changeRoomListProcessed}
+          cacheUpdateProcessed={props.cacheUpdateProcessed}
+          cache={props.cache}
+          changeRoom={props.changeRoom}
         />
         {props.isLoaded && <LeftBar rooms={rooms} {...props} />}
         <Content {...props} />

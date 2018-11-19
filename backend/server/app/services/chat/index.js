@@ -16,6 +16,7 @@ const sub = redis.createClient(REDIS_URI),
 const socketManager = require("./socket-connections")();
 const { Rooms, validateRooms } = require("../../model/rooms");
 const Invitation = require("../../model/invitations");
+const { updateUserDataInCache } = require("../chat/getUsers");
 
 const prefix = "koa:sess:";
 bluebird.promisifyAll(redis);
@@ -180,6 +181,17 @@ const getOrCreateGeneralRoom = async () => {
     process.exit(0);
   }
 };
+const updateRoomDates = (rooms, newRoomId, activeRoom) =>
+  rooms.map(room => {
+    if (`${room._id}` === `${activeRoom}`) {
+      room.leave_date = Date.now();
+    }
+    if (`${room._id}` === `${newRoomId}`) {
+      room.join_date = Date.now();
+    }
+    return room;
+  });
+
 const getUser = async ({ cookie }) => {
   try {
     const sid = cookies.parse(cookie)["chater:session"];
@@ -247,7 +259,7 @@ const socketMiddleware = io => {
     } catch (error) {
       console.log(error);
     }
-
+    updateUserDataInCache(user);
     await next();
   });
 };
@@ -280,7 +292,7 @@ const saveUserData = async ({ user }) => {
       }
       return room;
     });
-    await user.save();
+    await Promise.all([user.save(), updateUserDataInCache(user)]);
   } catch (error) {
     console.log(error);
     throw error;
@@ -314,7 +326,8 @@ const handlerNewMessage = socket => message => {
   saveToMongo(active_room, JSON.stringify(newMessage));
 };
 const handlerDisconnect = socket => reason => {
-  const { active_room } = socket.user;
+  const { active_room, _id, username } = socket.user;
+
   socket.broadcast.to(active_room).emit("user_disconnect", {
     users: socketManager.deleteConnection(socket),
     room_id: active_room
@@ -337,19 +350,13 @@ const handlerDeleteRoom = socket => ({ id, rooms }) => {
   const { _id } = socket.user.rooms[0];
   handlerChangeRoom(socket)({ id: _id, rooms: socket.user.rooms });
 };
-const handlerChangeRoom = socket => ({ id, rooms }) => {
-  const { active_room } = socket.user;
+const handlerChangeRoom = socket => ({ id, rooms }, newRoom) => {
   socket.emit("disconnect");
+  socket.user.rooms = updateRoomDates(rooms, id, socket.user.active_room);
 
-  socket.user.rooms = rooms.map(room => {
-    if (`${room._id}` === `${active_room}`) {
-      room.leave_date = Date.now();
-    }
-    if (`${room._id}` === `${id}`) {
-      room.join_date = Date.now();
-    }
-    return room;
-  });
+  if(newRoom) {
+    handlerUpdateRooms(socket)(newRoom);
+  }
 
   socket.user.active_room = id;
   socket.join(id);

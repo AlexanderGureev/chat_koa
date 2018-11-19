@@ -141,6 +141,7 @@ class SocketConnection {
     }
     return [];
   }
+
 }
 
 let instance;
