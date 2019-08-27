@@ -9,7 +9,7 @@ https://chater-koa.herokuapp.com
 
 ## Desktop and mobile version
 
-<img src="https://chater-koa.herokuapp.com/img/desktop.png" width="550px" hspace="20"/><img src="https://chater-koa.herokuapp.com/img/modile.jpeg" width="296px"/>
+<img src="https://chater-koa.herokuapp.com/img/desktop.png" width="530px" hspace="20"/><img src="https://chater-koa.herokuapp.com/img/modile.jpeg" width="296px"/>
 
 ### Requires
 
